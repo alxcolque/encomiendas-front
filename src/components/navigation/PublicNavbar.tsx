@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Package } from "lucide-react";
+import { Menu, X, User, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import kolmoxLogo from "@/assets/kolmox-logo.png"; // Ensure this asset exists or use fallback
+import kolmoxLogo from "@/assets/kolmox-logo.png";
 
 export default function PublicNavbar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -36,10 +36,7 @@ export default function PublicNavbar() {
     return (
         <nav
             className={cn(
-                "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-                scrolled
-                    ? "bg-background/80 backdrop-blur-md border-b border-border shadow-sm py-2"
-                    : "bg-transparent py-4"
+                "fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white shadow-sm border-b border-gray-100",
             )}
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -91,18 +88,23 @@ export default function PublicNavbar() {
                             </Link>
                         </div>
 
-                        {/* Mobile Menu Button */}
-                        <button
-                            className="md:hidden p-2 rounded-lg text-foreground hover:bg-muted transition-colors"
-                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                            aria-label="Toggle menu"
-                        >
-                            {mobileMenuOpen ? (
-                                <X className="w-6 h-6" />
-                            ) : (
-                                <Menu className="w-6 h-6" />
-                            )}
-                        </button>
+                        {/* Mobile Controls */}
+                        <div className="flex md:hidden items-center gap-3">
+                            <Link to="/login" className="p-2 text-orange-600 hover:bg-orange-50 rounded-full transition-colors">
+                                <User className="w-6 h-6" />
+                            </Link>
+                            <button
+                                className="p-2 text-orange-600 hover:bg-orange-50 rounded-full transition-colors"
+                                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                                aria-label="Toggle menu"
+                            >
+                                {mobileMenuOpen ? (
+                                    <X className="w-8 h-8" />
+                                ) : (
+                                    <Menu className="w-8 h-8" />
+                                )}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -110,8 +112,8 @@ export default function PublicNavbar() {
             {/* Mobile Navigation Menu */}
             <div
                 className={cn(
-                    "md:hidden fixed inset-x-0 top-[60px] bg-background/95 backdrop-blur-xl border-b border-border transition-all duration-300 ease-in-out overflow-hidden",
-                    mobileMenuOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+                    "md:hidden fixed inset-x-0 top-[64px] bg-background/95 backdrop-blur-xl border-b border-border transition-all duration-300 ease-in-out overflow-hidden",
+                    mobileMenuOpen ? "max-h-[500px] opacity-100 shadow-xl" : "max-h-0 opacity-0"
                 )}
             >
                 <div className="px-4 py-6 space-y-2">

@@ -88,8 +88,8 @@ export default function PublicFooter() {
                         </div>
                     </div>
 
-                    {/* Links Sections */}
-                    <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-8">
+                    {/* Links Sections - Desktop Only */}
+                    <div className="hidden lg:grid lg:col-span-8 grid-cols-1 sm:grid-cols-3 gap-8">
                         <div>
                             <h3 className="font-semibold text-foreground mb-6">Servicios</h3>
                             <ul className="space-y-4">
@@ -136,6 +136,32 @@ export default function PublicFooter() {
                                     </li>
                                 ))}
                             </ul>
+                        </div>
+                    </div>
+
+                    {/* Mobile Siguenos Section (Matches Design) */}
+                    <div className="lg:hidden col-span-1 flex flex-col items-center gap-4 text-center">
+                        <h3 className="text-lg font-bold text-orange-600">Síguenos</h3>
+                        <div className="flex gap-4">
+                            {socialLinks.map((social) => (
+                                <a
+                                    key={social.label}
+                                    href={social.href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 hover:bg-orange-600 hover:text-white transition-all duration-300"
+                                    aria-label={social.label}
+                                >
+                                    <social.icon className="w-5 h-5" />
+                                </a>
+                            ))}
+                        </div>
+                        <div className="flex gap-4 pt-2 text-[10px] text-gray-400">
+                            <span>Facebook</span>
+                            <span>Twitter</span>
+                            <span>TikTok</span>
+                            <span>YouTube</span>
+                            <span>Instagram</span>
                         </div>
                     </div>
                 </div>
