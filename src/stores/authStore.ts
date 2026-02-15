@@ -1,21 +1,5 @@
 import { create } from 'zustand';
-
-export type UserRole = 'admin' | 'worker' | 'driver' | 'client';
-
-interface User {
-  id: string;
-  name: string;
-  phone: string;
-  avatar: string;
-  role: UserRole;
-}
-
-interface AuthState {
-  user: User | null;
-  isAuthenticated: boolean;
-  login: (phone: string, role: UserRole) => void;
-  logout: () => void;
-}
+import { User, UserRole, AuthState } from '@/interfaces/auth.interface';
 
 const mockUsers: Record<UserRole, User> = {
   admin: {

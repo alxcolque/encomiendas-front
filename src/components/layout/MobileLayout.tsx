@@ -1,29 +1,29 @@
 import { ReactNode } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Outlet } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Home, Trophy, Wallet, Package, User } from "lucide-react";
 import { TopNavbar } from "./TopNavbar";
+import { LucideIcon } from "lucide-react";
+
+export interface NavItem {
+  icon: LucideIcon;
+  label: string;
+  path: string;
+}
 
 interface MobileLayoutProps {
-  children: ReactNode;
+  children?: ReactNode;
+  navItems?: NavItem[];
   title?: string;
   showNav?: boolean;
   showHeader?: boolean;
 }
 
-const navItems = [
-  { icon: Home, label: "Inicio", path: "/driver" },
-  { icon: Package, label: "Activo", path: "/driver/active" },
-  { icon: Trophy, label: "Ranking", path: "/ranking" },
-  { icon: Wallet, label: "Billetera", path: "/wallet" },
-  { icon: User, label: "Perfil", path: "/profile" },
-];
-
-export function MobileLayout({ 
-  children, 
-  title, 
-  showNav = true, 
-  showHeader = true 
+export function MobileLayout({
+  children,
+  navItems = [],
+  title,
+  showNav = true,
+  showHeader = true
 }: MobileLayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -36,20 +36,24 @@ export function MobileLayout({
       {/* Main content */}
       <main className={cn(
         "flex-1 overflow-auto",
-        showNav && "pb-20"
+        showNav && navItems.length > 0 && "pb-20"
       )}>
         <div className="max-w-lg mx-auto">
-          {children}
+          {children ? children : <Outlet />}
         </div>
       </main>
 
       {/* Bottom navigation */}
-      {showNav && (
+      {showNav && navItems.length > 0 && (
         <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-xl border-t border-border">
           <div className="flex justify-around items-center max-w-lg mx-auto py-2">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = location.pathname === item.path;
+              const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + "/");
+
+              // Exact match for root paths to prevent "Home" being active on subpages if not desired
+              // But strictly speaking, startsWith is usually better for sections.
+              // Let's stick to simple logic for now.
 
               return (
                 <button

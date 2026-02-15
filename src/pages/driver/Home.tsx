@@ -1,4 +1,4 @@
-import { MobileLayout } from "@/components/layout/MobileLayout";
+
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/button";
 import { DeliveryTypeBadge } from "@/components/ui/DeliveryTypeBadge";
@@ -66,9 +66,9 @@ function ChallengeCard({ challenge }: { challenge: Challenge }) {
       </div>
 
       {/* Action */}
-      <Button 
-        onClick={handleAccept} 
-        variant="hero" 
+      <Button
+        onClick={handleAccept}
+        variant="hero"
         className="w-full gap-2"
       >
         Aceptar Desafío
@@ -82,49 +82,49 @@ export default function DriverHomePage() {
   const { availableChallenges, activeChallenge } = useChallengeStore();
 
   return (
-    <MobileLayout title="Desafíos">
-      <div className="p-4 space-y-4">
-        {/* Active challenge banner */}
-        {activeChallenge && (
-          <GlassCard glow className="bg-primary/10 border-primary">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-primary font-semibold uppercase tracking-wide">
-                  Entrega activa
-                </p>
-                <p className="font-medium mt-1">{activeChallenge.destination}</p>
-              </div>
-              <Button size="sm" onClick={() => window.location.href = "/driver/active"}>
-                Ver
-              </Button>
+
+    <div className="p-4 space-y-4">
+      {/* Active challenge banner */}
+      {activeChallenge && (
+        <GlassCard glow className="bg-primary/10 border-primary">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs text-primary font-semibold uppercase tracking-wide">
+                Entrega activa
+              </p>
+              <p className="font-medium mt-1">{activeChallenge.destination}</p>
             </div>
-          </GlassCard>
-        )}
+            <Button size="sm" onClick={() => window.location.href = "/driver/active"}>
+              Ver
+            </Button>
+          </div>
+        </GlassCard>
+      )}
 
-        {/* Stats summary */}
-        <div className="grid grid-cols-3 gap-3">
-          <GlassCard className="text-center py-3">
-            <p className="text-2xl font-bold text-primary">{availableChallenges.length}</p>
-            <p className="text-xs text-muted-foreground">Disponibles</p>
-          </GlassCard>
-          <GlassCard className="text-center py-3">
-            <p className="text-2xl font-bold text-gold">485 Bs</p>
-            <p className="text-xs text-muted-foreground">Hoy</p>
-          </GlassCard>
-          <GlassCard className="text-center py-3">
-            <p className="text-2xl font-bold text-success">12</p>
-            <p className="text-xs text-muted-foreground">Completadas</p>
-          </GlassCard>
-        </div>
-
-        {/* Challenge list */}
-        <div className="space-y-4">
-          <h2 className="font-display font-bold text-lg">Desafíos Disponibles</h2>
-          {availableChallenges.map((challenge) => (
-            <ChallengeCard key={challenge.id} challenge={challenge} />
-          ))}
-        </div>
+      {/* Stats summary */}
+      <div className="grid grid-cols-3 gap-3">
+        <GlassCard className="text-center py-3">
+          <p className="text-2xl font-bold text-primary">{availableChallenges.length}</p>
+          <p className="text-xs text-muted-foreground">Disponibles</p>
+        </GlassCard>
+        <GlassCard className="text-center py-3">
+          <p className="text-2xl font-bold text-gold">485 Bs</p>
+          <p className="text-xs text-muted-foreground">Hoy</p>
+        </GlassCard>
+        <GlassCard className="text-center py-3">
+          <p className="text-2xl font-bold text-success">12</p>
+          <p className="text-xs text-muted-foreground">Completadas</p>
+        </GlassCard>
       </div>
-    </MobileLayout>
+
+      {/* Challenge list */}
+      <div className="space-y-4">
+        <h2 className="font-display font-bold text-lg">Desafíos Disponibles</h2>
+        {availableChallenges.map((challenge) => (
+          <ChallengeCard key={challenge.id} challenge={challenge} />
+        ))}
+      </div>
+    </div>
+
   );
 }
