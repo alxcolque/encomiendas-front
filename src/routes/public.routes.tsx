@@ -1,0 +1,12 @@
+import { Route } from "react-router-dom";
+import LandingPage from "@/pages/LandingPage";
+import LoginPage from "@/pages/LoginPage";
+import TrackingPage from "@/pages/TrackingPage";
+
+export const PublicRoutes = (
+    <>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/tracking" element={<TrackingPage />} />
+    </>
+);
