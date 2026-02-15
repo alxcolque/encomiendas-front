@@ -14,6 +14,15 @@ import UserLayout from "@/layouts/UserLayout";
 const LandingPage = lazy(() => import("@/pages/public/LandingPage"));
 const LoginPage = lazy(() => import("@/pages/public/LoginPage"));
 const TrackingPage = lazy(() => import("@/pages/public/TrackingPage"));
+const AboutPage = lazy(() => import("@/pages/public/AboutPage"));
+const ServicesPage = lazy(() => import("@/pages/public/ServicesPage"));
+const OfficesPage = lazy(() => import("@/pages/public/OfficesPage"));
+const ContactPage = lazy(() => import("@/pages/public/ContactPage"));
+const FaqPage = lazy(() => import("@/pages/public/FaqPage"));
+const TermsPage = lazy(() => import("@/pages/public/TermsPage"));
+const PrivacyPage = lazy(() => import("@/pages/public/PrivacyPage"));
+const RefundPolicyPage = lazy(() => import("@/pages/public/RefundPolicyPage"));
+const ClaimsPage = lazy(() => import("@/pages/public/ClaimsPage"));
 
 // Driver
 const DriverHome = lazy(() => import("@/pages/driver/Home"));
@@ -43,6 +52,19 @@ export const AppRouter = () => {
                     <Route path="/" element={<LandingPage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/tracking" element={<TrackingPage />} />
+
+                    {/* Informational */}
+                    <Route path="/about" element={<AboutPage />} />
+                    <Route path="/services" element={<ServicesPage />} />
+                    <Route path="/offices" element={<OfficesPage />} />
+                    <Route path="/contact" element={<ContactPage />} />
+                    <Route path="/faq" element={<FaqPage />} />
+
+                    {/* Legal */}
+                    <Route path="/terms" element={<TermsPage />} />
+                    <Route path="/privacy" element={<PrivacyPage />} />
+                    <Route path="/refunds" element={<RefundPolicyPage />} />
+                    <Route path="/claims" element={<ClaimsPage />} />
                 </Route>
 
                 {/* Driver Routes */}
