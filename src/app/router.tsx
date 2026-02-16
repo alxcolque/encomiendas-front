@@ -1,6 +1,6 @@
 import { Suspense, lazy } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { ProtectedRoute } from "@/components/guards/ProtectedRoute";
+import { ProtectedRoute } from "@/routes/ProtectedRoute";
 
 // Layouts
 import PublicLayout from "@/layouts/PublicLayout";
@@ -32,14 +32,12 @@ const Wallet = lazy(() => import("@/pages/driver/Wallet"));
 
 // Admin
 const AdminDashboard = lazy(() => import("@/pages/admin/Dashboard"));
-
-// Shared/User (using placeholder or reused components for now)
-const UserProfile = lazy(() => import("@/pages/driver/Wallet")); // Reusing Wallet as Profile placeholder per original App.tsx
-// Note: In original App.tsx, /profile -> WalletPage. 
-// I should probably check if I should create UserProfile or just reuse.
-// User request said `pages/user/Profile.tsx`. I should check if I created it.
-// I did NOT create `pages/user/Profile.tsx` yet. I moved `WalletPage` to `driver/Wallet`.
-// I will create a placeholder for pages I missed during the move or that didn't exist.
+const AdminShipments = lazy(() => import("@/pages/admin/Shipments"));
+const AdminUsers = lazy(() => import("@/pages/admin/Users"));
+const AdminDrivers = lazy(() => import("@/pages/admin/Drivers"));
+const AdminOffices = lazy(() => import("@/pages/admin/Offices"));
+const AdminReports = lazy(() => import("@/pages/admin/Reports"));
+const AdminSettings = lazy(() => import("@/pages/admin/Settings"));
 
 const Loading = () => <div className="p-4 text-center">Cargando...</div>;
 
@@ -78,7 +76,12 @@ export const AppRouter = () => {
                 {/* Admin Routes */}
                 <Route element={<ProtectedRoute allowedRoles={['admin']}><AdminLayout /></ProtectedRoute>}>
                     <Route path="/admin" element={<AdminDashboard />} />
-                    {/* Add more admin routes here */}
+                    <Route path="/admin/shipments" element={<AdminShipments />} />
+                    <Route path="/admin/users" element={<AdminUsers />} />
+                    <Route path="/admin/drivers" element={<AdminDrivers />} />
+                    <Route path="/admin/offices" element={<AdminOffices />} />
+                    <Route path="/admin/reports" element={<AdminReports />} />
+                    <Route path="/admin/settings" element={<AdminSettings />} />
                 </Route>
 
                 {/* Worker Routes */}

@@ -1,249 +1,106 @@
-import { useState } from "react";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+import { Package, Truck, CheckCircle2, TrendingUp, Users, Building2, Plus, FileText } from "lucide-react";
 
-import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useChallengeStore, DeliveryType, Challenge } from "@/stores/challengeStore";
-import {
-  Plus, Package, Users, TrendingUp, MapPin, Zap, Moon, Layers,
-  BarChart3, Trophy, Truck
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-
-const deliveryTypes: { type: DeliveryType; label: string; icon: typeof Zap }[] = [
-  { type: "normal", label: "Normal", icon: Package },
-  { type: "express", label: "Express", icon: Zap },
-  { type: "night", label: "Nocturno", icon: Moon },
-  { type: "combo", label: "Combo", icon: Layers },
-];
-
-const mockOffices = [
-  "Oficina Central - La Paz",
-  "El Alto - Villa Adela",
-  "Miraflores",
-  "San Miguel",
-  "Sopocachi",
-  "Santa Cruz - Centro",
-  "Cochabamba - Norte",
-];
+import { AdminSectionHeader } from "@/components/admin/shared/AdminSectionHeader";
+import { StatsCards } from "@/components/admin/dashboard/StatsCards";
+import { ShipmentsChart } from "@/components/admin/dashboard/ShipmentsChart";
+import { RevenueChart } from "@/components/admin/dashboard/RevenueChart";
+import { StatusChart } from "@/components/admin/dashboard/StatusChart";
+import { RecentShipmentsTable } from "@/components/admin/dashboard/RecentShipmentsTable";
+import { ActiveDriversList } from "@/components/admin/dashboard/ActiveDriversList";
+import { OfficePerformanceList } from "@/components/admin/dashboard/OfficePerformance";
 
 export default function AdminDashboard() {
-  const { availableChallenges, addChallenge } = useChallengeStore();
-  const [showForm, setShowForm] = useState(false);
-  const [newChallenge, setNewChallenge] = useState({
-    type: "normal" as DeliveryType,
-    origin: "",
-    destination: "",
-    reward: 30,
-    points: 100,
-    packages: 1,
-  });
+  // Mock Data for KPI cards
+  const kpiStats = [
+    { label: "Total Encomiendas (Mes)", value: "1,245", change: 12.5, trend: "up" as const, icon: Package },
+    { label: "En Tránsito", value: "85", change: 5.2, trend: "up" as const, icon: Truck },
+    { label: "Entregadas", value: "1,120", change: 8.1, trend: "up" as const, icon: CheckCircle2 },
+    { label: "Ingresos (Mes)", value: "Bs 145.2k", change: 15.3, trend: "up" as const, icon: TrendingUp },
+  ];
 
-  const handleCreateChallenge = () => {
-    const challenge: Challenge = {
-      id: `ch-${Date.now()}`,
-      type: newChallenge.type,
-      origin: newChallenge.origin || mockOffices[0],
-      destination: newChallenge.destination || mockOffices[1],
-      reward: newChallenge.reward,
-      points: newChallenge.points,
-      distance: `${Math.floor(Math.random() * 20) + 5} km`,
-      zone: "Multi-zona",
-      urgency: newChallenge.type === "express" ? "high" : "medium",
-      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
-      status: "available",
-      packages: newChallenge.packages,
-    };
-    addChallenge(challenge);
-    setShowForm(false);
-    setNewChallenge({
-      type: "normal",
-      origin: "",
-      destination: "",
-      reward: 30,
-      points: 100,
-      packages: 1,
-    });
-  };
+  const currentDate = format(new Date(), "d 'de' MMMM, yyyy", { locale: es });
 
   return (
+    <div className="space-y-6 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
-    <div className="p-4 space-y-6">
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 gap-3">
-        <GlassCard className="space-y-1">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Package size={16} />
-            <span className="text-xs">Entregas Activas</span>
-          </div>
-          <p className="text-2xl font-bold">{availableChallenges.length}</p>
-        </GlassCard>
-        <GlassCard className="space-y-1">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Truck size={16} />
-            <span className="text-xs">Conductores</span>
-          </div>
-          <p className="text-2xl font-bold text-primary">24</p>
-        </GlassCard>
-        <GlassCard className="space-y-1">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <TrendingUp size={16} />
-            <span className="text-xs">Completadas Hoy</span>
-          </div>
-          <p className="text-2xl font-bold text-success">156</p>
-        </GlassCard>
-        <GlassCard className="space-y-1">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <BarChart3 size={16} />
-            <span className="text-xs">Ingresos Hoy</span>
-          </div>
-          <p className="text-2xl font-bold text-gold">4,250 Bs</p>
-        </GlassCard>
+      {/* Header Section */}
+      <AdminSectionHeader
+        title="Panel Administrativo"
+        subtitle={`Resumen de operaciones - ${currentDate}`}
+        actions={
+          <>
+            <Button variant="outline" className="gap-2">
+              <FileText className="w-4 h-4" />
+              Ver Reportes
+            </Button>
+            <Button className="gap-2 shadow-lg shadow-primary/25">
+              <Plus className="w-4 h-4" />
+              Nueva Encomienda
+            </Button>
+          </>
+        }
+      />
+
+      {/* KPI Stats Grid */}
+      <StatsCards stats={kpiStats} />
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ShipmentsChart />
+        <RevenueChart />
+        <StatusChart />
       </div>
 
-      {/* Quick Actions */}
-      <GlassCard>
-        <h3 className="font-display font-bold mb-4">Acciones Rápidas</h3>
-        <div className="grid grid-cols-2 gap-3">
-          <Button
-            variant="hero"
-            onClick={() => setShowForm(!showForm)}
-            className="h-auto py-4 flex-col gap-2"
-          >
-            <Plus size={24} />
-            <span>Crear Desafío</span>
-          </Button>
-          <Button
-            variant="outline"
-            className="h-auto py-4 flex-col gap-2"
-          >
-            <Trophy size={24} />
-            <span>Ver Ranking</span>
-          </Button>
-        </div>
-      </GlassCard>
+      {/* Main Content Grid: Table & Sidebars */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
-      {/* Create Challenge Form */}
-      {showForm && (
-        <GlassCard glow className="space-y-4">
-          <h3 className="font-display font-bold">Nuevo Desafío</h3>
+        {/* Left Column: Recent Shipments & Office Performance */}
+        <div className="xl:col-span-2 space-y-6">
+          <RecentShipmentsTable />
 
-          {/* Type Selection */}
-          <div className="grid grid-cols-4 gap-2">
-            {deliveryTypes.map(({ type, label, icon: Icon }) => (
-              <button
-                key={type}
-                onClick={() => setNewChallenge({ ...newChallenge, type })}
-                className={cn(
-                  "flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all",
-                  newChallenge.type === type
-                    ? "border-primary bg-primary/10"
-                    : "border-border hover:border-primary/50"
-                )}
-              >
-                <Icon size={20} className={newChallenge.type === type ? "text-primary" : "text-muted-foreground"} />
-                <span className="text-xs font-medium">{label}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* Origin & Destination */}
-          <div className="space-y-3">
-            <div>
-              <label className="text-sm text-muted-foreground mb-1 block">Origen</label>
-              <select
-                value={newChallenge.origin}
-                onChange={(e) => setNewChallenge({ ...newChallenge, origin: e.target.value })}
-                className="w-full h-12 px-4 bg-muted/50 border border-border rounded-xl text-foreground"
-              >
-                <option value="">Seleccionar oficina</option>
-                {mockOffices.map((office) => (
-                  <option key={office} value={office}>{office}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="text-sm text-muted-foreground mb-1 block">Destino</label>
-              <select
-                value={newChallenge.destination}
-                onChange={(e) => setNewChallenge({ ...newChallenge, destination: e.target.value })}
-                className="w-full h-12 px-4 bg-muted/50 border border-border rounded-xl text-foreground"
-              >
-                <option value="">Seleccionar oficina</option>
-                {mockOffices.map((office) => (
-                  <option key={office} value={office}>{office}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Rewards */}
-          <div className="grid grid-cols-3 gap-3">
-            <div>
-              <label className="text-sm text-muted-foreground mb-1 block">Recompensa (Bs)</label>
-              <Input
-                type="number"
-                value={newChallenge.reward}
-                onChange={(e) => setNewChallenge({ ...newChallenge, reward: Number(e.target.value) })}
-                className="h-12 bg-muted/50"
-              />
-            </div>
-            <div>
-              <label className="text-sm text-muted-foreground mb-1 block">Puntos</label>
-              <Input
-                type="number"
-                value={newChallenge.points}
-                onChange={(e) => setNewChallenge({ ...newChallenge, points: Number(e.target.value) })}
-                className="h-12 bg-muted/50"
-              />
-            </div>
-            <div>
-              <label className="text-sm text-muted-foreground mb-1 block">Paquetes</label>
-              <Input
-                type="number"
-                value={newChallenge.packages}
-                onChange={(e) => setNewChallenge({ ...newChallenge, packages: Number(e.target.value) })}
-                className="h-12 bg-muted/50"
-              />
-            </div>
-          </div>
-
-          <Button onClick={handleCreateChallenge} variant="success" className="w-full">
-            Crear Desafío
-          </Button>
-        </GlassCard>
-      )}
-
-      {/* Active Challenges */}
-      <GlassCard>
-        <h3 className="font-display font-bold mb-4">Desafíos Activos</h3>
-        <div className="space-y-3">
-          {availableChallenges.slice(0, 5).map((challenge) => (
-            <div key={challenge.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-xl">
-              <div className="flex items-center gap-3">
-                <div className={cn(
-                  "p-2 rounded-lg",
-                  challenge.type === "express" ? "bg-express/20 text-express" :
-                    challenge.type === "night" ? "bg-night/20 text-night" :
-                      challenge.type === "combo" ? "bg-combo/20 text-combo" :
-                        "bg-muted text-muted-foreground"
-                )}>
-                  <Package size={16} />
-                </div>
-                <div>
-                  <p className="font-medium text-sm">{challenge.destination}</p>
-                  <p className="text-xs text-muted-foreground">{challenge.distance}</p>
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <OfficePerformanceList />
+            {/* Can add another component here or extend OfficePerformance */}
+            <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl border border-primary/20 p-6 flex flex-col justify-center items-start space-y-4">
+              <div className="p-3 bg-background rounded-full shadow-sm">
+                <TrendingUp className="w-6 h-6 text-primary" />
               </div>
-              <div className="text-right">
-                <p className="font-bold text-sm">{challenge.reward} Bs</p>
-                <p className="text-xs text-primary">+{challenge.points} pts</p>
+              <div>
+                <h3 className="text-lg font-bold font-display">Resumen del Día</h3>
+                <p className="text-muted-foreground text-sm mt-1">
+                  La eficiencia operativa ha subido un 5% respecto a ayer. Se detectaron 2 retrasos menores en la ruta Oruro-La Paz.
+                </p>
               </div>
+              <Button variant="ghost" className="p-0 h-auto font-medium text-primary hover:text-primary/80 hover:bg-transparent">
+                Ver detalles operativos →
+              </Button>
             </div>
-          ))}
+          </div>
         </div>
-      </GlassCard>
+
+        {/* Right Column: Drivers & Quick Stats */}
+        <div className="space-y-6">
+          <ActiveDriversList />
+
+          {/* Quick Stats / Secondary Metrics */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-card/50 border border-border/50 p-4 rounded-xl flex flex-col items-center justify-center text-center space-y-2">
+              <Users className="w-5 h-5 text-blue-500" />
+              <span className="text-2xl font-bold">24</span>
+              <span className="text-xs text-muted-foreground">Conductores Activos</span>
+            </div>
+            <div className="bg-card/50 border border-border/50 p-4 rounded-xl flex flex-col items-center justify-center text-center space-y-2">
+              <Building2 className="w-5 h-5 text-indigo-500" />
+              <span className="text-2xl font-bold">7</span>
+              <span className="text-xs text-muted-foreground">Oficinas Operativas</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 }
-

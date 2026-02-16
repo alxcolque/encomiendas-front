@@ -3,39 +3,43 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GlassCard } from "@/components/ui/GlassCard";
-import { useAuthStore, UserRole } from "@/stores/authStore";
-import { Truck, Package, Building, Users } from "lucide-react";
-import { cn } from "@/lib/utils";
-
-const roles: { role: UserRole; label: string; icon: typeof Truck; description: string }[] = [
-  { role: "driver", label: "Conductor", icon: Truck, description: "Acepta entregas y gana" },
-  { role: "client", label: "Cliente", icon: Package, description: "Rastrea tus envíos" },
-  { role: "worker", label: "Oficina", icon: Building, description: "Gestiona paquetes" },
-  { role: "admin", label: "Admin", icon: Users, description: "Panel de control" },
-];
+import { useAuthStore } from "@/stores/authStore";
+import { Package, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const [phone, setPhone] = useState("");
-  const [selectedRole, setSelectedRole] = useState<UserRole>("driver");
-  const { login } = useAuthStore();
+  const [pin, setPin] = useState("");
+  const { login, isLoading } = useAuthStore();
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    login(phone || "+591 70000000", selectedRole);
-    
-    switch (selectedRole) {
-      case "driver":
-        navigate("/driver");
-        break;
-      case "client":
-        navigate("/tracking");
-        break;
-      case "worker":
-        navigate("/worker");
-        break;
-      case "admin":
-        navigate("/admin");
-        break;
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!phone || !pin) {
+      toast.error("Por favor completa todos los campos");
+      return;
+    }
+
+    try {
+      // Sending strictly phone and pin as requested
+      await login({ phone, pin });
+      toast.success("Bienvenido de vuelta");
+      // Redirect is handled by the ProtectedRoute or we can explicit redirect here based on role if needed.
+      // But fetchUser saves the user, and ProtectedRoute will verify it.
+      // Usually good to redirect to a default dashboard.
+      // Let's rely on standard navigation or check role.
+      // For now, let's navigate to /admin or root and let router decide?
+      // Actually, after login, we usually want to know where to go.
+      // The store updates `user` state. We can check `useAuthStore.getState().user` or similar.
+      const user = useAuthStore.getState().user;
+      if (user) {
+        if (user.role === 'admin') navigate('/admin');
+        else if (user.role === 'driver') navigate('/driver');
+        else if (user.role === 'worker') navigate('/worker');
+        else navigate('/tracking');
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Credenciales incorrectas");
     }
   };
 
@@ -58,74 +62,69 @@ export default function LoginPage() {
               EnvíoExpress
             </h1>
             <p className="text-muted-foreground mt-1">
-              Sistema de entregas gamificado
+              Ingresa a tu cuenta
             </p>
           </div>
         </div>
 
-        {/* Role Selection */}
+        {/* Login Form */}
         <GlassCard className="space-y-4">
-          <p className="text-sm text-muted-foreground text-center">
-            Selecciona tu rol
-          </p>
-          <div className="grid grid-cols-2 gap-3">
-            {roles.map(({ role, label, icon: Icon, description }) => (
-              <button
-                key={role}
-                onClick={() => setSelectedRole(role)}
-                className={cn(
-                  "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all",
-                  selectedRole === role
-                    ? "border-primary bg-primary/10 glow-cyan"
-                    : "border-border hover:border-primary/50"
-                )}
-              >
-                <Icon 
-                  size={28} 
-                  className={selectedRole === role ? "text-primary" : "text-muted-foreground"} 
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm text-muted-foreground">
+                Número de Celular
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none text-sm">
+                  🇧🇴 +591
+                </span>
+                <Input
+                  type="tel"
+                  placeholder="70000000"
+                  value={phone}
+                  onChange={(e) => {
+                    // Allow only numbers and max 8 chars
+                    const val = e.target.value.replace(/\D/g, '').slice(0, 8);
+                    setPhone(val);
+                  }}
+                  className="h-12 bg-muted/50 border-border rounded-xl pl-20" // padding left for +591
+                  disabled={isLoading}
                 />
-                <div className="text-center">
-                  <p className={cn(
-                    "font-semibold text-sm",
-                    selectedRole === role ? "text-primary" : "text-foreground"
-                  )}>
-                    {label}
-                  </p>
-                  <p className="text-[10px] text-muted-foreground">{description}</p>
-                </div>
-              </button>
-            ))}
-          </div>
-        </GlassCard>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm text-muted-foreground">
+                PIN de Acceso
+              </label>
+              <Input
+                type="password"
+                placeholder="••••"
+                value={pin}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, '').slice(0, 4);
+                  setPin(val);
+                }}
+                className="h-12 bg-muted/50 border-border rounded-xl tracking-widest text-center"
+                disabled={isLoading}
+                maxLength={4}
+              />
+            </div>
 
-        {/* Phone Input */}
-        <GlassCard className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm text-muted-foreground">
-              Número de teléfono
-            </label>
-            <Input
-              type="tel"
-              placeholder="+591 70000000"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="h-14 text-lg bg-muted/50 border-border rounded-xl"
-            />
-          </div>
-
-          <Button 
-            onClick={handleLogin} 
-            variant="hero" 
-            size="xl" 
-            className="w-full"
-          >
-            Ingresar
-          </Button>
+            <Button
+              type="submit"
+              variant="hero"
+              size="lg"
+              className="w-full h-12 text-base"
+              disabled={isLoading || phone.length < 8 || pin.length < 4}
+            >
+              {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Ingresar"}
+            </Button>
+          </form>
         </GlassCard>
 
         {/* Footer */}
         <p className="text-center text-xs text-muted-foreground">
-          Demo UI • Sin autenticación real
+          Sistema de Gestión Interna • Privado
         </p>
       </div>
     </div>
