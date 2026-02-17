@@ -1,4 +1,7 @@
 import { create } from 'zustand';
+import { PublicService } from '@/services/public.service';
+import { IShipmentResponse, IShipmentEvent } from '@/interfaces/public.interface';
+import { toast } from 'sonner';
 
 export type ShipmentStatus = 'created' | 'in_transit' | 'at_office' | 'out_for_delivery' | 'delivered';
 
@@ -22,100 +25,48 @@ export interface Shipment {
 }
 
 interface ShipmentState {
-  shipments: Shipment[];
   currentShipment: Shipment | null;
-  trackShipment: (code: string) => Shipment | null;
-  updateShipmentStatus: (id: string, status: ShipmentStatus, location: string) => void;
+  isLoading: boolean;
+  trackShipment: (code: string) => Promise<void>;
+  resetShipment: () => void;
 }
 
-const mockShipments: Shipment[] = [
-  {
-    id: 'ship-1',
-    trackingCode: 'ENV-2025-001',
-    origin: 'La Paz',
-    destination: 'Santa Cruz',
-    currentStatus: 'in_transit',
-    estimatedDelivery: new Date(Date.now() + 24 * 60 * 60 * 1000),
-    senderName: 'Juan Pérez',
-    receiverName: 'María García',
-    events: [
-      {
-        status: 'created',
-        location: 'Oficina La Paz Centro',
-        timestamp: new Date(Date.now() - 48 * 60 * 60 * 1000),
-        description: 'Paquete recibido en oficina',
-      },
-      {
-        status: 'in_transit',
-        location: 'En camino a Santa Cruz',
-        timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000),
-        description: 'Paquete en tránsito',
-      },
-    ],
-  },
-  {
-    id: 'ship-2',
-    trackingCode: 'ENV-2025-002',
-    origin: 'Cochabamba',
-    destination: 'La Paz',
-    currentStatus: 'at_office',
-    estimatedDelivery: new Date(Date.now() + 6 * 60 * 60 * 1000),
-    senderName: 'Carlos Mendoza',
-    receiverName: 'Ana López',
-    events: [
-      {
-        status: 'created',
-        location: 'Oficina Cochabamba Norte',
-        timestamp: new Date(Date.now() - 72 * 60 * 60 * 1000),
-        description: 'Paquete recibido',
-      },
-      {
-        status: 'in_transit',
-        location: 'En ruta La Paz',
-        timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
-        description: 'Salió de Cochabamba',
-      },
-      {
-        status: 'at_office',
-        location: 'Oficina La Paz Sur',
-        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-        description: 'Llegó a oficina destino',
-      },
-    ],
-  },
-];
-
-export const useShipmentStore = create<ShipmentState>((set, get) => ({
-  shipments: mockShipments,
+export const useShipmentStore = create<ShipmentState>((set) => ({
   currentShipment: null,
-  trackShipment: (code: string) => {
-    const shipment = get().shipments.find(
-      (s) => s.trackingCode.toLowerCase() === code.toLowerCase()
-    );
-    if (shipment) {
+  isLoading: false,
+
+  trackShipment: async (code: string) => {
+    set({ isLoading: true, currentShipment: null });
+    try {
+      const data = await PublicService.trackShipment(code);
+
+      const shipment: Shipment = {
+        id: data.id.toString(),
+        trackingCode: data.tracking_code,
+        origin: data.origin_office.city,
+        destination: data.destination_office.city,
+        currentStatus: data.current_status as ShipmentStatus,
+        estimatedDelivery: new Date(data.estimated_delivery),
+        senderName: data.sender_name,
+        receiverName: data.receiver_name,
+        events: data.events.map((e) => ({
+          status: e.status as ShipmentStatus,
+          location: e.location || 'Oficina',
+          timestamp: new Date(e.timestamp),
+          description: e.description || 'Actualización de estado',
+        })),
+      };
+
       set({ currentShipment: shipment });
+    } catch (error) {
+      console.error(error);
+      toast.error('No se encontró el envío o hubo un error');
+      set({ currentShipment: null });
+    } finally {
+      set({ isLoading: false });
     }
-    return shipment || null;
   },
-  updateShipmentStatus: (id: string, status: ShipmentStatus, location: string) => {
-    set((state) => ({
-      shipments: state.shipments.map((s) =>
-        s.id === id
-          ? {
-              ...s,
-              currentStatus: status,
-              events: [
-                ...s.events,
-                {
-                  status,
-                  location,
-                  timestamp: new Date(),
-                  description: `Estado actualizado a ${status}`,
-                },
-              ],
-            }
-          : s
-      ),
-    }));
-  },
+
+  resetShipment: () => set({ currentShipment: null }),
 }));
+

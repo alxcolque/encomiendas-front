@@ -27,7 +27,7 @@ const statusLabels: Record<ShipmentStatus, string> = {
 export default function TrackingPage() {
   const [code, setCode] = useState("");
   const [searched, setSearched] = useState(false);
-  const { currentShipment, trackShipment } = useShipmentStore();
+  const { currentShipment, trackShipment, isLoading } = useShipmentStore();
 
   const handleSearch = () => {
     trackShipment(code);
@@ -35,7 +35,7 @@ export default function TrackingPage() {
   };
 
   const allStatuses: ShipmentStatus[] = ["created", "in_transit", "at_office", "out_for_delivery", "delivered"];
-  
+
   const getStatusIndex = (status: ShipmentStatus) => allStatuses.indexOf(status);
 
   return (
@@ -68,8 +68,21 @@ export default function TrackingPage() {
             />
             <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
           </div>
-          <Button onClick={handleSearch} variant="hero" size="lg" className="w-full">
-            Buscar
+          <Button
+            onClick={handleSearch}
+            variant="hero"
+            size="lg"
+            className="w-full"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                Buscando...
+              </div>
+            ) : (
+              "Buscar"
+            )}
           </Button>
         </GlassCard>
 
@@ -99,11 +112,10 @@ export default function TrackingPage() {
                   <p className="text-xs text-muted-foreground">Código</p>
                   <p className="font-mono font-bold text-lg">{currentShipment.trackingCode}</p>
                 </div>
-                <div className={`status-chip ${
-                  currentShipment.currentStatus === 'delivered' 
-                    ? 'bg-success/20 text-success' 
-                    : 'bg-primary/20 text-primary'
-                }`}>
+                <div className={`status-chip ${currentShipment.currentStatus === 'delivered'
+                  ? 'bg-success/20 text-success'
+                  : 'bg-primary/20 text-primary'
+                  }`}>
                   {statusLabels[currentShipment.currentStatus]}
                 </div>
               </div>
@@ -155,13 +167,13 @@ export default function TrackingPage() {
                 items={allStatuses.map((status, index) => {
                   const currentIndex = getStatusIndex(currentShipment.currentStatus);
                   const event = currentShipment.events.find(e => e.status === status);
-                  
+
                   return {
                     label: statusLabels[status],
                     icon: statusIcons[status],
                     completed: index <= currentIndex,
                     active: index === currentIndex,
-                    timestamp: event 
+                    timestamp: event
                       ? format(event.timestamp, "d MMM, HH:mm", { locale: es })
                       : undefined,
                   };

@@ -1,88 +1,174 @@
-import { create } from 'zustand';
-import { User, AuthState, LoginCredentials } from '@/interfaces/auth.interface';
+import { create, StateCreator } from "zustand"
+import { ENV } from "../config/env";
+import { ILoginResponse, IUser } from "../interfaces"; // Import from index
+import { toast } from "sonner";
+import { isAxiosError } from "axios";
+import { persist } from "zustand/middleware";
 
-// MOCK DATA
-const MOCK_USERS: Record<string, User> = {
-  '70000000': {
-    id: '1', name: 'Admin User', email: 'admin@kolmox.com', phone: '70000000', role: 'admin', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin'
-  },
-  '70000001': {
-    id: '2', name: 'Worker User', email: 'worker@kolmox.com', phone: '70000001', role: 'worker', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=worker'
-  },
-  '70000002': {
-    id: '3', name: 'Driver User', email: 'driver@kolmox.com', phone: '70000002', role: 'driver', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=driver'
-  },
-  '70000003': {
-    id: '4', name: 'Client User', email: 'client@kolmox.com', phone: '70000003', role: 'client', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=client'
-  },
-};
+interface AuthState {
+  user: undefined | IUser | any,
+  token: undefined | string,
+  authStatus: "pending" | "auth" | "not-auth",
+  isLoading: boolean;
+}
 
-const MOCK_PIN = '1234'; // Simple PIN for all mock users
+interface Actions {
+  logout: () => Promise<void>;
+  login: (
+    phone: string,
+    pin: string
+  ) => Promise<void>;
+  checkAuthStatus: () => Promise<void>;
+  hasPermission: (permission: string) => boolean;
+  hasRole: (role: string) => boolean;
+}
 
-export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  isAuthenticated: false,
-  isLoading: false, // Start false to allow UI to render. fetchUser will set true.
-  error: null,
+const storeApi: StateCreator<AuthState & Actions> = (set, get) => ({
+  user: undefined,
+  token: undefined,
+  authStatus: "pending",
+  isLoading: false,
 
-  login: async (credentials: LoginCredentials) => {
-    set({ isLoading: true, error: null });
+  login: async (phone: string, pin: string) => {
+    set({ isLoading: true });
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 800));
+      // Backend expects { phone, pin }
+      const { data } = await ENV.post<ILoginResponse>("/auth/login", { phone, pin });
 
-      const { phone, pin, password } = credentials;
-      const userPin = pin || password; // Support both for now
-
-      if (!phone || !userPin) throw new Error('Credenciales incompletas');
-
-      // Check PIN
-      if (userPin !== MOCK_PIN) {
-        throw new Error('PIN incorrecto (Prueba con 1234)');
-      }
-
-      // Check User
-      const user = MOCK_USERS[phone];
-      if (!user) {
-        throw new Error('Usuario no encontrado (Prueba 70000000 para Admin)');
-      }
-
-      // Simulate Session Persistence (Local for mock only)
-      localStorage.setItem('mock_session_user', JSON.stringify(user));
-
-      set({ user, isAuthenticated: true, isLoading: false, error: null });
-    } catch (error: any) {
-      set({
-        error: error.message || 'Error al iniciar sesión',
+      set(() => ({
+        user: data.user,
+        token: data.accessToken, // Backend returns 'accessToken'
+        authStatus: "auth",
         isLoading: false
+      }))
+      toast.success(`Bienvenido ${data.user.name}`);
+    }
+    catch (error) {
+      set(() => ({
+        user: undefined,
+        token: undefined,
+        authStatus: "not-auth",
+        isLoading: false
+      }));
+      if (isAxiosError(error)) {
+        toast.error(
+          "Error de inicio de sesión",
+          {
+            description: error.response?.data.message || "Credenciales incorrectas"
+          }
+        );
+      }
+    }
+  },
+
+  hasPermission: (permission) => {
+    // Backend 'permissions' field implementation might vary, adjusting based on simpler role check for now
+    // const { user } = get();
+    // return user?.permissions.includes(permission) ?? false;
+    return true; // Placeholder until permissions are fully implemented
+  },
+
+  hasRole: (role) => {
+    const { user } = get();
+    return user?.role === role; // Backend user has single 'role' field
+  },
+
+  checkAuthStatus: async () => {
+    const token = get().token;
+
+    // Helper to verify token validity
+    const verifyToken = async (accessToken: string) => {
+      const { data } = await ENV.get<IUser>("/me", {
+        headers: { Authorization: `Bearer ${accessToken}` }
       });
-      throw error;
+      return data;
+    };
+
+    // Helper to refresh token
+    const tryRefresh = async () => {
+      try {
+        const { data } = await ENV.post<ILoginResponse>("/auth/refresh");
+        set({
+          user: data.user,
+          token: data.accessToken,
+          authStatus: "auth",
+          isLoading: false
+        });
+        return true;
+      } catch (error) {
+        console.error("Session refresh failed", error);
+        return false;
+      }
+    };
+
+    if (!token) {
+      // No token? Try refreshing directly (maybe we have a cookie)
+      const refreshed = await tryRefresh();
+      if (!refreshed) {
+        set({ user: undefined, token: undefined, authStatus: "not-auth", isLoading: false });
+      }
+      return;
+    }
+
+    // Check if current token is valid
+    try {
+      const user = await verifyToken(token);
+      set({ user, token, authStatus: "auth", isLoading: false });
+    } catch (error) {
+      // Token invalid/expired? Try refresh
+      const refreshed = await tryRefresh();
+      if (!refreshed) {
+        set({ user: undefined, token: undefined, authStatus: "not-auth", isLoading: false });
+      }
     }
   },
 
   logout: async () => {
-    set({ isLoading: true });
-    try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      localStorage.removeItem('mock_session_user');
-      set({ user: null, isAuthenticated: false, isLoading: false, error: null });
-    } catch (error) {
-      set({ isLoading: false });
-    }
-  },
+    const token = get().token;
 
-  fetchUser: async () => {
-    set({ isLoading: true });
+    if (get().authStatus === "not-auth") {
+      set(() => ({
+        user: undefined,
+        token: undefined,
+        authStatus: "not-auth"
+      }));
+      return;
+    }
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      const stored = localStorage.getItem('mock_session_user');
-      if (stored) {
-        set({ user: JSON.parse(stored), isAuthenticated: true, isLoading: false, error: null });
-      } else {
-        set({ user: null, isAuthenticated: false, isLoading: false });
+      await ENV.post("/auth/logout", {}, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      // Clear state
+      set(() => ({
+        user: undefined,
+        token: undefined,
+        authStatus: "not-auth"
+      }));
+    }
+    catch (error) {
+      // Force logout on error
+      set(() => ({
+        user: undefined,
+        token: undefined,
+        authStatus: "not-auth"
+      }));
+
+      if (isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          // Already unauthorized
+        } else {
+          toast.error("Error al cerrar sesión");
+        }
       }
-    } catch (error) {
-      set({ user: null, isAuthenticated: false, isLoading: false });
     }
   },
-}));
+})
+
+export const useAuthStore = create<AuthState & Actions>()(
+  persist(storeApi, {
+    name: "auth-store",
+    partialize: (state) => ({ token: state.token, user: state.user, authStatus: state.authStatus }), // Persist necessary fields
+  })
+);

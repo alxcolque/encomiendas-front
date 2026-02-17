@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,8 +10,20 @@ import { toast } from "sonner";
 export default function LoginPage() {
   const [phone, setPhone] = useState("");
   const [pin, setPin] = useState("");
-  const { login, isLoading } = useAuthStore();
+  const { login, isLoading, user, authStatus } = useAuthStore();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (authStatus === 'auth' && user) {
+      switch (user.role) {
+        case 'admin': navigate('/admin'); break;
+        case 'driver': navigate('/driver'); break;
+        case 'worker': navigate('/worker'); break;
+        case 'client': navigate('/tracking'); break;
+        default: navigate('/');
+      }
+    }
+  }, [authStatus, user, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,21 +34,33 @@ export default function LoginPage() {
 
     try {
       // Sending strictly phone and pin as requested
-      await login({ phone, pin });
-      toast.success("Bienvenido de vuelta");
+      await login(phone, pin);
       // Redirect is handled by the ProtectedRoute or we can explicit redirect here based on role if needed.
       // But fetchUser saves the user, and ProtectedRoute will verify it.
       // Usually good to redirect to a default dashboard.
       // Let's rely on standard navigation or check role.
       // For now, let's navigate to /admin or root and let router decide?
       // Actually, after login, we usually want to know where to go.
-      // The store updates `user` state. We can check `useAuthStore.getState().user` or similar.
+      // Redirect based on role
       const user = useAuthStore.getState().user;
+      //console.log(user);
       if (user) {
-        if (user.role === 'admin') navigate('/admin');
-        else if (user.role === 'driver') navigate('/driver');
-        else if (user.role === 'worker') navigate('/worker');
-        else navigate('/tracking');
+        switch (user.role) {
+          case 'admin':
+            navigate('/admin');
+            break;
+          case 'driver':
+            navigate('/driver');
+            break;
+          case 'worker':
+            navigate('/worker');
+            break;
+          case 'client':
+            navigate('/tracking'); // Clients usually want to track packages
+            break;
+          default:
+            navigate('/');
+        }
       }
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Credenciales incorrectas");
