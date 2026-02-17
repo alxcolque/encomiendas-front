@@ -6,7 +6,9 @@ export interface User {
     email: string;
     phone?: string;
     avatar?: string;
+    avatar_key?: string;
     role: UserRole;
+    pin?: string;
     email_verified_at?: string;
     created_at?: string;
     updated_at?: string;
