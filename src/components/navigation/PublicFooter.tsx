@@ -1,46 +1,31 @@
+import { useSettingsStore } from "@/stores/settingsStore";
 import { Link } from "react-router-dom";
-import { Package, Facebook, Instagram, Twitter, Linkedin, CreditCard, Wallet, Banknote, Mail, Phone, MapPin } from "lucide-react";
-
-const footerLinks = {
-    services: [
-        { name: "Envíos Nacionales", href: "/services#nacionales" },
-        { name: "Servicio Express", href: "/services#express" },
-        { name: "Carga Corporativa", href: "/services#corporativo" },
-        { name: "Rastreo Satelital", href: "/tracking" },
-    ],
-    company: [
-        { name: "Nosotros", href: "/about" },
-        { name: "Nuestras Oficinas", href: "/offices" },
-        { name: "Contactar a Ventas", href: "/contact" },
-    ],
-    support: [
-        { name: "Preguntas Frecuentes", href: "/faq" },
-        { name: "Centro de Ayuda", href: "/contact" },
-        { name: "Libro de Reclamaciones", href: "/claims" },
-        { name: "Estado de mi envío", href: "/tracking" },
-    ],
-    legal: [
-        { name: "Términos y Condiciones", href: "/terms" },
-        { name: "Política de Privacidad", href: "/privacy" },
-        { name: "Política de Reembolsos", href: "/refunds" },
-    ]
-};
-
-const socialLinks = [
-    { icon: Facebook, href: "https://facebook.com", label: "Facebook" },
-    { icon: Instagram, href: "https://instagram.com", label: "Instagram" },
-    { icon: Twitter, href: "https://twitter.com", label: "Twitter" },
-    { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn" },
-];
-
-const paymentMethods = [
-    { icon: CreditCard, label: "Tarjetas" },
-    { icon: Wallet, label: "QR" },
-    { icon: Banknote, label: "Efectivo" },
-];
+import { Package, Facebook, Instagram, Twitter, Linkedin, CreditCard, Wallet, Banknote, Mail, Phone, MapPin, Video, MessageCircle } from "lucide-react";
 
 export default function PublicFooter() {
     const currentYear = new Date().getFullYear();
+    const { general, socials, footerLinks, paymentMethods } = useSettingsStore();
+
+    const getSocialIcon = (platform: string) => {
+        switch (platform) {
+            case 'facebook': return Facebook;
+            case 'instagram': return Instagram;
+            case 'twitter': return Twitter;
+            case 'linkedin': return Linkedin;
+            case 'tiktok': return Video;
+            case 'whatsapp': return MessageCircle;
+            default: return Package;
+        }
+    };
+
+    const getPaymentIcon = (iconName: string) => {
+        switch (iconName) {
+            case 'credit-card': return CreditCard;
+            case 'wallet': return Wallet;
+            case 'banknote': return Banknote;
+            default: return CreditCard;
+        }
+    };
 
     return (
         <footer className="bg-card/50 border-t border-border mt-auto">
@@ -53,38 +38,41 @@ export default function PublicFooter() {
                             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform duration-300">
                                 <Package className="w-6 h-6 text-primary-foreground" />
                             </div>
-                            <span className="text-xl font-bold font-display text-foreground">KOLMOX</span>
+                            <span className="text-xl font-bold font-display text-foreground">{general.siteName}</span>
                         </Link>
                         <p className="text-muted-foreground leading-relaxed max-w-sm">
-                            Revolucionando la logística en Bolivia. Conectamos personas y negocios con entregas rápidas, seguras y tecnología de punta.
+                            {general.siteDescription}
                         </p>
                         <div className="space-y-3 pt-2">
                             <div className="flex items-center gap-3 text-sm text-muted-foreground">
                                 <MapPin className="w-4 h-4 text-primary" />
-                                <span>Av. 6 de Agosto, Oruro, Bolivia</span>
+                                <span>{general.address}</span>
                             </div>
                             <div className="flex items-center gap-3 text-sm text-muted-foreground">
                                 <Phone className="w-4 h-4 text-primary" />
-                                <span>+591 2 5252525</span>
+                                <span>{general.supportPhone}</span>
                             </div>
                             <div className="flex items-center gap-3 text-sm text-muted-foreground">
                                 <Mail className="w-4 h-4 text-primary" />
-                                <span>contacto@kolmox.com</span>
+                                <span>{general.supportEmail}</span>
                             </div>
                         </div>
                         <div className="flex gap-3 pt-4">
-                            {socialLinks.map((social) => (
-                                <a
-                                    key={social.label}
-                                    href={social.href}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:shadow-lg hover:shadow-primary/25 transition-all duration-300"
-                                    aria-label={social.label}
-                                >
-                                    <social.icon className="w-5 h-5" />
-                                </a>
-                            ))}
+                            {socials.filter(s => s.active).map((social) => {
+                                const Icon = getSocialIcon(social.platform);
+                                return (
+                                    <a
+                                        key={social.platform}
+                                        href={social.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:shadow-lg hover:shadow-primary/25 transition-all duration-300"
+                                        aria-label={social.platform}
+                                    >
+                                        <Icon className="w-5 h-5" />
+                                    </a>
+                                );
+                            })}
                         </div>
                     </div>
 
@@ -143,18 +131,21 @@ export default function PublicFooter() {
                     <div className="lg:hidden col-span-1 flex flex-col items-center gap-4 text-center">
                         <h3 className="text-lg font-bold text-orange-600">Síguenos</h3>
                         <div className="flex gap-4">
-                            {socialLinks.map((social) => (
-                                <a
-                                    key={social.label}
-                                    href={social.href}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 hover:bg-orange-600 hover:text-white transition-all duration-300"
-                                    aria-label={social.label}
-                                >
-                                    <social.icon className="w-5 h-5" />
-                                </a>
-                            ))}
+                            {socials.filter(s => s.active).map((social) => {
+                                const Icon = getSocialIcon(social.platform);
+                                return (
+                                    <a
+                                        key={social.platform}
+                                        href={social.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 hover:bg-orange-600 hover:text-white transition-all duration-300"
+                                        aria-label={social.platform}
+                                    >
+                                        <Icon className="w-5 h-5" />
+                                    </a>
+                                );
+                            })}
                         </div>
                         <div className="flex gap-4 pt-2 text-[10px] text-gray-400">
                             <span>Facebook</span>
@@ -188,15 +179,18 @@ export default function PublicFooter() {
                         <div className="flex items-center gap-3 px-4 py-2 bg-muted/50 rounded-lg">
                             <span className="text-xs font-medium text-muted-foreground">Aceptamos:</span>
                             <div className="flex gap-2">
-                                {paymentMethods.map((method) => (
-                                    <div
-                                        key={method.label}
-                                        className="text-muted-foreground/80 hover:text-foreground transition-colors"
-                                        title={method.label}
-                                    >
-                                        <method.icon className="w-5 h-5" />
-                                    </div>
-                                ))}
+                                {paymentMethods.map((method) => {
+                                    const Icon = getPaymentIcon(method.icon);
+                                    return (
+                                        <div
+                                            key={method.id}
+                                            className="text-muted-foreground/80 hover:text-foreground transition-colors"
+                                            title={method.label}
+                                        >
+                                            <Icon className="w-5 h-5" />
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </div>
                     </div>

@@ -1,4 +1,6 @@
 import { AdminSectionHeader } from "@/components/admin/shared/AdminSectionHeader";
+import { DriversTable } from "@/components/admin/drivers/DriversTable";
+import { NewDriverModal } from "@/components/admin/drivers/NewDriverModal";
 
 export default function Drivers() {
     return (
@@ -6,10 +8,10 @@ export default function Drivers() {
             <AdminSectionHeader
                 title="Gestión de Conductores"
                 subtitle="Administra la flota de conductores activos"
+                actions={<NewDriverModal />}
             />
-            <div className="bg-card rounded-2xl p-6 border-border border shadow-sm h-96 flex items-center justify-center text-muted-foreground">
-                Módulo de Conductores en construcción
-            </div>
+
+            <DriversTable />
         </div>
     );
 }

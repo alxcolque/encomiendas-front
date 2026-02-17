@@ -4,8 +4,10 @@ import { Menu, X, User, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import kolmoxLogo from "@/assets/kolmox-logo.png";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 export default function PublicNavbar() {
+    const { general } = useSettingsStore();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const location = useLocation();
@@ -37,6 +39,7 @@ export default function PublicNavbar() {
         <nav
             className={cn(
                 "fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white shadow-sm border-b border-gray-100",
+                scrolled && "shadow-md bg-white/95 backdrop-blur-sm"
             )}
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -46,7 +49,7 @@ export default function PublicNavbar() {
                         <div className="relative w-10 h-10 overflow-hidden rounded-xl">
                             <img
                                 src={kolmoxLogo}
-                                alt="KOLMOX"
+                                alt={general.siteName}
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
                                     e.currentTarget.style.display = 'none';
@@ -56,7 +59,7 @@ export default function PublicNavbar() {
                             <Package className="w-6 h-6 text-primary-foreground absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden group-hover:block" />
                         </div>
                         <span className="text-xl font-bold font-display tracking-tight text-foreground">
-                            KOLMOX
+                            {general.siteName}
                         </span>
                     </Link>
 

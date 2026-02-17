@@ -1,4 +1,6 @@
 import { AdminSectionHeader } from "@/components/admin/shared/AdminSectionHeader";
+import { UsersTable } from "@/components/admin/users/UsersTable";
+import { NewUserModal } from "@/components/admin/users/NewUserModal";
 
 export default function Users() {
     return (
@@ -6,10 +8,10 @@ export default function Users() {
             <AdminSectionHeader
                 title="Gestión de Usuarios"
                 subtitle="Administra clientes y permisos"
+                actions={<NewUserModal />}
             />
-            <div className="bg-card rounded-2xl p-6 border-border border shadow-sm h-96 flex items-center justify-center text-muted-foreground">
-                Módulo de Usuarios en construcción
-            </div>
+
+            <UsersTable />
         </div>
     );
 }

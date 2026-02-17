@@ -2,8 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 export default function ContactPage() {
+    const { general } = useSettingsStore();
+
     return (
         <div className="container py-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
@@ -24,7 +27,7 @@ export default function ContactPage() {
                             </div>
                             <div>
                                 <p className="font-semibold">Llámanos</p>
-                                <p className="text-muted-foreground">+591 2 525 2525</p>
+                                <p className="text-muted-foreground">{general.supportPhone}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-4 p-4 rounded-xl bg-muted/50">
@@ -33,7 +36,7 @@ export default function ContactPage() {
                             </div>
                             <div>
                                 <p className="font-semibold">Escríbenos</p>
-                                <p className="text-muted-foreground">contacto@kolmox.com</p>
+                                <p className="text-muted-foreground">{general.supportEmail}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-4 p-4 rounded-xl bg-muted/50">
@@ -42,7 +45,7 @@ export default function ContactPage() {
                             </div>
                             <div>
                                 <p className="font-semibold">Visítanos</p>
-                                <p className="text-muted-foreground">Av. 6 de Agosto, Oruro, Bolivia</p>
+                                <p className="text-muted-foreground">{general.address}</p>
                             </div>
                         </div>
                     </div>
