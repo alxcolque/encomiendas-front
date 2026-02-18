@@ -51,7 +51,7 @@ interface SettingsState {
 
 export const useSettingsStore = create<SettingsState>((set) => ({
     general: {
-        siteName: 'Encomiendas Kolmox',
+        siteName: 'Kolmox',
         siteDescription: 'Servicio de transporte de encomiendas rápido y seguro a nivel nacional.',
         keywords: 'encomiendas, transporte, bolivia, envios, paqueteria',
         supportEmail: 'soporte@kolmox.com',
