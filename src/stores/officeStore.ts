@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { Office } from '@/interfaces/office.interface';
+import { ENV } from "@/config/env";
 
 interface OfficeState {
     offices: Office[];
@@ -11,25 +12,7 @@ interface OfficeState {
     deleteOffice: (id: string) => Promise<void>;
 }
 
-// MOCK DATA
-const MOCK_OFFICES_DATA: Office[] = [
-    {
-        id: '1', name: 'Oficina Central Oruro', city: 'Oruro', address: 'Calle Bolívar #123',
-        phone: '2-5200000', manager: 'Ana Flores', status: 'active'
-    },
-    {
-        id: '2', name: 'Sucursal Terminal', city: 'Oruro', address: 'Terminal de Buses, Local 45',
-        phone: '2-5200001', manager: 'Mario Cruz', status: 'active'
-    },
-    {
-        id: '3', name: 'Oficina La Paz', city: 'La Paz', address: 'Av. Montes #789',
-        phone: '2-2400000', manager: 'Sofia Lima', status: 'active'
-    },
-    {
-        id: '4', name: 'Oficina Cochabamba', city: 'Cochabamba', address: 'Av. Ayacucho #456',
-        phone: '4-4200000', manager: 'Pedro Rojas', status: 'inactive'
-    }
-];
+
 
 export const useOfficeStore = create<OfficeState>((set) => ({
     offices: [],
@@ -38,43 +21,55 @@ export const useOfficeStore = create<OfficeState>((set) => ({
 
     fetchOffices: async () => {
         set({ isLoading: true });
-        // Mock API call
-        setTimeout(() => {
-            set({ offices: MOCK_OFFICES_DATA, isLoading: false });
-        }, 600);
+        try {
+            const { data } = await ENV.get<{ data: Office[] }>("/offices");
+            set({ offices: data.data || [], isLoading: false });
+        } catch (error) {
+            set({ isLoading: false });
+            console.error(error);
+        }
     },
 
     createOffice: async (office) => {
         set({ isLoading: true });
-        setTimeout(() => {
-            const newOffice = {
-                ...office,
-                id: Math.random().toString(36).substr(2, 9)
-            };
+        try {
+            const { data } = await ENV.post<{ data: Office }>("/offices", office);
             set((state) => ({
-                offices: [...state.offices, newOffice as Office],
+                offices: [...state.offices, data.data],
                 isLoading: false
             }));
-        }, 500);
+            return Promise.resolve();
+        } catch (error) {
+            set({ isLoading: false });
+            throw error;
+        }
     },
 
     updateOffice: async (id, updatedOffice) => {
         set({ isLoading: true });
-        setTimeout(() => {
+        try {
+            const { data } = await ENV.put<{ data: Office }>(`/offices/${id}`, updatedOffice);
             set((state) => ({
-                offices: state.offices.map((o) => o.id === id ? { ...o, ...updatedOffice } : o),
+                offices: state.offices.map((o) => o.id === id ? data.data : o),
                 isLoading: false
             }));
-        }, 500);
+        } catch (error) {
+            set({ isLoading: false });
+            throw error;
+        }
     },
 
     deleteOffice: async (id) => {
         set({ isLoading: true });
-        setTimeout(() => {
+        try {
+            await ENV.delete(`/offices/${id}`);
             set((state) => ({
                 offices: state.offices.filter((o) => o.id !== id),
                 isLoading: false
             }));
-        }, 500);
+        } catch (error) {
+            set({ isLoading: false });
+            throw error;
+        }
     }
 }));

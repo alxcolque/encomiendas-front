@@ -5,8 +5,8 @@ export interface Office {
     name: string;
     city: string;
     address: string;
-    phone: string;
-    manager: string;
+    phone?: string;
+    manager?: string;
     status: OfficeStatus;
     coordinates?: string;
 }

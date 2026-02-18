@@ -19,8 +19,13 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Office } from "@/interfaces/office.interface";
 
-export function OfficesTable() {
+interface OfficesTableProps {
+    onEdit: (office: Office) => void;
+}
+
+export function OfficesTable({ onEdit }: OfficesTableProps) {
     const { offices, isLoading, fetchOffices, deleteOffice } = useOfficeStore();
 
     useEffect(() => {
@@ -85,8 +90,13 @@ export function OfficesTable() {
                                         <DropdownMenuItem onClick={() => navigator.clipboard.writeText(office.address)}>
                                             Copiar Dirección
                                         </DropdownMenuItem>
+                                        {office.coordinates && (
+                                            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(office.coordinates!)}>
+                                                Copiar Coordenadas
+                                            </DropdownMenuItem>
+                                        )}
                                         <DropdownMenuSeparator />
-                                        <DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => onEdit(office)}>
                                             <Edit2 className="mr-2 h-4 w-4" /> Editar
                                         </DropdownMenuItem>
                                         <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => deleteOffice(office.id)}>
