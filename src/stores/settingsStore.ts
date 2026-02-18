@@ -1,3 +1,5 @@
+import { ENV } from '../config/env';
+import { toast } from 'sonner';
 import { create } from 'zustand';
 
 interface GeneralSettings {
@@ -7,10 +9,13 @@ interface GeneralSettings {
     supportEmail: string;
     supportPhone: string;
     address: string;
+    logo?: string | null;
+    favicon?: string | null;
 }
 
 interface SocialLink {
-    platform: 'facebook' | 'instagram' | 'tiktok' | 'whatsapp';
+    id: number;
+    platform: string;
     url: string;
     active: boolean;
 }
@@ -19,12 +24,22 @@ interface FAQItem {
     id: string;
     question: string;
     answer: string;
+    order: number;
+    active: boolean;
+}
+
+interface FooterLink {
+    id: number;
+    name: string;
+    href: string;
+    order: number;
 }
 
 interface PaymentMethod {
     id: string;
     icon: 'credit-card' | 'wallet' | 'banknote';
     label: string;
+    active: boolean;
 }
 
 interface SettingsState {
@@ -41,103 +56,171 @@ interface SettingsState {
     termsAndConditions: string;
     privacyPolicy: string;
     isLoading: boolean;
+    fetchSettings: () => Promise<void>;
     updateGeneral: (settings: Partial<GeneralSettings>) => Promise<void>;
     updateSocials: (socials: SocialLink[]) => Promise<void>;
     updateFaqs: (faqs: FAQItem[]) => Promise<void>;
     updateFooterLinks: (footerLinks: any) => Promise<void>;
     updatePaymentMethods: (methods: PaymentMethod[]) => Promise<void>;
     updateLegal: (type: 'terms' | 'privacy', content: string) => Promise<void>;
+    uploadLogo: (file: File, type: 'logo' | 'favicon') => Promise<void>;
 }
 
 export const useSettingsStore = create<SettingsState>((set) => ({
+
     general: {
-        siteName: 'Kolmox',
-        siteDescription: 'Servicio de transporte de encomiendas rápido y seguro a nivel nacional.',
-        keywords: 'encomiendas, transporte, bolivia, envios, paqueteria',
-        supportEmail: 'soporte@kolmox.com',
-        supportPhone: '+591 2 5200000',
-        address: 'Calle Bolívar #123, Oruro, Bolivia'
+        siteName: '',
+        siteDescription: '',
+        keywords: '',
+        supportEmail: '',
+        supportPhone: '',
+        address: '',
     },
-    socials: [
-        { platform: 'facebook', url: 'https://facebook.com/kolmox', active: true },
-        { platform: 'instagram', url: 'https://instagram.com/kolmox', active: true },
-        { platform: 'tiktok', url: 'https://tiktok.com/@kolmox', active: false },
-        { platform: 'whatsapp', url: 'https://wa.me/59170000000', active: true },
-    ],
-    faqs: [
-        { id: '1', question: '¿Cuánto tiempo tarda un envío?', answer: 'El tiempo de entrega depende del destino, generalmente entre 24 a 48 horas.' },
-        { id: '2', question: '¿Cómo puedo rastrear mi paquete?', answer: 'Puede usar el código de guía en nuestra página de inicio.' },
-    ],
+    socials: [],
+    faqs: [],
     footerLinks: {
-        services: [
-            { name: "Envíos Nacionales", href: "/services#nacionales" },
-            { name: "Servicio Express", href: "/services#express" },
-            { name: "Carga Corporativa", href: "/services#corporativo" },
-            { name: "Rastreo Satelital", href: "/tracking" },
-        ],
-        company: [
-            { name: "Nosotros", href: "/about" },
-            { name: "Nuestras Oficinas", href: "/offices" },
-            { name: "Contactar a Ventas", href: "/contact" },
-        ],
-        support: [
-            { name: "Preguntas Frecuentes", href: "/faq" },
-            { name: "Centro de Ayuda", href: "/contact" },
-            { name: "Libro de Reclamaciones", href: "/claims" },
-            { name: "Estado de mi envío", href: "/tracking" },
-        ],
-        legal: [
-            { name: "Términos y Condiciones", href: "/terms" },
-            { name: "Política de Privacidad", href: "/privacy" },
-            { name: "Política de Reembolsos", href: "/refunds" },
-        ]
+        services: [],
+        company: [],
+        support: [],
+        legal: [],
     },
-    paymentMethods: [
-        { id: '1', icon: 'credit-card', label: "Tarjetas" },
-        { id: '2', icon: 'wallet', label: "QR" },
-        { id: '3', icon: 'banknote', label: "Efectivo" },
-    ],
-    termsAndConditions: 'Términos y condiciones de uso del servicio...',
-    privacyPolicy: 'Política de privacidad y manejo de datos...',
+    paymentMethods: [],
+    termsAndConditions: '',
+    privacyPolicy: '',
     isLoading: false,
 
+    fetchSettings: async () => {
+        set({ isLoading: true });
+        try {
+            const response = await ENV.get<any>('/admin/settings');
+            const data = response.data;
+            set({
+                general: data.general,
+                socials: data.socials,
+                faqs: data.faqs,
+                footerLinks: data.footerLinks,
+                paymentMethods: data.paymentMethods,
+                termsAndConditions: data.termsAndConditions,
+                privacyPolicy: data.privacyPolicy,
+                isLoading: false,
+            });
+        } catch (error) {
+            console.error('Error fetching settings:', error);
+            set({ isLoading: false });
+        }
+    },
     updateGeneral: async (settings) => {
         set({ isLoading: true });
-        setTimeout(() => {
-            set((state) => ({ general: { ...state.general, ...settings }, isLoading: false }));
-        }, 500);
+        try {
+            const payload = {
+                site_name: settings.siteName,
+                site_description: settings.siteDescription,
+                keywords: settings.keywords,
+                support_email: settings.supportEmail,
+                support_phone: settings.supportPhone,
+                address: settings.address,
+            };
+            const response = await ENV.put<any>('/admin/settings/general', payload);
+            set((state) => ({ general: { ...state.general, ...response.data.data }, isLoading: false }));
+            toast.success('Configuración general actualizada');
+        } catch (error) {
+            console.error('Error updating general settings:', error);
+            set({ isLoading: false });
+            toast.error('Error al actualizar configuración');
+        }
     },
     updateSocials: async (socials) => {
         set({ isLoading: true });
-        setTimeout(() => {
-            set({ socials, isLoading: false });
-        }, 500);
+        try {
+            const response = await ENV.put<any>('/admin/settings/socials', { socials });
+            set({ socials: response.data.data, isLoading: false });
+            toast.success('Redes sociales actualizadas');
+        } catch (error) {
+            console.error('Error updating socials:', error);
+            set({ isLoading: false });
+            toast.error('Error al actualizar redes sociales');
+        }
     },
     updateFaqs: async (faqs) => {
         set({ isLoading: true });
-        setTimeout(() => {
-            set({ faqs, isLoading: false });
-        }, 500);
+        try {
+            const response = await ENV.put<any>('/admin/settings/faqs', { faqs });
+            set({ faqs: response.data.data, isLoading: false });
+            toast.success('FAQs actualizadas');
+        } catch (error) {
+            console.error('Error updating FAQs:', error);
+            set({ isLoading: false });
+            toast.error('Error al actualizar FAQs');
+        }
     },
     updateFooterLinks: async (footerLinks) => {
         set({ isLoading: true });
-        setTimeout(() => {
-            set({ footerLinks, isLoading: false });
-        }, 500);
+        try {
+            const response = await ENV.put<any>('/admin/settings/footer-links', { footerLinks });
+            set({ footerLinks: response.data, isLoading: false });
+            toast.success('Enlaces del pie de página actualizados');
+        } catch (error) {
+            console.error('Error updating footer links:', error);
+            set({ isLoading: false });
+            toast.error('Error al actualizar enlaces');
+        }
     },
     updatePaymentMethods: async (methods) => {
         set({ isLoading: true });
-        setTimeout(() => {
-            set({ paymentMethods: methods, isLoading: false });
-        }, 500);
+        try {
+            const response = await ENV.put<any>('/admin/settings/payment-methods', { paymentMethods: methods });
+            set({ paymentMethods: response.data.data, isLoading: false });
+            toast.success('Métodos de pago actualizados');
+        } catch (error) {
+            console.error('Error updating payment methods:', error);
+            set({ isLoading: false });
+            toast.error('Error al actualizar métodos de pago');
+        }
     },
     updateLegal: async (type, content) => {
         set({ isLoading: true });
-        setTimeout(() => {
+        try {
+            const payload = {
+                [type === 'terms' ? 'terms_and_conditions' : 'privacy_policy']: content
+            };
+            const response = await ENV.put<any>('/admin/settings/legal', payload);
+            set({
+                termsAndConditions: response.data.termsAndConditions,
+                privacyPolicy: response.data.privacyPolicy,
+                isLoading: false
+            });
+            toast.success('Información legal actualizada');
+        } catch (error) {
+            console.error('Error updating legal info:', error);
+            set({ isLoading: false });
+            toast.error('Error al actualizar información legal');
+        }
+    },
+    uploadLogo: async (file: File, type: 'logo' | 'favicon') => {
+        set({ isLoading: true });
+        try {
+            const formData = new FormData();
+            formData.append('type', type);
+            formData.append(type, file);
+
+            // Need to use axios directly or ensure ENV handles FormData correctly with Content-Type
+            const response = await ENV.post<any>('/admin/settings/logo', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+
             set((state) => ({
-                [type === 'terms' ? 'termsAndConditions' : 'privacyPolicy']: content,
+                general: {
+                    ...state.general,
+                    logo: response.data.data.logo,
+                    favicon: response.data.data.favicon
+                },
                 isLoading: false
             }));
-        }, 500);
+            toast.success(`${type === 'logo' ? 'Logo' : 'Favicon'} actualizado`);
+        } catch (error) {
+            console.error(`Error uploading ${type}:`, error);
+            set({ isLoading: false });
+            toast.error(`Error al subir ${type}`);
+        }
     },
 }));

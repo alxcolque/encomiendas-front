@@ -1,3 +1,6 @@
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { AdminSectionHeader } from "@/components/admin/shared/AdminSectionHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GeneralSettingsTab } from "@/components/admin/settings/GeneralSettingsTab";
@@ -5,10 +8,18 @@ import { SocialSettingsTab } from "@/components/admin/settings/SocialSettingsTab
 import { LegalSettingsTab } from "@/components/admin/settings/LegalSettingsTab";
 import { FAQSettingsTab } from "@/components/admin/settings/FAQSettingsTab";
 import { Settings as SettingsIcon, Globe, Shield, HelpCircle, Share2, Upload } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useSettingsStore } from "@/stores/settingsStore";
+import { useEffect } from "react";
 
 export default function Settings() {
+    const { general, uploadLogo, fetchSettings } = useSettingsStore();
+
+    useEffect(() => {
+        fetchSettings();
+    }, []);
+
     return (
         <div className="space-y-6">
             <AdminSectionHeader
@@ -44,13 +55,63 @@ export default function Settings() {
                         </Card>
                     </TabsContent>
 
-                    <TabsContent value="logos">
+                    <TabsContent value="logos" className="space-y-4">
                         <Card>
-                            <CardContent className="pt-6 min-h-[300px] flex items-center justify-center text-muted-foreground">
-                                <div className="text-center space-y-2">
-                                    <Upload className="h-12 w-12 mx-auto opacity-20" />
-                                    <p>Gestor de Archivos / Logos en construcción</p>
-                                    <Button variant="outline">Subir Logo Principal</Button>
+                            <CardHeader>
+                                <CardTitle>Logos e Identidad</CardTitle>
+                                <CardDescription>
+                                    Gestiona el logo principal y el favicon del sitio.
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                <div className="flex items-center gap-6">
+                                    <div className="w-24 h-24 border rounded-lg flex items-center justify-center bg-muted/20 relative overflow-hidden">
+                                        {general.logo ? (
+                                            <img src={general.logo} alt="Logo" className="w-full h-full object-contain" />
+                                        ) : (
+                                            <span className="text-xs text-muted-foreground">Sin Logo</span>
+                                        )}
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Logo Principal</Label>
+                                        <Input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0];
+                                                if (file) uploadLogo(file, 'logo');
+                                            }}
+                                        />
+                                        <p className="text-xs text-muted-foreground">
+                                            Recomendado: PNG transparente, 500x500px. Max 2MB.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <Separator />
+
+                                <div className="flex items-center gap-6">
+                                    <div className="w-16 h-16 border rounded-lg flex items-center justify-center bg-muted/20 relative overflow-hidden">
+                                        {general.favicon ? (
+                                            <img src={general.favicon} alt="Favicon" className="w-full h-full object-contain" />
+                                        ) : (
+                                            <span className="text-xs text-muted-foreground">Sin Favicon</span>
+                                        )}
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Favicon</Label>
+                                        <Input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0];
+                                                if (file) uploadLogo(file, 'favicon');
+                                            }}
+                                        />
+                                        <p className="text-xs text-muted-foreground">
+                                            Recomendado: ICO o PNG, 32x32px. Max 1MB.
+                                        </p>
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>

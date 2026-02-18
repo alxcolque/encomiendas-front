@@ -6,12 +6,17 @@ import { useSettingsStore } from "@/stores/settingsStore";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Save } from "lucide-react";
+import { useEffect } from "react";
 
 export function GeneralSettingsTab() {
     const { general, updateGeneral, isLoading } = useSettingsStore();
-    const { register, handleSubmit } = useForm({
+    const { register, handleSubmit, reset } = useForm({
         defaultValues: general
     });
+
+    useEffect(() => {
+        reset(general);
+    }, [general, reset]);
 
     const onSubmit = (data: any) => {
         updateGeneral(data).then(() => toast.success("Configuración general guardada"));
