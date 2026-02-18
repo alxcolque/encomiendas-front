@@ -1,96 +1,79 @@
 import { create } from 'zustand';
-
-export interface Driver {
-    id: string;
-    name: string;
-    email: string;
-    phone: string;
-    status: 'active' | 'inactive' | 'on-delivery';
-    avatar: string;
-    vehicleType: string;
-    plateNumber: string;
-    licenseNumber: string;
-    currentLocation?: string;
-    rating: number;
-    totalDeliveries: number;
-}
+import { ENV } from "../config/env";
+import { Driver, IGetDriversResponse, IDriverResponse } from "@/interfaces/driver.interface";
+import { toast } from "sonner";
+import { isAxiosError } from "axios";
 
 interface DriverState {
     drivers: Driver[];
     isLoading: boolean;
     error: string | null;
     fetchDrivers: () => Promise<void>;
-    createDriver: (driver: Omit<Driver, 'id' | 'avatar' | 'rating' | 'totalDeliveries'>) => Promise<void>;
-    updateDriver: (id: string, driver: Partial<Driver>) => Promise<void>;
+    createDriver: (driver: any) => Promise<void>;
+    updateDriver: (id: string, driver: any) => Promise<void>;
     deleteDriver: (id: string) => Promise<void>;
 }
 
-// MOCK DATA
-const MOCK_DRIVERS_DATA: Driver[] = [
-    {
-        id: '1', name: 'Carlos Mamani', email: 'carlos@kolmox.com', phone: '70000002', status: 'active',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=driver1',
-        vehicleType: 'Motocicleta', plateNumber: '2024-ABC', licenseNumber: '7654321', rating: 4.8, totalDeliveries: 154
-    },
-    {
-        id: '2', name: 'Juan Perez', email: 'juan@kolmox.com', phone: '60000002', status: 'on-delivery',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=driver2',
-        vehicleType: 'Automóvil', plateNumber: '4040-XYZ', licenseNumber: '9988776', rating: 4.5, totalDeliveries: 89
-    },
-    {
-        id: '3', name: 'Roberto Gomez', email: 'roberto@kolmox.com', phone: '71234567', status: 'inactive',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=driver3',
-        vehicleType: 'Camión', plateNumber: '1010-TRK', licenseNumber: '5566778', rating: 5.0, totalDeliveries: 312
-    }
-];
-
-export const useDriverStore = create<DriverState>((set) => ({
+export const useDriverStore = create<DriverState>((set, get) => ({
     drivers: [],
     isLoading: false,
     error: null,
 
     fetchDrivers: async () => {
         set({ isLoading: true });
-        // Mock API call
-        setTimeout(() => {
-            set({ drivers: MOCK_DRIVERS_DATA, isLoading: false });
-        }, 600);
+        try {
+            const { data } = await ENV.get<IGetDriversResponse>("/drivers");
+            set({ drivers: data.data || [], isLoading: false }); // Backend usually returns wrapped in 'data' via Collection
+        } catch (error) {
+            set({ isLoading: false });
+            console.error(error);
+        }
     },
 
-    createDriver: async (driver) => {
+    createDriver: async (driverData) => {
         set({ isLoading: true });
-        setTimeout(() => {
-            const newDriver = {
-                ...driver,
-                id: Math.random().toString(36).substr(2, 9),
-                avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${driver.name}`,
-                rating: 5.0,
-                totalDeliveries: 0
-            };
+        try {
+            const { data } = await ENV.post<IDriverResponse>("/drivers", driverData);
             set((state) => ({
-                drivers: [...state.drivers, newDriver as Driver],
+                drivers: [...state.drivers, data.data], // Assuming single resource return
                 isLoading: false
             }));
-        }, 500);
+        } catch (error) {
+            set({ isLoading: false });
+            if (isAxiosError(error)) {
+                throw error;
+            }
+        }
     },
 
-    updateDriver: async (id, updatedDriver) => {
+    updateDriver: async (id, driverData) => {
         set({ isLoading: true });
-        setTimeout(() => {
+        try {
+            const { data } = await ENV.put<IDriverResponse>(`/drivers/${id}`, driverData);
             set((state) => ({
-                drivers: state.drivers.map((d) => d.id === id ? { ...d, ...updatedDriver } : d),
+                drivers: state.drivers.map((d) => d.id === id ? data.data : d),
                 isLoading: false
             }));
-        }, 500);
+        } catch (error) {
+            set({ isLoading: false });
+            throw error;
+        }
     },
 
     deleteDriver: async (id) => {
         set({ isLoading: true });
-        setTimeout(() => {
+        try {
+            await ENV.delete(`/drivers/${id}`);
             set((state) => ({
                 drivers: state.drivers.filter((d) => d.id !== id),
                 isLoading: false
             }));
-        }, 500);
+            toast.success("Conductor eliminado correctamente");
+        } catch (error) {
+            set({ isLoading: false });
+            if (isAxiosError(error)) {
+                toast.error(error.response?.data.message || "Error al eliminar conductor");
+            }
+        }
     }
 }));
