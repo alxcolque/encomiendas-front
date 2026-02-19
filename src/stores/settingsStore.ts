@@ -201,11 +201,12 @@ export const useSettingsStore = create<SettingsState>((set) => ({
         try {
             const formData = new FormData();
             formData.append('type', type);
-            formData.append(type, file);
+            formData.append(type, file); // 'files' handling in backend
 
-            // Need to use axios directly or ensure ENV handles FormData correctly with Content-Type
+            // Explicitly unset Content-Type so browser sets boundary correctly
+            // This overrides the default 'application/json' in ENV
             const response = await ENV.post<any>('/admin/settings/logo', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
+                headers: { 'Content-Type': undefined } // undefined allows browser to set multipart/form-data + boundary
             });
 
             set((state) => ({
@@ -217,10 +218,16 @@ export const useSettingsStore = create<SettingsState>((set) => ({
                 isLoading: false
             }));
             toast.success(`${type === 'logo' ? 'Logo' : 'Favicon'} actualizado`);
-        } catch (error) {
+        } catch (error: any) {
             console.error(`Error uploading ${type}:`, error);
+            if (error.response?.data) {
+                console.error("Validation errors:", error.response.data);
+                toast.error(`Error: ${error.response.data.message || 'Error de validación'}`);
+            } else {
+                set({ isLoading: false });
+                toast.error(`Error al subir ${type}`);
+            }
             set({ isLoading: false });
-            toast.error(`Error al subir ${type}`);
         }
     },
 }));

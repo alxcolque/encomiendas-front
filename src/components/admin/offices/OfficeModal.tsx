@@ -102,7 +102,7 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
         <Dialog open={open} onOpenChange={setOpen}>
             {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
 
-            <DialogContent className="sm:max-w-lg bg-background/95 backdrop-blur-xl border-border">
+            <DialogContent className="sm:max-w-lg backdrop-blur-xl border-border max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <Building2 className="h-5 w-5 text-primary" />
