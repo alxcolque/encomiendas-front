@@ -20,7 +20,7 @@ interface SocialLink {
     active: boolean;
 }
 
-interface FAQItem {
+export interface FAQItem {
     id: string;
     question: string;
     answer: string;

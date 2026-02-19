@@ -111,11 +111,6 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
                 </DialogHeader>
 
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="name">Nombre de Oficina</Label>
-                        <Input id="name" {...form.register("name")} placeholder="Ej: Sucursal Centro" />
-                        {form.formState.errors.name && <span className="text-xs text-destructive">{form.formState.errors.name.message}</span>}
-                    </div>
 
                     <div className="grid grid-cols-1 gap-4">
                         <div className="space-y-4 border rounded-lg p-4 bg-muted/20">
