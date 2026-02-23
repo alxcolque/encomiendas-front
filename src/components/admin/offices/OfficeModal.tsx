@@ -7,19 +7,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Building2, Loader2, Pencil } from "lucide-react";
+import { Building2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useOfficeStore } from "@/stores/officeStore";
 import { Office } from "@/interfaces/office.interface";
+import { useUserStore } from "@/stores/userStore";
+import { MultiSelect } from "@/components/ui/multi-select";
 
 const officeSchema = z.object({
     name: z.string().min(3, "Nombre requerido"),
     city: z.string().min(2, "Ciudad requerida"),
     address: z.string().min(5, "Dirección requerida"),
-    phone: z.string().optional(),
-    manager: z.string().optional(),
+    users: z.array(z.string()).optional(),
     status: z.enum(["active", "inactive"]),
-    coordinates: z.string().optional(), // Could add regex validation for lat,lng
+    coordinates: z.string().optional(),
 });
 
 type OfficeFormValues = z.infer<typeof officeSchema>;
@@ -35,6 +36,7 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
     const [internalOpen, setInternalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { createOffice, updateOffice } = useOfficeStore();
+    const { users, getUsers } = useUserStore();
 
     const isControlled = typeof controlledOpen !== "undefined";
     const open = isControlled ? controlledOpen : internalOpen;
@@ -46,19 +48,20 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
         resolver: zodResolver(officeSchema),
         defaultValues: {
             status: "active",
-            city: "Oruro"
+            city: "Oruro",
+            users: []
         }
     });
 
     useEffect(() => {
         if (open) {
+            getUsers();
             if (officeToEdit) {
                 form.reset({
                     name: officeToEdit.name,
                     city: officeToEdit.city,
                     address: officeToEdit.address,
-                    phone: officeToEdit.phone,
-                    manager: officeToEdit.manager || "",
+                    users: officeToEdit.managers?.map(m => m.id) || [],
                     status: officeToEdit.status,
                     coordinates: officeToEdit.coordinates || "",
                 });
@@ -67,14 +70,13 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
                     name: "",
                     city: "Oruro",
                     address: "",
-                    phone: "",
-                    manager: "",
+                    users: [],
                     status: "active",
                     coordinates: "",
                 });
             }
         }
-    }, [open, officeToEdit, form]);
+    }, [open, officeToEdit, form, getUsers]);
 
     const onSubmit = async (data: OfficeFormValues) => {
         setIsSubmitting(true);
@@ -97,6 +99,13 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
             setIsSubmitting(false);
         }
     };
+
+    const managerOptions = users
+        .filter(u => ['admin', 'worker'].includes(u.role))
+        .map(u => ({
+            value: u.id,
+            label: `${u.name} (${u.role})`
+        }));
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -178,17 +187,18 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
 
                         <div className="space-y-4 border rounded-lg p-4 bg-muted/20">
                             <h3 className="text-sm font-semibold flex items-center gap-2 text-muted-foreground">
-                                <Building2 className="h-4 w-4" /> Contacto y Responsable
+                                <Building2 className="h-4 w-4" /> Encargados
                             </h3>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="phone">Teléfono</Label>
-                                    <Input id="phone" {...form.register("phone")} placeholder="2-5200000" />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="manager">Encargado</Label>
-                                    <Input id="manager" {...form.register("manager")} placeholder="Nombre del responsable" />
-                                </div>
+                            <div className="space-y-2">
+                                <Label>Seleccionar Encargados</Label>
+                                <MultiSelect
+                                    options={managerOptions}
+                                    selected={form.watch("users") || []}
+                                    onChange={(values) => form.setValue("users", values)}
+                                    placeholder="Buscar usuarios..."
+                                    className="w-full"
+                                />
+                                <p className="text-[10px] text-muted-foreground">Solo se muestran usuarios con rol Admin o Worker.</p>
                             </div>
                         </div>
                     </div>

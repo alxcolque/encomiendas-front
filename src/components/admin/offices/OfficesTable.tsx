@@ -44,8 +44,7 @@ export function OfficesTable({ onEdit }: OfficesTableProps) {
                         <TableHead>Oficina</TableHead>
                         <TableHead>Ciudad</TableHead>
                         <TableHead>Dirección</TableHead>
-                        <TableHead>Teléfono</TableHead>
-                        <TableHead>Encargado</TableHead>
+                        <TableHead>Encargados</TableHead>
                         <TableHead>Estado</TableHead>
                         <TableHead className="text-right">Acciones</TableHead>
                     </TableRow>
@@ -65,13 +64,9 @@ export function OfficesTable({ onEdit }: OfficesTableProps) {
                             <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate" title={office.address}>
                                 {office.address}
                             </TableCell>
-                            <TableCell>
-                                <div className="flex items-center gap-1 text-xs">
-                                    <Phone className="h-3 w-3 text-muted-foreground" />
-                                    {office.phone}
-                                </div>
+                            <TableCell className="text-sm">
+                                {office.managers?.map(m => m.name).join(", ") || "Sin encargado"}
                             </TableCell>
-                            <TableCell className="text-sm">{office.manager}</TableCell>
                             <TableCell>
                                 <Badge variant={office.status === 'active' ? 'default' : 'secondary'} className={office.status === 'active' ? 'bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 border-emerald-500/20' : ''}>
                                     {office.status === 'active' ? 'Activa' : 'Inactiva'}
