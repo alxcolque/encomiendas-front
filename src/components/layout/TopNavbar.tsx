@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, Sun, Moon, Monitor, LogOut, User, Settings, ChevronDown, LayoutDashboard, Package, Users, Truck, Building2, FileBarChart } from "lucide-react";
+import { Bell, Sun, Moon, Monitor, LogOut, User, Settings, ChevronDown, LayoutDashboard, Package, Users, Truck, Building2, FileBarChart, MapPin } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 import {
   DropdownMenu,
@@ -172,6 +172,10 @@ export function TopNavbar() {
                       <DropdownMenuItem onClick={() => navigate('/admin/offices')}>
                         <Building2 size={16} className="mr-2" />
                         Oficinas
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/admin/cities')}>
+                        <MapPin size={16} className="mr-2" />
+                        Ciudades y Rutas
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => navigate('/admin/reports')}>
                         <FileBarChart size={16} className="mr-2" />
