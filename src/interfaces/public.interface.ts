@@ -3,12 +3,15 @@ import { IUser } from "./backend.interface";
 export interface IOffice {
     id: number;
     name: string;
-    city: string;
+    city: {
+        id: string;
+        name: string;
+    };
     address: string;
-    phone: string;
-    hours: string;
-    image: string;
-    coordinates: string;
+    phone?: string;
+    hours?: string;
+    image?: string;
+    coordinates?: string;
 }
 
 export interface IShipmentEvent {

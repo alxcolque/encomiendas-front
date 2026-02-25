@@ -13,27 +13,33 @@ import {
     MapPin,
     Wallet,
     MapPinOff,
+    Search,
+    Plus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import type { ShipmentDetailsData } from "./ShipmentDetailsForm";
+import { useOfficeStore } from "@/stores/officeStore";
+import { useClientStore } from "@/stores/clientStore";
 
 /* ─── Schema ─────────────────────────────────────────────── */
 const schema = z.object({
+    senderId: z.string().optional(),
     senderName: z.string().min(3, "Nombre requerido (mínimo 3 caracteres)"),
     senderCI: z.string().min(5, "Carnet de identidad requerido"),
     senderPhone: z
         .string()
-        .min(7, "Número de celular requerido")
-        .max(15, "Número de celular inválido"),
+        .min(7, "Número de celular requerido"),
+
+    recipientId: z.string().optional(),
     recipientName: z.string().min(3, "Nombre requerido (mínimo 3 caracteres)"),
     recipientCI: z.string().min(5, "Carnet de identidad requerido"),
     recipientPhone: z
         .string()
-        .min(7, "Número de celular requerido")
-        .max(15, "Número de celular inválido"),
+        .min(7, "Número de celular requerido"),
+
     paymentBy: z.enum(["remitente", "destinatario"]),
 });
 
@@ -117,6 +123,13 @@ export default function ShipmentPeopleForm({
     onSubmit,
 }: Props) {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { offices } = useOfficeStore();
+    const { searchClients, createClient } = useClientStore();
+
+    const [isNewSender, setIsNewSender] = useState(false);
+    const [isNewRecipient, setIsNewRecipient] = useState(false);
+    const [isSearchingSender, setIsSearchingSender] = useState(false);
+    const [isSearchingRecipient, setIsSearchingRecipient] = useState(false);
 
     const {
         register,
@@ -126,19 +139,94 @@ export default function ShipmentPeopleForm({
         formState: { errors },
     } = useForm<FormValues>({
         resolver: zodResolver(schema),
-        defaultValues: { paymentBy: "remitente" },
+        defaultValues: {
+            paymentBy: "remitente",
+            senderId: "",
+            recipientId: "",
+        },
     });
+
+    const senderCI = watch("senderCI");
+    const recipientCI = watch("recipientCI");
+
+    const handleSearchClient = async (type: 'sender' | 'recipient') => {
+        const ci = type === 'sender' ? senderCI : recipientCI;
+        if (!ci || ci.length < 5) return;
+
+        if (type === 'sender') setIsSearchingSender(true);
+        else setIsSearchingRecipient(true);
+
+        try {
+            const results = await searchClients(ci);
+            const found = results.find(c => c.ci_nit === ci);
+
+            if (found) {
+                if (type === 'sender') {
+                    setValue("senderId", found.id);
+                    setValue("senderName", found.name);
+                    setValue("senderPhone", found.phone || "");
+                    setIsNewSender(false);
+                } else {
+                    setValue("recipientId", found.id);
+                    setValue("recipientName", found.name);
+                    setValue("recipientPhone", found.phone || "");
+                    setIsNewRecipient(false);
+                }
+            } else {
+                if (type === 'sender') {
+                    setValue("senderId", "");
+                } else {
+                    setValue("recipientId", "");
+                }
+            }
+        } finally {
+            if (type === 'sender') setIsSearchingSender(false);
+            else setIsSearchingRecipient(false);
+        }
+    };
 
     const paymentBy = watch("paymentBy");
 
     const onFormSubmit = async (data: FormValues) => {
         setIsSubmitting(true);
         try {
-            await onSubmit(data);
+            let finalSenderId = data.senderId;
+            let finalRecipientId = data.recipientId;
+
+            // Create new sender if needed
+            if (!finalSenderId || isNewSender) {
+                const newSender = await createClient({
+                    name: data.senderName,
+                    ci_nit: data.senderCI,
+                    phone: data.senderPhone,
+                    status: 'normal'
+                });
+                finalSenderId = newSender.id;
+            }
+
+            // Create new recipient if needed
+            if (!finalRecipientId || isNewRecipient) {
+                const newRecipient = await createClient({
+                    name: data.recipientName,
+                    ci_nit: data.recipientCI,
+                    phone: data.recipientPhone,
+                    status: 'normal'
+                });
+                finalRecipientId = newRecipient.id;
+            }
+
+            await onSubmit({
+                ...data,
+                senderId: finalSenderId,
+                recipientId: finalRecipientId
+            });
         } finally {
             setIsSubmitting(false);
         }
     };
+
+    const originOffice = offices.find(o => o.id === shipmentDetails.origin_office_id);
+    const destinationOffice = offices.find(o => o.id === shipmentDetails.destination_office_id);
 
     const selectedTierLabel = {
         normal: "Normal",
@@ -158,14 +246,18 @@ export default function ShipmentPeopleForm({
                             <div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
                                 <MapPin className="h-3 w-3 text-white" />
                             </div>
-                            <span className="font-bold text-foreground">{shipmentDetails.origin}</span>
+                            <span className="font-bold text-foreground">
+                                {originOffice?.city?.name || "..."} ({originOffice?.name || "..."})
+                            </span>
                         </div>
                         <span className="text-muted-foreground">→</span>
                         <div className="flex items-center gap-1.5">
                             <div className="w-5 h-5 rounded-full bg-rose-500 flex items-center justify-center">
                                 <MapPin className="h-3 w-3 text-white" />
                             </div>
-                            <span className="font-bold text-foreground">{shipmentDetails.destination}</span>
+                            <span className="font-bold text-foreground">
+                                {destinationOffice?.city?.name || "..."} ({destinationOffice?.name || "..."})
+                            </span>
                         </div>
                         <div className="flex gap-1.5 ml-1 flex-wrap">
                             <span className="text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground font-medium capitalize">
@@ -193,74 +285,200 @@ export default function ShipmentPeopleForm({
 
                 {/* Sender */}
                 <div className="border border-border/60 rounded-2xl p-5 bg-card/60 shadow-sm space-y-4">
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white text-sm font-black shadow-md">
-                            R
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white text-sm font-black shadow-md">
+                                R
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-sm text-foreground">Remitente</h3>
+                                <p className="text-xs text-muted-foreground">Quien envía la encomienda</p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 className="font-bold text-sm text-foreground">Remitente</h3>
-                            <p className="text-xs text-muted-foreground">Quien envía la encomienda</p>
-                        </div>
+                        {!isNewSender && (
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setIsNewSender(true)}
+                                className="h-8 text-xs gap-1 text-primary hover:text-primary hover:bg-primary/10"
+                            >
+                                <Plus className="h-3 w-3" />
+                                Nuevo cliente
+                            </Button>
+                        )}
+                        {isNewSender && (
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setIsNewSender(false)}
+                                className="h-8 text-xs gap-1 text-muted-foreground hover:bg-muted"
+                            >
+                                Buscar existente
+                            </Button>
+                        )}
                     </div>
 
-                    <PersonField
-                        label="Nombre Completo"
-                        icon={User}
-                        placeholder="Ej: Juan Carlos Mamani"
-                        error={errors.senderName?.message}
-                        {...register("senderName")}
-                    />
-                    <PersonField
-                        label="Carnet de Identidad"
-                        icon={CreditCard}
-                        placeholder="Ej: 7654321"
-                        error={errors.senderCI?.message}
-                        {...register("senderCI")}
-                    />
-                    <PersonField
-                        label="Número de Celular"
-                        icon={Phone}
-                        type="tel"
-                        placeholder="Ej: 71234567"
-                        error={errors.senderPhone?.message}
-                        {...register("senderPhone")}
-                    />
+                    <div className="space-y-1.5">
+                        <Label className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                            <CreditCard className="h-4 w-4 text-primary" />
+                            Carnet de Identidad
+                            <span className="text-destructive text-sm">*</span>
+                        </Label>
+                        <div className="flex gap-2">
+                            <Input
+                                placeholder="Ej: 7654321"
+                                className={cn(
+                                    "h-11 transition-colors focus:border-primary",
+                                    errors.senderCI && "border-destructive"
+                                )}
+                                {...register("senderCI")}
+                            />
+                            {!isNewSender && (
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-11 w-11 shrink-0"
+                                    disabled={isSearchingSender || (senderCI?.length || 0) < 5}
+                                    onClick={() => handleSearchClient('sender')}
+                                >
+                                    {isSearchingSender ? (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                        <Search className="h-4 w-4" />
+                                    )}
+                                </Button>
+                            )}
+                        </div>
+                        {errors.senderCI && (
+                            <p className="text-xs text-destructive flex items-center gap-1">
+                                {errors.senderCI.message}
+                            </p>
+                        )}
+                    </div>
+
+                    {(isNewSender || watch("senderId")) && (
+                        <>
+                            <PersonField
+                                label="Nombre Completo"
+                                icon={User}
+                                placeholder="Ej: Juan Carlos Mamani"
+                                error={errors.senderName?.message}
+                                {...register("senderName")}
+                                readOnly={!!watch("senderId") && !isNewSender}
+                            />
+                            <PersonField
+                                label="Número de Celular"
+                                icon={Phone}
+                                type="tel"
+                                placeholder="Ej: 71234567"
+                                error={errors.senderPhone?.message}
+                                {...register("senderPhone")}
+                                readOnly={!!watch("senderId") && !isNewSender}
+                            />
+                        </>
+                    )}
                 </div>
 
                 {/* Recipient */}
                 <div className="border border-border/60 rounded-2xl p-5 bg-card/60 shadow-sm space-y-4">
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-sky-500 flex items-center justify-center text-white text-sm font-black shadow-md">
-                            D
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-sky-500 flex items-center justify-center text-white text-sm font-black shadow-md">
+                                D
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-sm text-foreground">Destinatario</h3>
+                                <p className="text-xs text-muted-foreground">Quien recibe la encomienda</p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 className="font-bold text-sm text-foreground">Destinatario</h3>
-                            <p className="text-xs text-muted-foreground">Quien recibe la encomienda</p>
-                        </div>
+                        {!isNewRecipient && (
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setIsNewRecipient(true)}
+                                className="h-8 text-xs gap-1 text-primary hover:text-primary hover:bg-primary/10"
+                            >
+                                <Plus className="h-3 w-3" />
+                                Nuevo cliente
+                            </Button>
+                        )}
+                        {isNewRecipient && (
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setIsNewRecipient(false)}
+                                className="h-8 text-xs gap-1 text-muted-foreground hover:bg-muted"
+                            >
+                                Buscar existente
+                            </Button>
+                        )}
                     </div>
 
-                    <PersonField
-                        label="Nombre Completo"
-                        icon={User}
-                        placeholder="Ej: María Quispe Flores"
-                        error={errors.recipientName?.message}
-                        {...register("recipientName")}
-                    />
-                    <PersonField
-                        label="Carnet de Identidad"
-                        icon={CreditCard}
-                        placeholder="Ej: 4321876"
-                        error={errors.recipientCI?.message}
-                        {...register("recipientCI")}
-                    />
-                    <PersonField
-                        label="Número de Celular"
-                        icon={Phone}
-                        type="tel"
-                        placeholder="Ej: 76543210"
-                        error={errors.recipientPhone?.message}
-                        {...register("recipientPhone")}
-                    />
+                    <div className="space-y-1.5">
+                        <Label className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                            <CreditCard className="h-4 w-4 text-primary" />
+                            Carnet de Identidad
+                            <span className="text-destructive text-sm">*</span>
+                        </Label>
+                        <div className="flex gap-2">
+                            <Input
+                                placeholder="Ej: 4321876"
+                                className={cn(
+                                    "h-11 transition-colors focus:border-primary",
+                                    errors.recipientCI && "border-destructive"
+                                )}
+                                {...register("recipientCI")}
+                            />
+                            {!isNewRecipient && (
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-11 w-11 shrink-0"
+                                    disabled={isSearchingRecipient || (recipientCI?.length || 0) < 5}
+                                    onClick={() => handleSearchClient('recipient')}
+                                >
+                                    {isSearchingRecipient ? (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                        <Search className="h-4 w-4" />
+                                    )}
+                                </Button>
+                            )}
+                        </div>
+                        {errors.recipientCI && (
+                            <p className="text-xs text-destructive flex items-center gap-1">
+                                {errors.recipientCI.message}
+                            </p>
+                        )}
+                    </div>
+
+                    {(isNewRecipient || watch("recipientId")) && (
+                        <>
+                            <PersonField
+                                label="Nombre Completo"
+                                icon={User}
+                                placeholder="Ej: María Quispe Flores"
+                                error={errors.recipientName?.message}
+                                {...register("recipientName")}
+                                readOnly={!!watch("recipientId") && !isNewRecipient}
+                            />
+                            <PersonField
+                                label="Número de Celular"
+                                icon={Phone}
+                                type="tel"
+                                placeholder="Ej: 76543210"
+                                error={errors.recipientPhone?.message}
+                                {...register("recipientPhone")}
+                                readOnly={!!watch("recipientId") && !isNewRecipient}
+                            />
+                        </>
+                    )}
                 </div>
             </div>
 

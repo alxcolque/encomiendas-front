@@ -24,6 +24,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { useOfficeStore } from "@/stores/officeStore";
 
 /* ─── Types ─────────────────────────────────────────────── */
 export type ShipmentType = "paquete" | "sobre";
@@ -32,8 +33,8 @@ export type ServiceTier = "normal" | "estandar" | "rapido";
 
 export interface ShipmentDetailsData {
     type: ShipmentType;
-    origin: string;
-    destination: string;
+    origin_office_id: string;
+    destination_office_id: string;
     width?: number;
     length?: number;
     height?: number;
@@ -48,18 +49,6 @@ interface Props {
 }
 
 /* ─── Constants ─────────────────────────────────────────── */
-const CITIES = [
-    "La Paz",
-    "Cochabamba",
-    "Santa Cruz",
-    "Oruro",
-    "Potosí",
-    "Sucre",
-    "Tarija",
-    "Trinidad",
-    "Cobija",
-];
-
 interface ServiceTierConfig {
     id: ServiceTier;
     label: string;
@@ -265,9 +254,10 @@ function TransportCard({
 
 /* ─── Main Component ─────────────────────────────────────── */
 export default function ShipmentDetailsForm({ onNext }: Props) {
+    const { offices, fetchOffices } = useOfficeStore();
     const [type, setType] = useState<ShipmentType>("paquete");
-    const [origin, setOrigin] = useState("");
-    const [destination, setDestination] = useState("");
+    const [originId, setOriginId] = useState("");
+    const [destinationId, setDestinationId] = useState("");
     const [width, setWidth] = useState<string>("");
     const [lengthVal, setLengthVal] = useState<string>("");
     const [height, setHeight] = useState<string>("");
@@ -275,6 +265,12 @@ export default function ShipmentDetailsForm({ onNext }: Props) {
     const [transport, setTransport] = useState<TransportMode>("terrestre");
     const [service, setService] = useState<ServiceTier>("estandar");
     const [total, setTotal] = useState(0);
+
+    useEffect(() => {
+        if (offices.length === 0) {
+            fetchOffices();
+        }
+    }, []);
 
     /* Recalculate total whenever any relevant field changes */
     useEffect(() => {
@@ -293,14 +289,14 @@ export default function ShipmentDetailsForm({ onNext }: Props) {
             parseFloat(height) > 0 &&
             parseFloat(weight) > 0);
 
-    const isValid = origin && destination && origin !== destination && isPackageDimensionsValid;
+    const isValid = originId && destinationId && originId !== destinationId && isPackageDimensionsValid;
 
     const handleNext = () => {
         if (!isValid) return;
         onNext({
             type,
-            origin,
-            destination,
+            origin_office_id: originId,
+            destination_office_id: destinationId,
             width: type === "paquete" ? parseFloat(width) : undefined,
             length: type === "paquete" ? parseFloat(lengthVal) : undefined,
             height: type === "paquete" ? parseFloat(height) : undefined,
@@ -313,12 +309,15 @@ export default function ShipmentDetailsForm({ onNext }: Props) {
 
     const selectedTier = SERVICE_TIERS.find((t) => t.id === service)!;
 
+    const originOffice = offices.find(o => o.id === originId);
+    const destinationOffice = offices.find(o => o.id === destinationId);
+
     return (
         <div className="space-y-5">
 
             {/* ── Section 1: Tipo y Ruta ───────────────────────── */}
             <div className="border border-border/60 rounded-2xl p-5 bg-card/60 backdrop-blur-sm shadow-sm">
-                <SectionHeader number={1} title="Tipo de Encomienda y Ruta" />
+                <SectionHeader number={1} title="Oficina de Origen y Destino" />
 
                 {/* Type selector */}
                 <div className="flex gap-4 mb-5">
@@ -345,17 +344,17 @@ export default function ShipmentDetailsForm({ onNext }: Props) {
                             <div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
                                 <MapPin className="h-3 w-3 text-white" />
                             </div>
-                            Ciudad de Origen
+                            Oficina de Origen
                             <span className="text-destructive">*</span>
                         </Label>
-                        <Select value={origin} onValueChange={setOrigin}>
+                        <Select value={originId} onValueChange={setOriginId}>
                             <SelectTrigger className="h-11 border-border/80 focus:border-primary">
                                 <SelectValue placeholder="Seleccionar origen..." />
                             </SelectTrigger>
                             <SelectContent>
-                                {CITIES.map((c) => (
-                                    <SelectItem key={c} value={c} disabled={c === destination}>
-                                        {c}
+                                {offices.filter(o => o.status === 'active').map((o) => (
+                                    <SelectItem key={o.id} value={o.id} disabled={o.id === destinationId}>
+                                        {o.city?.name} - {o.name}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -366,17 +365,17 @@ export default function ShipmentDetailsForm({ onNext }: Props) {
                             <div className="w-5 h-5 rounded-full bg-rose-500 flex items-center justify-center">
                                 <MapPin className="h-3 w-3 text-white" />
                             </div>
-                            Ciudad de Destino
+                            Oficina de Destino
                             <span className="text-destructive">*</span>
                         </Label>
-                        <Select value={destination} onValueChange={setDestination}>
+                        <Select value={destinationId} onValueChange={setDestinationId}>
                             <SelectTrigger className="h-11 border-border/80 focus:border-primary">
                                 <SelectValue placeholder="Seleccionar destino..." />
                             </SelectTrigger>
                             <SelectContent>
-                                {CITIES.map((c) => (
-                                    <SelectItem key={c} value={c} disabled={c === origin}>
-                                        {c}
+                                {offices.filter(o => o.status === 'active').map((o) => (
+                                    <SelectItem key={o.id} value={o.id} disabled={o.id === originId}>
+                                        {o.city?.name} - {o.name}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -385,11 +384,11 @@ export default function ShipmentDetailsForm({ onNext }: Props) {
                 </div>
 
                 {/* Route preview */}
-                {origin && destination && (
+                {originOffice && destinationOffice && (
                     <div className="mt-3 flex items-center justify-center gap-2 text-xs text-muted-foreground bg-muted/40 rounded-lg px-3 py-2">
-                        <span className="font-semibold text-emerald-600 dark:text-emerald-400">{origin}</span>
+                        <span className="font-semibold text-emerald-600 dark:text-emerald-400">{originOffice.city?.name} ({originOffice.name})</span>
                         <ArrowRight className="h-3 w-3" />
-                        <span className="font-semibold text-rose-600 dark:text-rose-400">{destination}</span>
+                        <span className="font-semibold text-rose-600 dark:text-rose-400">{destinationOffice.city?.name} ({destinationOffice.name})</span>
                     </div>
                 )}
             </div>
@@ -567,7 +566,7 @@ export default function ShipmentDetailsForm({ onNext }: Props) {
                                         >
                                             {tier.delta > 0 ? `+${tier.delta} Bs.` : "Incluido"}
                                         </span>
-                                        <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground font-medium">
+                                        <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground font-medium"	>
                                             <Clock className="h-3 w-3" />
                                             {tier.days}
                                         </span>
@@ -590,9 +589,9 @@ export default function ShipmentDetailsForm({ onNext }: Props) {
                                 Costo Total del Envío
                             </p>
                             <div className="flex items-center gap-2 mt-1 flex-wrap">
-                                {origin && destination && (
+                                {originOffice && destinationOffice && (
                                     <span className="text-xs bg-primary/10 text-primary font-semibold px-2 py-0.5 rounded-full">
-                                        {origin} → {destination}
+                                        {originOffice.city?.name} → {destinationOffice.city?.name}
                                     </span>
                                 )}
                                 <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full font-medium capitalize">
@@ -642,9 +641,9 @@ export default function ShipmentDetailsForm({ onNext }: Props) {
 
                 {!isValid && (
                     <p className="text-center text-xs text-muted-foreground">
-                        {!origin || !destination
+                        {!originId || !destinationId
                             ? "📍 Selecciona ciudad de origen y destino para continuar"
-                            : origin === destination
+                            : originId === destinationId
                                 ? "⚠️ El origen y destino deben ser ciudades diferentes"
                                 : "📐 Completa las dimensiones y peso del paquete para continuar"}
                     </p>

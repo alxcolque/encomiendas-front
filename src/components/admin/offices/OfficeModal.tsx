@@ -83,12 +83,20 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
 
     const onSubmit = async (data: OfficeFormValues) => {
         setIsSubmitting(true);
+        const payload = {
+            name: data.name,
+            city_id: data.city_id,
+            address: data.address,
+            status: data.status,
+            users: data.users,
+            coordinates: data.coordinates,
+        };
         try {
             if (isEditing && officeToEdit) {
-                await updateOffice(officeToEdit.id, data as Partial<Office>);
+                await updateOffice(officeToEdit.id, payload);
                 toast.success("Oficina actualizada correctamente");
             } else {
-                await createOffice(data as Omit<Office, 'id'>);
+                await createOffice(payload);
                 toast.success("Oficina registrada exitosamente");
             }
             setOpen?.(false);

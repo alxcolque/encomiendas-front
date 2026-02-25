@@ -8,6 +8,8 @@ import ShipmentPeopleForm, {
     type ShipmentPeopleData,
 } from "./ShipmentPeopleForm";
 import { cn } from "@/lib/utils";
+import { useAdminShipmentStore } from "@/stores/adminShipmentStore";
+import { CreateShipmentPayload } from "@/interfaces/shipment.interface";
 
 /* ─── Step indicator ─────────────────────────────────────── */
 const STEPS = [
@@ -83,6 +85,7 @@ export default function ShipmentRegisterWizard({
 }: ShipmentRegisterWizardProps) {
     const [step, setStep] = useState(1);
     const [detailsData, setDetailsData] = useState<ShipmentDetailsData | null>(null);
+    const { createShipment } = useAdminShipmentStore();
 
     const handleDetailsNext = (data: ShipmentDetailsData) => {
         setDetailsData(data);
@@ -95,25 +98,54 @@ export default function ShipmentRegisterWizard({
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
+    const generateTrackingCode = () => {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        let code = "SH-";
+        for (let i = 0; i < 6; i++) {
+            code += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return code;
+    };
+
     const handleFinalSubmit = async (people: ShipmentPeopleData) => {
-        // Combine all data for API call
-        const fullPayload = { ...detailsData, ...people };
-        console.log("Shipment payload:", fullPayload);
+        if (!detailsData) return;
 
-        // Simulated API delay
-        await new Promise((resolve) => setTimeout(resolve, 1200));
+        try {
+            const payload: CreateShipmentPayload = {
+                tracking_code: generateTrackingCode(),
+                origin_office_id: detailsData.origin_office_id,
+                destination_office_id: detailsData.destination_office_id,
+                sender_id: people.senderId!,
+                receiver_id: people.recipientId!,
+                tracking_pay: people.paymentBy === 'remitente' ? 1 : 2,
+                is_pack: detailsData.type === 'paquete',
+                type_service: {
+                    normal: 'normal',
+                    estandar: 'standard',
+                    rapido: 'express'
+                }[detailsData.service] as any,
+                track_type: detailsData.transport === 'terrestre' ? 1 : 2,
+                price: detailsData.total,
+                current_status: 'created'
+            };
 
-        toast.success("¡Encomienda registrada exitosamente!", {
-            description: `${detailsData?.origin} → ${detailsData?.destination} · ${detailsData?.total.toFixed(2)} Bs.`,
-        });
+            await createShipment(payload);
 
-        // Reset wizard
-        setStep(1);
-        setDetailsData(null);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+            toast.success("¡Encomienda registrada exitosamente!", {
+                description: `Código: ${payload.tracking_code} · ${detailsData.total.toFixed(2)} Bs.`,
+            });
 
-        // Notify parent (e.g. close modal)
-        onSuccess?.();
+            // Reset wizard
+            setStep(1);
+            setDetailsData(null);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            // Notify parent (e.g. close modal)
+            onSuccess?.();
+        } catch (error) {
+            console.error("Error creating shipment:", error);
+            toast.error("Error al registrar la encomienda. Por favor intente de nuevo.");
+        }
     };
 
     return (
@@ -160,7 +192,7 @@ export default function ShipmentRegisterWizard({
                 >
                     {detailsData && (
                         <ShipmentPeopleForm
-                            shipmentDetails={detailsData}
+                            shipmentDetails={detailsData as any}
                             onBack={handleBack}
                             onSubmit={handleFinalSubmit}
                         />

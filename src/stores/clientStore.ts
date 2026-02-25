@@ -9,10 +9,11 @@ interface ClientState {
     isLoading: boolean;
     error: string | null;
     fetchClients: () => Promise<void>;
-    createClient: (client: Partial<Client>) => Promise<void>;
+    createClient: (client: Partial<Client>) => Promise<Client>;
     updateClient: (id: string, client: Partial<Client>) => Promise<void>;
     deleteClient: (id: string) => Promise<void>;
     changeClientStatus: (id: string, status: Client['status']) => Promise<void>;
+    searchClients: (q: string) => Promise<Client[]>;
 }
 
 export const useClientStore = create<ClientState>((set) => ({
@@ -40,11 +41,13 @@ export const useClientStore = create<ClientState>((set) => ({
                 isLoading: false,
             }));
             toast.success('Cliente registrado correctamente');
+            return data.data;
         } catch (error) {
             set({ isLoading: false });
             if (isAxiosError(error)) {
                 throw error;
             }
+            throw error;
         }
     },
 
@@ -100,6 +103,16 @@ export const useClientStore = create<ClientState>((set) => ({
             if (isAxiosError(error)) {
                 toast.error('Error al cambiar el estado del cliente');
             }
+        }
+    },
+
+    searchClients: async (q) => {
+        try {
+            const { data } = await ENV.get<IGetClientsResponse>(`/clients/search?q=${q}`);
+            return data.data || [];
+        } catch (error) {
+            console.error(error);
+            return [];
         }
     },
 }));

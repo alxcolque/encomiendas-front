@@ -2,17 +2,25 @@ import { create } from 'zustand';
 import { Office } from '@/interfaces/office.interface';
 import { ENV } from "@/config/env";
 
+// Fields sent to the backend (excludes nested 'city' object)
+interface OfficePayload {
+    name: string;
+    city_id: string;
+    address: string;
+    users?: string[];
+    status: string;
+    coordinates?: string;
+}
+
 interface OfficeState {
     offices: Office[];
     isLoading: boolean;
     error: string | null;
     fetchOffices: () => Promise<void>;
-    createOffice: (office: Omit<Office, 'id'>) => Promise<void>;
-    updateOffice: (id: string, office: Partial<Office>) => Promise<void>;
+    createOffice: (office: OfficePayload) => Promise<void>;
+    updateOffice: (id: string, office: Partial<OfficePayload>) => Promise<void>;
     deleteOffice: (id: string) => Promise<void>;
 }
-
-
 
 export const useOfficeStore = create<OfficeState>((set) => ({
     offices: [],

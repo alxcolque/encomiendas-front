@@ -43,8 +43,8 @@ export const useShipmentStore = create<ShipmentState>((set) => ({
       const shipment: Shipment = {
         id: data.id.toString(),
         trackingCode: data.tracking_code,
-        origin: data.origin_office.city,
-        destination: data.destination_office.city,
+        origin: data.origin_office.city?.name || 'N/A',
+        destination: data.destination_office.city?.name || 'N/A',
         currentStatus: data.current_status as ShipmentStatus,
         estimatedDelivery: new Date(data.estimated_delivery),
         senderName: data.sender_name,
