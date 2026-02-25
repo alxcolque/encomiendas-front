@@ -60,7 +60,7 @@ export function OfficesTable({ onEdit }: OfficesTableProps) {
                                     {office.name}
                                 </div>
                             </TableCell>
-                            <TableCell>{office.city}</TableCell>
+                            <TableCell>{office.city?.name ?? '—'}</TableCell>
                             <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate" title={office.address}>
                                 {office.address}
                             </TableCell>

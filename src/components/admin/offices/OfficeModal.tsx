@@ -12,11 +12,12 @@ import { toast } from "sonner";
 import { useOfficeStore } from "@/stores/officeStore";
 import { Office } from "@/interfaces/office.interface";
 import { useUserStore } from "@/stores/userStore";
+import { useCityStore } from "@/stores/cityStore";
 import { MultiSelect } from "@/components/ui/multi-select";
 
 const officeSchema = z.object({
     name: z.string().min(3, "Nombre requerido"),
-    city: z.string().min(2, "Ciudad requerida"),
+    city_id: z.string().min(1, "Ciudad requerida"),
     address: z.string().min(5, "Dirección requerida"),
     users: z.array(z.string()).optional(),
     status: z.enum(["active", "inactive"]),
@@ -37,6 +38,7 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { createOffice, updateOffice } = useOfficeStore();
     const { users, getUsers } = useUserStore();
+    const { cities, fetchCities } = useCityStore();
 
     const isControlled = typeof controlledOpen !== "undefined";
     const open = isControlled ? controlledOpen : internalOpen;
@@ -48,7 +50,7 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
         resolver: zodResolver(officeSchema),
         defaultValues: {
             status: "active",
-            city: "Oruro",
+            city_id: "",
             users: []
         }
     });
@@ -56,10 +58,11 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
     useEffect(() => {
         if (open) {
             getUsers();
+            fetchCities();
             if (officeToEdit) {
                 form.reset({
                     name: officeToEdit.name,
-                    city: officeToEdit.city,
+                    city_id: officeToEdit.city_id || String(officeToEdit.city?.id || ""),
                     address: officeToEdit.address,
                     users: officeToEdit.managers?.map(m => m.id) || [],
                     status: officeToEdit.status,
@@ -68,7 +71,7 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
             } else {
                 form.reset({
                     name: "",
-                    city: "Oruro",
+                    city_id: "",
                     address: "",
                     users: [],
                     status: "active",
@@ -76,7 +79,7 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
                 });
             }
         }
-    }, [open, officeToEdit, form, getUsers]);
+    }, [open, officeToEdit, form, getUsers, fetchCities]);
 
     const onSubmit = async (data: OfficeFormValues) => {
         setIsSubmitting(true);
@@ -133,28 +136,23 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="city">Ciudad <span className="text-destructive">*</span></Label>
+                                    <Label htmlFor="city_id">Ciudad <span className="text-destructive">*</span></Label>
                                     <Select
-                                        onValueChange={(val) => form.setValue("city", val)}
-                                        defaultValue={isEditing ? officeToEdit?.city : "Oruro"}
-                                        value={form.watch("city")}
+                                        onValueChange={(val) => form.setValue("city_id", val)}
+                                        value={form.watch("city_id")}
                                     >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Seleccione ciudad" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="Oruro">Oruro</SelectItem>
-                                            <SelectItem value="La Paz">La Paz</SelectItem>
-                                            <SelectItem value="Cochabamba">Cochabamba</SelectItem>
-                                            <SelectItem value="Santa Cruz">Santa Cruz</SelectItem>
-                                            <SelectItem value="Potosí">Potosí</SelectItem>
-                                            <SelectItem value="Sucre">Sucre</SelectItem>
-                                            <SelectItem value="Tarija">Tarija</SelectItem>
-                                            <SelectItem value="Beni">Beni</SelectItem>
-                                            <SelectItem value="Pando">Pando</SelectItem>
+                                            {cities.map((city) => (
+                                                <SelectItem key={city.id} value={String(city.id)}>
+                                                    {city.name}
+                                                </SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
-                                    {form.formState.errors.city && <span className="text-xs text-destructive">{form.formState.errors.city.message}</span>}
+                                    {form.formState.errors.city_id && <span className="text-xs text-destructive">{form.formState.errors.city_id.message}</span>}
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="status">Estado</Label>
