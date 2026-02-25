@@ -34,6 +34,7 @@ const Wallet = lazy(() => import("@/pages/driver/Wallet"));
 const AdminDashboard = lazy(() => import("@/pages/admin/Dashboard"));
 const AdminShipments = lazy(() => import("@/pages/admin/Shipments"));
 const AdminUsers = lazy(() => import("@/pages/admin/Users"));
+const AdminClients = lazy(() => import("@/pages/admin/Clients"));
 const AdminDrivers = lazy(() => import("@/pages/admin/Drivers"));
 const AdminOffices = lazy(() => import("@/pages/admin/Offices"));
 const AdminCities = lazy(() => import("@/pages/admin/Cities"));
@@ -79,6 +80,7 @@ export const AppRouter = () => {
                     <Route path="/admin" element={<AdminDashboard />} />
                     <Route path="/admin/shipments" element={<AdminShipments />} />
                     <Route path="/admin/users" element={<AdminUsers />} />
+                    <Route path="/admin/clients" element={<AdminClients />} />
                     <Route path="/admin/drivers" element={<AdminDrivers />} />
                     <Route path="/admin/offices" element={<AdminOffices />} />
                     <Route path="/admin/cities" element={<AdminCities />} />

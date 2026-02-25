@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, Users, Truck, Building2, FileBarChart, Settings, MapPin } from "lucide-react";
+import { LayoutDashboard, Package, Users, UserCheck, Truck, Building2, FileBarChart, Settings, MapPin } from "lucide-react";
 import { AdminSidebarItem } from "./AdminSidebarItem";
 import { ADMIN_ROUTES } from "@/constants/admin.routes";
 import { cn } from "@/lib/utils";
@@ -32,6 +32,7 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
                 <AdminSidebarItem icon={LayoutDashboard} label="Dashboard" path={ADMIN_ROUTES.DASHBOARD} />
                 <AdminSidebarItem icon={Package} label="Encomiendas" path={ADMIN_ROUTES.SHIPMENTS} />
                 <AdminSidebarItem icon={Users} label="Usuarios" path={ADMIN_ROUTES.USERS} />
+                <AdminSidebarItem icon={UserCheck} label="Clientes" path={ADMIN_ROUTES.CLIENTS} />
 
                 <div className="px-3 mt-6 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Operaciones
