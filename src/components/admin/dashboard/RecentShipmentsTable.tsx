@@ -1,15 +1,25 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "../shared/StatusBadge";
-import { Eye, Loader2 } from "lucide-react";
+import { Eye, Loader2, FileText } from "lucide-react";
 import { useAdminShipmentStore } from "@/stores/adminShipmentStore";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { InvoiceDocument } from "@/components/worker/shipment/InvoiceDocument";
+import { AdminShipment } from "@/interfaces/shipment.interface";
 
 export function RecentShipmentsTable() {
     const { shipments, isLoading, fetchShipments } = useAdminShipmentStore();
+    const [selectedShipment, setSelectedShipment] = useState<AdminShipment | null>(null);
+    const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
+
+    const handleViewInvoice = (shipment: AdminShipment) => {
+        setSelectedShipment(shipment);
+        setIsInvoiceOpen(true);
+    };
 
     useEffect(() => {
         fetchShipments();
@@ -44,7 +54,7 @@ export function RecentShipmentsTable() {
                                 <TableHead>Fecha</TableHead>
                                 <TableHead>Monto</TableHead>
                                 <TableHead>Estado</TableHead>
-                                <TableHead className="text-right">Acción</TableHead>
+                                <TableHead className="text-right">Opciones</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -75,7 +85,17 @@ export function RecentShipmentsTable() {
                                         <TableCell>
                                             <StatusBadge status={shipment.current_status} />
                                         </TableCell>
-                                        <TableCell className="text-right">
+                                        <TableCell className="text-right flex justify-end gap-2">
+                                            {shipment.invoice && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-muted-foreground hover:text-primary"
+                                                    onClick={() => handleViewInvoice(shipment)}
+                                                >
+                                                    <FileText className="w-4 h-4" />
+                                                </Button>
+                                            )}
                                             <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary">
                                                 <Eye className="w-4 h-4" />
                                             </Button>
@@ -87,6 +107,20 @@ export function RecentShipmentsTable() {
                     </Table>
                 </div>
             </CardContent>
+
+            <Dialog open={isInvoiceOpen} onOpenChange={setIsInvoiceOpen}>
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle className="sr-only">Factura</DialogTitle>
+                    </DialogHeader>
+                    {selectedShipment?.invoice && (
+                        <InvoiceDocument
+                            invoice={selectedShipment.invoice}
+                            onClose={() => setIsInvoiceOpen(false)}
+                        />
+                    )}
+                </DialogContent>
+            </Dialog>
         </Card>
     );
 }

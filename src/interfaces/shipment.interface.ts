@@ -1,4 +1,5 @@
 import { City } from './city.interface';
+import { Invoice } from './invoice.interface';
 
 export type ShipmentStatus = 'created' | 'in_transit' | 'at_office' | 'out_for_delivery' | 'delivered' | 'cancelled';
 
@@ -35,6 +36,7 @@ export interface AdminShipment {
     estimated_delivery?: string;
     price: number;
     events?: AdminShipmentEvent[];
+    invoice?: Invoice;
     created_at?: string;
     updated_at?: string;
 }

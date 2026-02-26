@@ -3,6 +3,8 @@ import {
     Dialog,
     DialogContent,
     DialogTrigger,
+    DialogTitle,
+    DialogHeader,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Package } from "lucide-react";
@@ -57,14 +59,14 @@ export function NewShipmentModal({
                         <div className="p-2.5 rounded-xl gradient-primary shadow-md shadow-primary/30">
                             <Package className="h-5 w-5 text-white" />
                         </div>
-                        <div>
-                            <h2 className="text-lg font-black text-foreground leading-tight">
+                        <DialogHeader className="text-left">
+                            <DialogTitle className="text-lg font-black text-foreground leading-tight">
                                 Registro de Encomienda
-                            </h2>
+                            </DialogTitle>
                             <p className="text-xs text-muted-foreground">
                                 Completa los pasos para registrar el nuevo envío
                             </p>
-                        </div>
+                        </DialogHeader>
                     </div>
 
                     {/* Date display */}

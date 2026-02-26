@@ -11,6 +11,9 @@ import { cn } from "@/lib/utils";
 import { useAdminShipmentStore } from "@/stores/adminShipmentStore";
 import { CreateShipmentPayload } from "@/interfaces/shipment.interface";
 
+import { InvoiceDocument } from "./InvoiceDocument";
+import { Invoice } from "@/interfaces/invoice.interface";
+
 /* ─── Step indicator ─────────────────────────────────────── */
 const STEPS = [
     { number: 1, label: "Detalles del Envío" },
@@ -85,6 +88,8 @@ export default function ShipmentRegisterWizard({
 }: ShipmentRegisterWizardProps) {
     const [step, setStep] = useState(1);
     const [detailsData, setDetailsData] = useState<ShipmentDetailsData | null>(null);
+    const [showInvoice, setShowInvoice] = useState(false);
+    const [createdInvoice, setCreatedInvoice] = useState<Invoice | null>(null);
     const { createShipment } = useAdminShipmentStore();
 
     const handleDetailsNext = (data: ShipmentDetailsData) => {
@@ -125,30 +130,47 @@ export default function ShipmentRegisterWizard({
                 current_status: 'created'
             };
 
-            const result = await createShipment(payload);
+            const result = await createShipment({
+                ...payload,
+                // Add with_invoice flag if needed (assuming true as per user request to show invoice)
+                with_invoice: true,
+                invoice_name: people.senderName,
+                invoice_nit: people.senderCI,
+            } as any);
 
             toast.success("¡Encomienda registrada exitosamente!", {
                 description: `Código: ${result.tracking_code} · ${detailsData.total.toFixed(2)} Bs.`,
             });
 
-            // Reset wizard
-            setStep(1);
-            setDetailsData(null);
-            window.scrollTo({ top: 0, behavior: "smooth" });
+            if (result.invoice) {
+                setCreatedInvoice(result.invoice);
+                setShowInvoice(true);
+            } else {
+                // Reset wizard if no invoice
+                resetWizard();
+            }
 
             // Notify parent (e.g. close modal)
             onSuccess?.();
+            window.scrollTo({ top: 0, behavior: "smooth" });
         } catch (error) {
             console.error("Error creating shipment:", error);
             toast.error("Error al registrar la encomienda. Por favor intente de nuevo.");
         }
     };
 
+    const resetWizard = () => {
+        setStep(1);
+        setDetailsData(null);
+        setShowInvoice(false);
+        setCreatedInvoice(null);
+    };
+
     return (
         <div className="max-w-3xl mx-auto">
 
             {/* Header — hidden when used inside a modal */}
-            {!hideHeader && (
+            {!hideHeader && !showInvoice && (
                 <div className="mb-6">
                     <div className="flex items-center gap-3 mb-1">
                         <div className="p-2.5 rounded-xl gradient-primary glow-primary">
@@ -166,35 +188,44 @@ export default function ShipmentRegisterWizard({
                 </div>
             )}
 
-            {/* Step indicator */}
-            <StepIndicator current={step} />
+            {showInvoice && createdInvoice ? (
+                <InvoiceDocument
+                    invoice={createdInvoice}
+                    onClose={resetWizard}
+                />
+            ) : (
+                <>
+                    {/* Step indicator */}
+                    <StepIndicator current={step} />
 
-            {/* Step content with slide animation */}
-            <div className="relative overflow-hidden">
-                <div
-                    className={cn(
-                        "transition-all duration-300",
-                        step === 1 ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0 absolute inset-0 pointer-events-none"
-                    )}
-                >
-                    <ShipmentDetailsForm onNext={handleDetailsNext} />
-                </div>
+                    {/* Step content with slide animation */}
+                    <div className="relative overflow-hidden">
+                        <div
+                            className={cn(
+                                "transition-all duration-300",
+                                step === 1 ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0 absolute inset-0 pointer-events-none"
+                            )}
+                        >
+                            <ShipmentDetailsForm onNext={handleDetailsNext} />
+                        </div>
 
-                <div
-                    className={cn(
-                        "transition-all duration-300",
-                        step === 2 ? "translate-x-0 opacity-100" : "translate-x-full opacity-0 absolute inset-0 pointer-events-none"
-                    )}
-                >
-                    {detailsData && (
-                        <ShipmentPeopleForm
-                            shipmentDetails={detailsData as any}
-                            onBack={handleBack}
-                            onSubmit={handleFinalSubmit}
-                        />
-                    )}
-                </div>
-            </div>
+                        <div
+                            className={cn(
+                                "transition-all duration-300",
+                                step === 2 ? "translate-x-0 opacity-100" : "translate-x-full opacity-0 absolute inset-0 pointer-events-none"
+                            )}
+                        >
+                            {detailsData && (
+                                <ShipmentPeopleForm
+                                    shipmentDetails={detailsData as any}
+                                    onBack={handleBack}
+                                    onSubmit={handleFinalSubmit}
+                                />
+                            )}
+                        </div>
+                    </div>
+                </>
+            )}
         </div>
     );
 }
