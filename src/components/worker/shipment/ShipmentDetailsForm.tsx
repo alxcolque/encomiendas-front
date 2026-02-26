@@ -29,7 +29,7 @@ import { useOfficeStore } from "@/stores/officeStore";
 /* ─── Types ─────────────────────────────────────────────── */
 export type ShipmentType = "paquete" | "sobre";
 export type TransportMode = "terrestre" | "aereo";
-export type ServiceTier = "normal" | "estandar" | "rapido";
+export type ServiceTier = "normal" | "standard" | "express";
 
 export interface ShipmentDetailsData {
     type: ShipmentType;
@@ -78,7 +78,7 @@ const SERVICE_TIERS: ServiceTierConfig[] = [
         icon: Truck,
     },
     {
-        id: "estandar",
+        id: "standard",
         label: "Estándar",
         delta: 5,
         days: "3 – 5 días",
@@ -91,7 +91,7 @@ const SERVICE_TIERS: ServiceTierConfig[] = [
         icon: Star,
     },
     {
-        id: "rapido",
+        id: "express",
         label: "Rápido",
         delta: 15,
         days: "1 – 2 días",
@@ -120,7 +120,7 @@ function calculateTotal(
             ? 15
             : 25 + ((w * l * h) / 1000) * 0.5 + weight * 2;
     const factor = transport === "aereo" ? 1.4 : 1.0;
-    const delta = { normal: 0, estandar: 5, rapido: 15 }[service];
+    const delta = { normal: 0, standard: 5, express: 15 }[service];
     return Math.round((base * factor + delta) * 100) / 100;
 }
 
@@ -263,7 +263,7 @@ export default function ShipmentDetailsForm({ onNext }: Props) {
     const [height, setHeight] = useState<string>("");
     const [weight, setWeight] = useState<string>("");
     const [transport, setTransport] = useState<TransportMode>("terrestre");
-    const [service, setService] = useState<ServiceTier>("estandar");
+    const [service, setService] = useState<ServiceTier>("standard");
     const [total, setTotal] = useState(0);
 
     useEffect(() => {

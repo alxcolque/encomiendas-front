@@ -40,13 +40,23 @@ export interface AdminShipment {
 }
 
 export interface CreateShipmentPayload {
-    tracking_code: string;
+    tracking_code?: string;
     origin_office_id: string;
     destination_office_id: string;
-    sender_id: string;
-    receiver_id: string;
+    sender_id?: string;
+    receiver_id?: string;
+
+    // Optional client data for auto-creation
+    sender_name?: string;
+    sender_ci?: string;
+    sender_phone?: string;
+    receiver_name?: string;
+    receiver_ci?: string;
+    receiver_phone?: string;
+
     tracking_pay: number;
     is_pack: boolean;
+    is_fragile: boolean;
     type_service: 'normal' | 'standard' | 'express';
     track_type: number;
     observation?: string;

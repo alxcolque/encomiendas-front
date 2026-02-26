@@ -98,41 +98,37 @@ export default function ShipmentRegisterWizard({
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    const generateTrackingCode = () => {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        let code = "SH-";
-        for (let i = 0; i < 6; i++) {
-            code += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return code;
-    };
-
     const handleFinalSubmit = async (people: ShipmentPeopleData) => {
         if (!detailsData) return;
 
         try {
             const payload: CreateShipmentPayload = {
-                tracking_code: generateTrackingCode(),
                 origin_office_id: detailsData.origin_office_id,
                 destination_office_id: detailsData.destination_office_id,
-                sender_id: people.senderId!,
-                receiver_id: people.recipientId!,
+                sender_id: people.senderId || undefined,
+                receiver_id: people.recipientId || undefined,
+
+                // If IDs are missing, the backend will use these
+                sender_name: people.senderName,
+                sender_ci: people.senderCI,
+                sender_phone: people.senderPhone,
+                receiver_name: people.recipientName,
+                receiver_ci: people.recipientCI,
+                receiver_phone: people.recipientPhone,
+
                 tracking_pay: people.paymentBy === 'remitente' ? 1 : 2,
                 is_pack: detailsData.type === 'paquete',
-                type_service: {
-                    normal: 'normal',
-                    estandar: 'standard',
-                    rapido: 'express'
-                }[detailsData.service] as any,
+                is_fragile: people.isFragile,
+                type_service: detailsData.service,
                 track_type: detailsData.transport === 'terrestre' ? 1 : 2,
                 price: detailsData.total,
                 current_status: 'created'
             };
 
-            await createShipment(payload);
+            const result = await createShipment(payload);
 
             toast.success("¡Encomienda registrada exitosamente!", {
-                description: `Código: ${payload.tracking_code} · ${detailsData.total.toFixed(2)} Bs.`,
+                description: `Código: ${result.tracking_code} · ${detailsData.total.toFixed(2)} Bs.`,
             });
 
             // Reset wizard

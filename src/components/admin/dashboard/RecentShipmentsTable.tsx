@@ -71,7 +71,7 @@ export function RecentShipmentsTable() {
                                         <TableCell className="text-muted-foreground text-sm">
                                             {shipment.created_at ? format(new Date(shipment.created_at), 'dd MMM yyyy', { locale: es }) : '-'}
                                         </TableCell>
-                                        <TableCell className="font-medium text-foreground">Bs. {shipment.price.toFixed(2)}</TableCell>
+                                        <TableCell className="font-medium text-foreground">Bs. {Number(shipment.price).toFixed(2)}</TableCell>
                                         <TableCell>
                                             <StatusBadge status={shipment.current_status} />
                                         </TableCell>

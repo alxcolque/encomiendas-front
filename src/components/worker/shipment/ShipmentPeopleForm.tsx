@@ -1,21 +1,24 @@
-import { useState } from "react";
+import { useState, forwardRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
-    User,
-    Phone,
-    CreditCard,
     ArrowLeft,
-    Send,
     CheckCircle2,
+    CreditCard,
     Loader2,
     MapPin,
-    Wallet,
     MapPinOff,
-    Search,
+    MessageCircle,
+    Phone,
     Plus,
+    Search,
+    Send,
+    Star, // Added Star here
+    User,
+    Wallet,
 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,6 +44,7 @@ const schema = z.object({
         .min(7, "Número de celular requerido"),
 
     paymentBy: z.enum(["remitente", "destinatario"]),
+    isFragile: z.boolean().default(false),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -54,16 +58,11 @@ interface Props {
 }
 
 /* ─── Field helper ───────────────────────────────────────── */
-function PersonField({
-    label,
-    icon: Icon,
-    error,
-    ...props
-}: {
+const PersonField = forwardRef<HTMLInputElement, {
     label: string;
     icon: React.ElementType;
     error?: string;
-} & React.ComponentProps<"input">) {
+} & React.ComponentProps<"input">>(({ label, icon: Icon, error, ...props }, ref) => {
     return (
         <div className="space-y-1.5">
             <Label className="flex items-center gap-2 text-sm font-semibold text-foreground">
@@ -73,6 +72,7 @@ function PersonField({
             </Label>
             <Input
                 {...props}
+                ref={ref}
                 className={cn(
                     "h-11 transition-colors focus:border-primary",
                     error && "border-destructive focus:border-destructive"
@@ -86,7 +86,9 @@ function PersonField({
             )}
         </div>
     );
-}
+});
+
+PersonField.displayName = "PersonField";
 
 /* ─── Section Header ─────────────────────────────────────── */
 function SectionHeader({
@@ -131,6 +133,13 @@ export default function ShipmentPeopleForm({
     const [isSearchingSender, setIsSearchingSender] = useState(false);
     const [isSearchingRecipient, setIsSearchingRecipient] = useState(false);
 
+    const [origSenderName, setOrigSenderName] = useState("");
+    const [origRecipientName, setOrigRecipientName] = useState("");
+    const [origSenderPhone, setOrigSenderPhone] = useState("");
+    const [origRecipientPhone, setOrigRecipientPhone] = useState("");
+    const [isUpdatingSender, setIsUpdatingSender] = useState(false);
+    const [isUpdatingRecipient, setIsUpdatingRecipient] = useState(false);
+
     const {
         register,
         handleSubmit,
@@ -142,7 +151,14 @@ export default function ShipmentPeopleForm({
         defaultValues: {
             paymentBy: "remitente",
             senderId: "",
+            senderName: "",
+            senderCI: "",
+            senderPhone: "",
             recipientId: "",
+            recipientName: "",
+            recipientCI: "",
+            recipientPhone: "",
+            isFragile: false,
         },
     });
 
@@ -162,21 +178,33 @@ export default function ShipmentPeopleForm({
 
             if (found) {
                 if (type === 'sender') {
-                    setValue("senderId", found.id);
+                    setValue("senderId", String(found.id));
                     setValue("senderName", found.name);
                     setValue("senderPhone", found.phone || "");
+                    setOrigSenderName(found.name);
+                    setOrigSenderPhone(found.phone || "");
                     setIsNewSender(false);
                 } else {
-                    setValue("recipientId", found.id);
+                    setValue("recipientId", String(found.id));
                     setValue("recipientName", found.name);
                     setValue("recipientPhone", found.phone || "");
+                    setOrigRecipientName(found.name);
+                    setOrigRecipientPhone(found.phone || "");
                     setIsNewRecipient(false);
                 }
+                toast.success("Cliente encontrado");
             } else {
+                toast.error("Cliente no encontrado. Se habilitará el registro nuevo.");
                 if (type === 'sender') {
                     setValue("senderId", "");
+                    setValue("senderName", "");
+                    setValue("senderPhone", "");
+                    setIsNewSender(true);
                 } else {
                     setValue("recipientId", "");
+                    setValue("recipientName", "");
+                    setValue("recipientPhone", "");
+                    setIsNewRecipient(true);
                 }
             }
         } finally {
@@ -185,41 +213,51 @@ export default function ShipmentPeopleForm({
         }
     };
 
+    const handleWhatsApp = (phone: string, name: string) => {
+        if (!phone || phone.length < 7) {
+            toast.error("Por favor ingrese un número de celular válido.");
+            return;
+        }
+        const message = `Hola ${name}, su código de verificación para Encomiendas Oruro es: ${Math.floor(Math.random() * 900000) + 100000}`;
+        const encoded = encodeURIComponent(message);
+        window.open(`https://wa.me/591${phone}?text=${encoded}`, '_blank');
+    };
+
+    const handleUpdateClientData = async (type: 'sender' | 'recipient') => {
+        const id = String(type === 'sender' ? watch("senderId") : watch("recipientId"));
+        const name = type === 'sender' ? watch("senderName") : watch("recipientName");
+        const phone = type === 'sender' ? watch("senderPhone") : watch("recipientPhone");
+
+        if (!id || id === 'undefined' || !name || !phone) return;
+
+        if (type === 'sender') setIsUpdatingSender(true);
+        else setIsUpdatingRecipient(true);
+
+        try {
+            const { updateClient } = useClientStore.getState();
+            await updateClient(id, { name, phone });
+            if (type === 'sender') {
+                setOrigSenderName(name);
+                setOrigSenderPhone(phone);
+            } else {
+                setOrigRecipientName(name);
+                setOrigRecipientPhone(phone);
+            }
+            toast.success("Datos del cliente actualizados");
+        } catch (error) {
+            toast.error("Error al actualizar el cliente");
+        } finally {
+            if (type === 'sender') setIsUpdatingSender(false);
+            else setIsUpdatingRecipient(false);
+        }
+    };
+
     const paymentBy = watch("paymentBy");
 
     const onFormSubmit = async (data: FormValues) => {
         setIsSubmitting(true);
         try {
-            let finalSenderId = data.senderId;
-            let finalRecipientId = data.recipientId;
-
-            // Create new sender if needed
-            if (!finalSenderId || isNewSender) {
-                const newSender = await createClient({
-                    name: data.senderName,
-                    ci_nit: data.senderCI,
-                    phone: data.senderPhone,
-                    status: 'normal'
-                });
-                finalSenderId = newSender.id;
-            }
-
-            // Create new recipient if needed
-            if (!finalRecipientId || isNewRecipient) {
-                const newRecipient = await createClient({
-                    name: data.recipientName,
-                    ci_nit: data.recipientCI,
-                    phone: data.recipientPhone,
-                    status: 'normal'
-                });
-                finalRecipientId = newRecipient.id;
-            }
-
-            await onSubmit({
-                ...data,
-                senderId: finalSenderId,
-                recipientId: finalRecipientId
-            });
+            await onSubmit(data);
         } finally {
             setIsSubmitting(false);
         }
@@ -234,8 +272,13 @@ export default function ShipmentPeopleForm({
         rapido: "Rápido",
     }[shipmentDetails.service];
 
+    const onError = (errors: any) => {
+        console.log("Validation Errors:", errors);
+        toast.error("Por favor revise los datos del formulario. Faltan campos obligatorios.");
+    };
+
     return (
-        <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-5">
+        <form onSubmit={handleSubmit(onFormSubmit, onError)} className="space-y-5">
 
             {/* ── Summary banner ──────────────────────────────── */}
             <div className="relative rounded-2xl overflow-hidden border border-primary/25 shadow-md shadow-primary/10">
@@ -361,23 +404,70 @@ export default function ShipmentPeopleForm({
 
                     {(isNewSender || watch("senderId")) && (
                         <>
-                            <PersonField
-                                label="Nombre Completo"
-                                icon={User}
-                                placeholder="Ej: Juan Carlos Mamani"
-                                error={errors.senderName?.message}
-                                {...register("senderName")}
-                                readOnly={!!watch("senderId") && !isNewSender}
-                            />
-                            <PersonField
-                                label="Número de Celular"
-                                icon={Phone}
-                                type="tel"
-                                placeholder="Ej: 71234567"
-                                error={errors.senderPhone?.message}
-                                {...register("senderPhone")}
-                                readOnly={!!watch("senderId") && !isNewSender}
-                            />
+                            <div className="space-y-1.5">
+                                <PersonField
+                                    label="Nombre Completo"
+                                    icon={User}
+                                    placeholder="Ej: Juan Carlos Mamani"
+                                    error={errors.senderName?.message}
+                                    {...register("senderName")}
+                                />
+                                {!isNewSender && watch("senderId") && watch("senderName") !== origSenderName && (
+                                    <Button
+                                        type="button"
+                                        size="sm"
+                                        onClick={() => handleUpdateClientData('sender')}
+                                        disabled={isUpdatingSender}
+                                        className="w-full h-9 gap-1 bg-amber-500 hover:bg-amber-600 text-white font-bold transition-all animate-in fade-in zoom-in duration-300"
+                                    >
+                                        {isUpdatingSender ? <Loader2 className="h-4 w-4 animate-spin" /> : "Guardar nombre actualizado"}
+                                    </Button>
+                                )}
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <Label className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                                    <Phone className="h-4 w-4 text-primary" />
+                                    Número de Celular
+                                    <span className="text-destructive text-sm">*</span>
+                                </Label>
+                                <div className="flex gap-2">
+                                    <Input
+                                        type="tel"
+                                        placeholder="Ej: 71234567"
+                                        className={cn(
+                                            "h-11 transition-colors focus:border-primary",
+                                            errors.senderPhone && "border-destructive"
+                                        )}
+                                        {...register("senderPhone")}
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="icon"
+                                        className="h-11 w-11 shrink-0 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50"
+                                        onClick={() => handleWhatsApp(watch("senderPhone"), watch("senderName"))}
+                                    >
+                                        <MessageCircle className="h-5 w-5" />
+                                    </Button>
+                                    {!isNewSender && watch("senderId") && (watch("senderPhone") !== origSenderPhone || watch("senderName") !== origSenderName) && (
+                                        <Button
+                                            type="button"
+                                            size="sm"
+                                            onClick={() => handleUpdateClientData('sender')}
+                                            disabled={isUpdatingSender}
+                                            className="h-11 px-3 gap-1 bg-amber-500 hover:bg-amber-600 text-white font-bold transition-all animate-in fade-in zoom-in duration-300"
+                                        >
+                                            {isUpdatingSender ? <Loader2 className="h-4 w-4 animate-spin" /> : "Guardar"}
+                                        </Button>
+                                    )}
+                                </div>
+                                {errors.senderPhone && (
+                                    <p className="text-xs text-destructive flex items-center gap-1">
+                                        {errors.senderPhone.message}
+                                    </p>
+                                )}
+                            </div>
                         </>
                     )}
                 </div>
@@ -460,23 +550,70 @@ export default function ShipmentPeopleForm({
 
                     {(isNewRecipient || watch("recipientId")) && (
                         <>
-                            <PersonField
-                                label="Nombre Completo"
-                                icon={User}
-                                placeholder="Ej: María Quispe Flores"
-                                error={errors.recipientName?.message}
-                                {...register("recipientName")}
-                                readOnly={!!watch("recipientId") && !isNewRecipient}
-                            />
-                            <PersonField
-                                label="Número de Celular"
-                                icon={Phone}
-                                type="tel"
-                                placeholder="Ej: 76543210"
-                                error={errors.recipientPhone?.message}
-                                {...register("recipientPhone")}
-                                readOnly={!!watch("recipientId") && !isNewRecipient}
-                            />
+                            <div className="space-y-1.5">
+                                <PersonField
+                                    label="Nombre Completo"
+                                    icon={User}
+                                    placeholder="Ej: María Quispe Flores"
+                                    error={errors.recipientName?.message}
+                                    {...register("recipientName")}
+                                />
+                                {!isNewRecipient && watch("recipientId") && watch("recipientName") !== origRecipientName && (
+                                    <Button
+                                        type="button"
+                                        size="sm"
+                                        onClick={() => handleUpdateClientData('recipient')}
+                                        disabled={isUpdatingRecipient}
+                                        className="w-full h-9 gap-1 bg-amber-500 hover:bg-amber-600 text-white font-bold transition-all animate-in fade-in zoom-in duration-300"
+                                    >
+                                        {isUpdatingRecipient ? <Loader2 className="h-4 w-4 animate-spin" /> : "Guardar nombre actualizado"}
+                                    </Button>
+                                )}
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <Label className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                                    <Phone className="h-4 w-4 text-primary" />
+                                    Número de Celular
+                                    <span className="text-destructive text-sm">*</span>
+                                </Label>
+                                <div className="flex gap-2">
+                                    <Input
+                                        type="tel"
+                                        placeholder="Ej: 76543210"
+                                        className={cn(
+                                            "h-11 transition-colors focus:border-primary",
+                                            errors.recipientPhone && "border-destructive"
+                                        )}
+                                        {...register("recipientPhone")}
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="icon"
+                                        className="h-11 w-11 shrink-0 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50"
+                                        onClick={() => handleWhatsApp(watch("recipientPhone"), watch("recipientName"))}
+                                    >
+                                        <MessageCircle className="h-5 w-5" />
+                                    </Button>
+                                    {!isNewRecipient && watch("recipientId") && (watch("recipientPhone") !== origRecipientPhone || watch("recipientName") !== origRecipientName) && (
+                                        <Button
+                                            type="button"
+                                            size="sm"
+                                            onClick={() => handleUpdateClientData('recipient')}
+                                            disabled={isUpdatingRecipient}
+                                            className="h-11 px-3 gap-1 bg-amber-500 hover:bg-amber-600 text-white font-bold transition-all animate-in fade-in zoom-in duration-300"
+                                        >
+                                            {isUpdatingRecipient ? <Loader2 className="h-4 w-4 animate-spin" /> : "Guardar"}
+                                        </Button>
+                                    )}
+                                </div>
+                                {errors.recipientPhone && (
+                                    <p className="text-xs text-destructive flex items-center gap-1">
+                                        {errors.recipientPhone.message}
+                                    </p>
+                                )}
+                            </div>
                         </>
                     )}
                 </div>
@@ -574,6 +711,27 @@ export default function ShipmentPeopleForm({
                             </button>
                         );
                     })()}
+                </div>
+            </div>
+
+            {/* ── Section 6: Opciones Extra ───────────────────── */}
+            <div className="border border-border/60 rounded-2xl p-5 bg-card/60 shadow-sm">
+                <div className="flex items-center gap-3">
+                    <div
+                        className="flex items-center space-x-2 cursor-pointer group"
+                        onClick={() => setValue("isFragile", !watch("isFragile"))}
+                    >
+                        <div className={cn(
+                            "w-6 h-6 rounded border-2 flex items-center justify-center transition-all",
+                            watch("isFragile") ? "bg-amber-500 border-amber-500" : "border-border bg-muted group-hover:border-amber-400"
+                        )}>
+                            {watch("isFragile") && <CheckCircle2 className="h-4 w-4 text-white" />}
+                        </div>
+                        <Label className="text-sm font-bold text-foreground cursor-pointer flex items-center gap-2">
+                            <Star className={cn("h-4 w-4 transition-colors", watch("isFragile") ? "text-amber-500" : "text-muted-foreground")} />
+                            Esta encomienda contiene objetos frágiles
+                        </Label>
+                    </div>
                 </div>
             </div>
 
