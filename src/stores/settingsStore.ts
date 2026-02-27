@@ -35,12 +35,6 @@ interface FooterLink {
     order: number;
 }
 
-interface PaymentMethod {
-    id: string;
-    icon: 'credit-card' | 'wallet' | 'banknote';
-    label: string;
-    active: boolean;
-}
 
 interface SettingsState {
     general: GeneralSettings;
@@ -52,7 +46,6 @@ interface SettingsState {
         support: FooterLink[];
         legal: FooterLink[];
     };
-    paymentMethods: PaymentMethod[];
     termsAndConditions: string;
     privacyPolicy: string;
     isLoading: boolean;
@@ -61,7 +54,6 @@ interface SettingsState {
     updateSocials: (socials: SocialLink[]) => Promise<void>;
     updateFaqs: (faqs: FAQItem[]) => Promise<void>;
     updateFooterLinks: (footerLinks: any) => Promise<void>;
-    updatePaymentMethods: (methods: PaymentMethod[]) => Promise<void>;
     updateLegal: (type: 'terms' | 'privacy', content: string) => Promise<void>;
     uploadLogo: (file: File, type: 'logo' | 'favicon') => Promise<void>;
 }
@@ -84,7 +76,6 @@ export const useSettingsStore = create<SettingsState>((set) => ({
         support: [],
         legal: [],
     },
-    paymentMethods: [],
     termsAndConditions: '',
     privacyPolicy: '',
     isLoading: false,
@@ -99,7 +90,6 @@ export const useSettingsStore = create<SettingsState>((set) => ({
                 socials: data.socials,
                 faqs: data.faqs,
                 footerLinks: data.footerLinks,
-                paymentMethods: data.paymentMethods,
                 termsAndConditions: data.termsAndConditions,
                 privacyPolicy: data.privacyPolicy,
                 isLoading: false,
@@ -163,18 +153,6 @@ export const useSettingsStore = create<SettingsState>((set) => ({
             console.error('Error updating footer links:', error);
             set({ isLoading: false });
             toast.error('Error al actualizar enlaces');
-        }
-    },
-    updatePaymentMethods: async (methods) => {
-        set({ isLoading: true });
-        try {
-            const response = await ENV.put<any>('/admin/settings/payment-methods', { paymentMethods: methods });
-            set({ paymentMethods: response.data.data, isLoading: false });
-            toast.success('Métodos de pago actualizados');
-        } catch (error) {
-            console.error('Error updating payment methods:', error);
-            set({ isLoading: false });
-            toast.error('Error al actualizar métodos de pago');
         }
     },
     updateLegal: async (type, content) => {

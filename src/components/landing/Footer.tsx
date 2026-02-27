@@ -28,11 +28,6 @@ const socialLinks = [
   { icon: Linkedin, href: "#", label: "LinkedIn" },
 ];
 
-const paymentMethods = [
-  { icon: CreditCard, label: "Tarjetas" },
-  { icon: Wallet, label: "QR" },
-  { icon: Banknote, label: "Efectivo" },
-];
 
 export default function Footer() {
   return (
@@ -123,22 +118,7 @@ export default function Footer() {
             <p className="text-sm text-muted-foreground">
               © 2024 KOLMOX. Todos los derechos reservados.
             </p>
-            
-            {/* Payment Methods */}
-            <div className="flex items-center gap-4">
-              <span className="text-xs text-muted-foreground">Métodos de pago:</span>
-              <div className="flex gap-2">
-                {paymentMethods.map((method, index) => (
-                  <div
-                    key={index}
-                    className="w-10 h-7 rounded bg-muted flex items-center justify-center"
-                    title={method.label}
-                  >
-                    <method.icon className="w-5 h-5 text-muted-foreground" />
-                  </div>
-                ))}
-              </div>
-            </div>
+
 
             <div className="flex gap-4 text-sm text-muted-foreground">
               <a href="#" className="hover:text-primary transition-colors">

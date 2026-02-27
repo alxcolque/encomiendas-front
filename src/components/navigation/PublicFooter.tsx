@@ -4,7 +4,7 @@ import { Package, Facebook, Instagram, Twitter, Linkedin, CreditCard, Wallet, Ba
 
 export default function PublicFooter() {
     const currentYear = new Date().getFullYear();
-    const { general, socials, footerLinks, paymentMethods } = useSettingsStore();
+    const { general, socials, footerLinks } = useSettingsStore();
 
     const getSocialIcon = (platform: string) => {
         switch (platform) {
@@ -18,14 +18,6 @@ export default function PublicFooter() {
         }
     };
 
-    const getPaymentIcon = (iconName: string) => {
-        switch (iconName) {
-            case 'credit-card': return CreditCard;
-            case 'wallet': return Wallet;
-            case 'banknote': return Banknote;
-            default: return CreditCard;
-        }
-    };
 
     return (
         <footer className="bg-card/50 border-t border-border mt-auto">
@@ -176,23 +168,6 @@ export default function PublicFooter() {
                             ))}
                         </div>
 
-                        <div className="flex items-center gap-3 px-4 py-2 bg-muted/50 rounded-lg">
-                            <span className="text-xs font-medium text-muted-foreground">Aceptamos:</span>
-                            <div className="flex gap-2">
-                                {paymentMethods.map((method) => {
-                                    const Icon = getPaymentIcon(method.icon);
-                                    return (
-                                        <div
-                                            key={method.id}
-                                            className="text-muted-foreground/80 hover:text-foreground transition-colors"
-                                            title={method.label}
-                                        >
-                                            <Icon className="w-5 h-5" />
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
