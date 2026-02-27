@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { useOfficeStore } from "@/stores/officeStore";
+import { Checkbox } from "@/components/ui/checkbox";
 
 /* ─── Types ─────────────────────────────────────────────── */
 export type ShipmentType = "paquete" | "sobre";
@@ -42,6 +43,7 @@ export interface ShipmentDetailsData {
     transport: TransportMode;
     service: ServiceTier;
     total: number;
+    withIva: boolean;
 }
 
 interface Props {
@@ -113,7 +115,8 @@ function calculateTotal(
     w = 0,
     l = 0,
     h = 0,
-    weight = 0
+    weight = 0,
+    withIva = false
 ): number {
     const base =
         type === "sobre"
@@ -121,7 +124,11 @@ function calculateTotal(
             : 25 + ((w * l * h) / 1000) * 0.5 + weight * 2;
     const factor = transport === "aereo" ? 1.4 : 1.0;
     const delta = { normal: 0, standard: 5, express: 15 }[service];
-    return Math.round((base * factor + delta) * 100) / 100;
+    let total = base * factor + delta;
+    if (withIva) {
+        total = total * 1.16;
+    }
+    return Math.round(total * 100) / 100;
 }
 
 /* ─── Section Header ─────────────────────────────────────── */
@@ -264,6 +271,7 @@ export default function ShipmentDetailsForm({ onNext }: Props) {
     const [weight, setWeight] = useState<string>("");
     const [transport, setTransport] = useState<TransportMode>("terrestre");
     const [service, setService] = useState<ServiceTier>("standard");
+    const [withIva, setWithIva] = useState(false);
     const [total, setTotal] = useState(0);
 
     useEffect(() => {
@@ -278,8 +286,8 @@ export default function ShipmentDetailsForm({ onNext }: Props) {
         const l = parseFloat(lengthVal) || 0;
         const h = parseFloat(height) || 0;
         const wt = parseFloat(weight) || 0;
-        setTotal(calculateTotal(type, transport, service, w, l, h, wt));
-    }, [type, transport, service, width, lengthVal, height, weight]);
+        setTotal(calculateTotal(type, transport, service, w, l, h, wt, withIva));
+    }, [type, transport, service, width, lengthVal, height, weight, withIva]);
 
     /* Validation */
     const isPackageDimensionsValid =
@@ -304,6 +312,7 @@ export default function ShipmentDetailsForm({ onNext }: Props) {
             transport,
             service,
             total,
+            withIva,
         });
     };
 
@@ -611,11 +620,24 @@ export default function ShipmentDetailsForm({ onNext }: Props) {
                                 </span>
                             </div>
                         </div>
-                        <div className="text-right">
-                            <p className="text-5xl sm:text-6xl font-black text-primary tabular-nums tracking-tight leading-none">
-                                {total.toFixed(2)}
-                                <span className="text-2xl sm:text-3xl font-bold ml-1 text-primary/80">Bs.</span>
-                            </p>
+                        <div className="flex flex-col items-end gap-3 shrink-0">
+                            <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-primary/20 hover:border-primary/40 transition-colors cursor-pointer" onClick={() => setWithIva(!withIva)}>
+                                <Checkbox
+                                    id="iva-checkbox"
+                                    checked={withIva}
+                                    onCheckedChange={(checked) => setWithIva(!!checked)}
+                                    className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                                />
+                                <Label htmlFor="iva-checkbox" className="text-sm font-bold text-foreground cursor-pointer select-none">
+                                    Facturar con IVA (+16%)
+                                </Label>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-5xl sm:text-6xl font-black text-primary tabular-nums tracking-tight leading-none">
+                                    {total.toFixed(2)}
+                                    <span className="text-2xl sm:text-3xl font-bold ml-1 text-primary/80">Bs.</span>
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>

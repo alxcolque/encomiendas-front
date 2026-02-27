@@ -3,6 +3,7 @@ import { Package, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import ShipmentDetailsForm, {
     type ShipmentDetailsData,
+    type ServiceTier,
 } from "./ShipmentDetailsForm";
 import ShipmentPeopleForm, {
     type ShipmentPeopleData,
@@ -88,12 +89,14 @@ export default function ShipmentRegisterWizard({
 }: ShipmentRegisterWizardProps) {
     const [step, setStep] = useState(1);
     const [detailsData, setDetailsData] = useState<ShipmentDetailsData | null>(null);
+    const [withIva, setWithIva] = useState(false);
     const [showInvoice, setShowInvoice] = useState(false);
     const [createdInvoice, setCreatedInvoice] = useState<Invoice | null>(null);
     const { createShipment } = useAdminShipmentStore();
 
     const handleDetailsNext = (data: ShipmentDetailsData) => {
         setDetailsData(data);
+        setWithIva(data.withIva);
         setStep(2);
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
@@ -132,10 +135,10 @@ export default function ShipmentRegisterWizard({
 
             const result = await createShipment({
                 ...payload,
-                // Add with_invoice flag if needed (assuming true as per user request to show invoice)
                 with_invoice: true,
                 invoice_name: people.senderName,
                 invoice_nit: people.senderCI,
+                invoice_type: withIva ? 'con' : 'sin',
             } as any);
 
             toast.success("¡Encomienda registrada exitosamente!", {
