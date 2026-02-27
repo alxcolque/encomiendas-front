@@ -29,8 +29,8 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, onClo
 
             {/* Invoice Content */}
             <div className="flex justify-between items-start mb-10">
-                <div className="text-sm font-bold">
-                    <p className="text-xl">PRUEBA</p>
+                <div className="text-sm font-bold uppercase">
+                    <p className="text-xl">{import.meta.env.VITE_COMPANY_NAME || 'KOLMOX'}</p>
                     <p>CASA MATRIZ</p>
                     <p>Calle Juan Pablo II #54</p>
                     <p>Teléfono: 2457896</p>
@@ -39,7 +39,7 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, onClo
                 <div className="text-sm border-2 border-black p-4 bg-gray-50">
                     <div className="grid grid-cols-2 gap-x-4">
                         <p className="font-bold">NIT</p>
-                        <p>{invoice.nit_ci_emisor || '456489012'}</p>
+                        <p>{import.meta.env.VITE_COMPANY_NIT || '12345678'}</p>
                         <p className="font-bold">FACTURA Nº</p>
                         <p>{invoice.invoice_number}</p>
                         <p className="font-bold">CUF</p>

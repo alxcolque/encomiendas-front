@@ -10,6 +10,7 @@ interface RouteValueState {
     createRouteValue: (rv: { city_a: string; city_b: string; value: number }) => Promise<void>;
     updateRouteValue: (id: string, value: number) => Promise<void>;
     deleteRouteValue: (id: string) => Promise<void>;
+    findRouteValue: (cityA: string, cityB: string) => Promise<RouteValue | null>;
 }
 
 export const useRouteValueStore = create<RouteValueState>((set) => ({
@@ -67,6 +68,18 @@ export const useRouteValueStore = create<RouteValueState>((set) => ({
         } catch (error) {
             set({ isLoading: false });
             throw error;
+        }
+    },
+
+    findRouteValue: async (cityA, cityB) => {
+        try {
+            const { data } = await ENV.get<{ data: RouteValue }>(`/route-values/find`, {
+                params: { city_a: cityA, city_b: cityB }
+            });
+            return data.data;
+        } catch (error) {
+            console.error(error);
+            return null;
         }
     },
 }));

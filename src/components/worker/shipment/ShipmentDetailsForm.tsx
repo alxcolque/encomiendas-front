@@ -26,6 +26,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useOfficeStore } from "@/stores/officeStore";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useRouteValueStore } from "@/stores/routeValueStore";
 
 /* ─── Types ─────────────────────────────────────────────── */
 export type ShipmentType = "paquete" | "sobre";
@@ -69,7 +70,7 @@ const SERVICE_TIERS: ServiceTierConfig[] = [
     {
         id: "normal",
         label: "Normal",
-        delta: 0,
+        delta: 3,
         days: "6 – 8 días",
         description: "Entrega estándar económica",
         colorClass: "text-sky-500",
@@ -95,7 +96,7 @@ const SERVICE_TIERS: ServiceTierConfig[] = [
     {
         id: "express",
         label: "Rápido",
-        delta: 15,
+        delta: 10,
         days: "1 – 2 días",
         description: "Entrega urgente prioritaria",
         colorClass: "text-violet-500",
@@ -116,18 +117,39 @@ function calculateTotal(
     l = 0,
     h = 0,
     weight = 0,
-    withIva = false
+    withIva = false,
+    routeValue = 0,
+    discount = 0
 ): number {
-    const base =
-        type === "sobre"
-            ? 15
-            : 25 + ((w * l * h) / 1000) * 0.5 + weight * 2;
-    const factor = transport === "aereo" ? 1.4 : 1.0;
-    const delta = { normal: 0, standard: 5, express: 15 }[service];
-    let total = base * factor + delta;
+    const minStore = Number(import.meta.env.VITE_STORE_MIN) || 3;
+    const maxStore = Number(import.meta.env.VITE_STORE_MAX) || 5;
+    const divX = Number(import.meta.env.VITE_DIV_X) || 0.9;
+    const divY = Number(import.meta.env.VITE_DIV_Y) || 0.6;
+    const basePrice = Number(import.meta.env.VITE_BASE_PRICE) || 15;
+
+    let baseResult = 0;
+
+    if (type === "paquete") {
+        const volumetricWeight = (w * l * h) / 5000;
+        const finalWeight = Math.max(volumetricWeight, weight);
+
+        const store = (finalWeight * routeValue) + (finalWeight < 50 ? minStore : maxStore);
+        const divXVal = Math.floor((store / divX) * 100) / 100;
+        const divYVal = Math.round((divXVal / divY) * 100) / 100;
+        baseResult = divYVal;
+    } else {
+        baseResult = basePrice;
+    }
+
+    const serviceDelta = { normal: 3, standard: 5, express: 10 }[service];
+    let total = baseResult + serviceDelta - discount;
+
+    if (total < 0) total = 0;
+
     if (withIva) {
         total = total * 1.16;
     }
+
     return Math.round(total * 100) / 100;
 }
 
@@ -273,6 +295,10 @@ export default function ShipmentDetailsForm({ onNext }: Props) {
     const [service, setService] = useState<ServiceTier>("standard");
     const [withIva, setWithIva] = useState(false);
     const [total, setTotal] = useState(0);
+    const [routeValue, setRouteValue] = useState(0);
+    const [routeValueNotFound, setRouteValueNotFound] = useState(false);
+    const [discount, setDiscount] = useState<string>("0");
+    const { findRouteValue } = useRouteValueStore();
 
     useEffect(() => {
         if (offices.length === 0) {
@@ -280,14 +306,39 @@ export default function ShipmentDetailsForm({ onNext }: Props) {
         }
     }, []);
 
+    /* Fetch Route Value when offices change */
+    useEffect(() => {
+        const fetchValue = async () => {
+            if (originId && destinationId && originId !== destinationId) {
+                const origin = offices.find(o => o.id === originId);
+                const dest = offices.find(o => o.id === destinationId);
+                if (origin?.city_id && dest?.city_id) {
+                    const rv = await findRouteValue(origin.city_id, dest.city_id);
+                    if (rv) {
+                        setRouteValue(Number(rv.value) || 0);
+                        setRouteValueNotFound(false);
+                    } else {
+                        setRouteValue(0);
+                        setRouteValueNotFound(true);
+                    }
+                }
+            } else {
+                setRouteValue(0);
+                setRouteValueNotFound(false);
+            }
+        };
+        fetchValue();
+    }, [originId, destinationId, offices]);
+
     /* Recalculate total whenever any relevant field changes */
     useEffect(() => {
         const w = parseFloat(width) || 0;
         const l = parseFloat(lengthVal) || 0;
         const h = parseFloat(height) || 0;
         const wt = parseFloat(weight) || 0;
-        setTotal(calculateTotal(type, transport, service, w, l, h, wt, withIva));
-    }, [type, transport, service, width, lengthVal, height, weight, withIva]);
+        const d = parseFloat(discount) || 0;
+        setTotal(calculateTotal(type, transport, service, w, l, h, wt, withIva, routeValue, d));
+    }, [type, transport, service, width, lengthVal, height, weight, withIva, routeValue, discount]);
 
     /* Validation */
     const isPackageDimensionsValid =
@@ -394,10 +445,25 @@ export default function ShipmentDetailsForm({ onNext }: Props) {
 
                 {/* Route preview */}
                 {originOffice && destinationOffice && (
-                    <div className="mt-3 flex items-center justify-center gap-2 text-xs text-muted-foreground bg-muted/40 rounded-lg px-3 py-2">
-                        <span className="font-semibold text-emerald-600 dark:text-emerald-400">{originOffice.city?.name} ({originOffice.name})</span>
-                        <ArrowRight className="h-3 w-3" />
-                        <span className="font-semibold text-rose-600 dark:text-rose-400">{destinationOffice.city?.name} ({destinationOffice.name})</span>
+                    <div className="mt-3 space-y-2">
+                        <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground bg-muted/40 rounded-lg px-3 py-2">
+                            <span className="font-semibold text-emerald-600 dark:text-emerald-400">{originOffice.city?.name} ({originOffice.name})</span>
+                            <ArrowRight className="h-3 w-3" />
+                            <span className="font-semibold text-rose-600 dark:text-rose-400">{destinationOffice.city?.name} ({destinationOffice.name})</span>
+                        </div>
+
+                        {routeValueNotFound && (
+                            <div className="flex items-center justify-center gap-2 text-[11px] font-bold text-amber-600 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg px-3 py-1.5 animate-pulse">
+                                <Zap className="h-3 w-3" />
+                                No se encontró el valor de la ruta entre estas ciudades. Se asume valor 0.
+                            </div>
+                        )}
+
+                        {!routeValueNotFound && routeValue > 0 && (
+                            <div className="text-center text-[10px] text-muted-foreground font-medium">
+                                Valor de ruta encontrado: <span className="text-primary font-bold">{routeValue} Bs/Kg</span>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
@@ -632,6 +698,23 @@ export default function ShipmentDetailsForm({ onNext }: Props) {
                                     Facturar con IVA (+16%)
                                 </Label>
                             </div>
+
+                            {/* Discount Input */}
+                            <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-border/60 hover:border-primary/40 transition-colors">
+                                <Label htmlFor="discount-input" className="text-sm font-bold text-muted-foreground whitespace-nowrap">
+                                    Descuento (Bs.)
+                                </Label>
+                                <Input
+                                    id="discount-input"
+                                    type="number"
+                                    min="0"
+                                    step="0.5"
+                                    value={discount}
+                                    onChange={(e) => setDiscount(e.target.value)}
+                                    className="h-8 w-24 text-right font-bold border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 p-0"
+                                />
+                            </div>
+
                             <div className="text-right">
                                 <p className="text-5xl sm:text-6xl font-black text-primary tabular-nums tracking-tight leading-none">
                                     {total.toFixed(2)}
