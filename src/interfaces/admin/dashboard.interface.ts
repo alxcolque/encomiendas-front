@@ -7,7 +7,7 @@ export interface KPIData {
     description?: string;
 }
 
-export type ShipmentStatus = 'pending' | 'in_transit' | 'delivered' | 'cancelled';
+export type ShipmentStatus = 'created' | 'pending' | 'in_transit' | 'at_office' | 'out_for_delivery' | 'delivered' | 'cancelled';
 
 export interface ShipmentData {
     id: string;

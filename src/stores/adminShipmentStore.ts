@@ -7,6 +7,7 @@ interface AdminShipmentState {
     isLoading: boolean;
     error: string | null;
     fetchShipments: () => Promise<void>;
+    fetchShipmentById: (id: string) => Promise<AdminShipment>;
     createShipment: (payload: CreateShipmentPayload) => Promise<AdminShipment>;
     updateShipment: (id: string, payload: Partial<CreateShipmentPayload>) => Promise<void>;
     updateStatus: (id: string, status: ShipmentStatus) => Promise<void>;
@@ -26,6 +27,18 @@ export const useAdminShipmentStore = create<AdminShipmentState>((set, get) => ({
         } catch (error) {
             set({ isLoading: false, error: 'Error al cargar encomiendas' });
             console.error(error);
+        }
+    },
+
+    fetchShipmentById: async (id) => {
+        set({ isLoading: true, error: null });
+        try {
+            const { data } = await ENV.get<{ data: AdminShipment }>(`/shipments/${id}`);
+            set({ isLoading: false });
+            return data.data;
+        } catch (error) {
+            set({ isLoading: false, error: 'Error al cargar la encomienda' });
+            throw error;
         }
     },
 

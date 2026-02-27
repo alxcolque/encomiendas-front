@@ -40,6 +40,8 @@ const AdminOffices = lazy(() => import("@/pages/admin/Offices"));
 const AdminCities = lazy(() => import("@/pages/admin/Cities"));
 const AdminReports = lazy(() => import("@/pages/admin/Reports"));
 const AdminSettings = lazy(() => import("@/pages/admin/Settings"));
+const ShipmentDetails = lazy(() => import("@/pages/admin/ShipmentDetails"));
+const InvoicePage = lazy(() => import("@/pages/shared/InvoicePage"));
 
 const Loading = () => <div className="p-4 text-center">Cargando...</div>;
 
@@ -79,6 +81,7 @@ export const AppRouter = () => {
                 <Route element={<ProtectedRoute allowedRoles={['admin']}><AdminLayout /></ProtectedRoute>}>
                     <Route path="/admin" element={<AdminDashboard />} />
                     <Route path="/admin/shipments" element={<AdminShipments />} />
+                    <Route path="/admin/shipments/:id" element={<ShipmentDetails />} />
                     <Route path="/admin/users" element={<AdminUsers />} />
                     <Route path="/admin/clients" element={<AdminClients />} />
                     <Route path="/admin/drivers" element={<AdminDrivers />} />
@@ -94,9 +97,10 @@ export const AppRouter = () => {
                 </Route>
 
                 {/* User Routes */}
-                <Route element={<ProtectedRoute allowedRoles={['client', 'driver']}><UserLayout /></ProtectedRoute>}>
+                <Route element={<ProtectedRoute allowedRoles={['client', 'driver', 'admin', 'worker']}><UserLayout /></ProtectedRoute>}>
                     <Route path="/user" element={<Wallet />} /> {/* Placeholder */}
                     <Route path="/user/profile" element={<Wallet />} /> {/* Placeholder */}
+                    <Route path="/shipments/:id/invoice" element={<InvoicePage />} />
                 </Route>
 
                 {/* Fallback */}

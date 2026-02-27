@@ -9,16 +9,41 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { InvoiceDocument } from "@/components/worker/shipment/InvoiceDocument";
-import { AdminShipment } from "@/interfaces/shipment.interface";
+import { AdminShipment, ShipmentStatus } from "@/interfaces/shipment.interface";
+import { useNavigate } from "react-router-dom";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+    DropdownMenuSub,
+    DropdownMenuSubTrigger,
+    DropdownMenuSubContent,
+    DropdownMenuPortal
+} from "@/components/ui/dropdown-menu";
+import { MoreVertical, CheckCircle2, Truck, Package, RotateCcw, XCircle, Send, ExternalLink } from "lucide-react";
+import { toast } from "sonner";
 
 export function RecentShipmentsTable() {
-    const { shipments, isLoading, fetchShipments } = useAdminShipmentStore();
+    const navigate = useNavigate();
+    const { shipments, isLoading, fetchShipments, updateStatus } = useAdminShipmentStore();
     const [selectedShipment, setSelectedShipment] = useState<AdminShipment | null>(null);
     const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
 
     const handleViewInvoice = (shipment: AdminShipment) => {
         setSelectedShipment(shipment);
         setIsInvoiceOpen(true);
+    };
+
+    const handleUpdateStatus = async (id: string, status: ShipmentStatus) => {
+        try {
+            await updateStatus(id, status);
+            toast.success(`Estado actualizado a ${status}`);
+        } catch (error) {
+            toast.error("Error al actualizar el estado");
+        }
     };
 
     useEffect(() => {
@@ -40,7 +65,14 @@ export function RecentShipmentsTable() {
         <Card className="shadow-sm border-border/50 bg-card/50 backdrop-blur-sm">
             <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-lg font-medium">Últimas Encomiendas</CardTitle>
-                <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80">Ver todas</Button>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-primary hover:text-primary/80"
+                    onClick={() => navigate('/admin/shipments')}
+                >
+                    Ver todas
+                </Button>
             </CardHeader>
             <CardContent>
                 <div className="overflow-x-auto">
@@ -85,20 +117,97 @@ export function RecentShipmentsTable() {
                                         <TableCell>
                                             <StatusBadge status={shipment.current_status} />
                                         </TableCell>
-                                        <TableCell className="text-right flex justify-end gap-2">
-                                            {shipment.invoice && (
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-8 w-8 text-muted-foreground hover:text-primary"
-                                                    onClick={() => handleViewInvoice(shipment)}
-                                                >
-                                                    <FileText className="w-4 h-4" />
-                                                </Button>
-                                            )}
-                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary">
-                                                <Eye className="w-4 h-4" />
-                                            </Button>
+                                        <TableCell className="text-right">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted">
+                                                        <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end" className="w-56">
+                                                    <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuItem
+                                                        className="cursor-pointer"
+                                                        onClick={() => navigate(`/admin/shipments/${shipment.id}`)}
+                                                    >
+                                                        <Eye className="w-4 h-4 mr-2" />
+                                                        Ver detalles
+                                                    </DropdownMenuItem>
+                                                    {shipment.invoice && (
+                                                        <>
+                                                            <DropdownMenuItem
+                                                                className="cursor-pointer"
+                                                                onClick={() => handleViewInvoice(shipment)}
+                                                            >
+                                                                <FileText className="w-4 h-4 mr-2" />
+                                                                Ver factura (Modal)
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem
+                                                                className="cursor-pointer"
+                                                                onClick={() => window.open(`/shipments/${shipment.id}/invoice`, '_blank')}
+                                                            >
+                                                                <ExternalLink className="w-4 h-4 mr-2" />
+                                                                Ver factura (Nueva pestaña)
+                                                            </DropdownMenuItem>
+                                                        </>
+                                                    )}
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuSub>
+                                                        <DropdownMenuSubTrigger className="cursor-pointer">
+                                                            <RotateCcw className="w-4 h-4 mr-2" />
+                                                            Cambiar estado
+                                                        </DropdownMenuSubTrigger>
+                                                        <DropdownMenuPortal>
+                                                            <DropdownMenuSubContent>
+                                                                <DropdownMenuItem
+                                                                    className="cursor-pointer"
+                                                                    onClick={() => handleUpdateStatus(shipment.id, 'created')}
+                                                                >
+                                                                    <Package className="w-4 h-4 mr-2 text-purple-500" />
+                                                                    Creado
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem
+                                                                    className="cursor-pointer"
+                                                                    onClick={() => handleUpdateStatus(shipment.id, 'in_transit')}
+                                                                >
+                                                                    <Truck className="w-4 h-4 mr-2 text-blue-500" />
+                                                                    En Tránsito
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem
+                                                                    className="cursor-pointer"
+                                                                    onClick={() => handleUpdateStatus(shipment.id, 'at_office')}
+                                                                >
+                                                                    <Package className="w-4 h-4 mr-2 text-indigo-500" />
+                                                                    En Sucursal
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem
+                                                                    className="cursor-pointer"
+                                                                    onClick={() => handleUpdateStatus(shipment.id, 'out_for_delivery')}
+                                                                >
+                                                                    <Send className="w-4 h-4 mr-2 text-cyan-500" />
+                                                                    En Reparto
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem
+                                                                    className="cursor-pointer"
+                                                                    onClick={() => handleUpdateStatus(shipment.id, 'delivered')}
+                                                                >
+                                                                    <CheckCircle2 className="w-4 h-4 mr-2 text-green-500" />
+                                                                    Entregado
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuSeparator />
+                                                                <DropdownMenuItem
+                                                                    className="cursor-pointer text-destructive focus:text-destructive"
+                                                                    onClick={() => handleUpdateStatus(shipment.id, 'cancelled')}
+                                                                >
+                                                                    <XCircle className="w-4 h-4 mr-2" />
+                                                                    Cancelado
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuSubContent>
+                                                        </DropdownMenuPortal>
+                                                    </DropdownMenuSub>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
                                         </TableCell>
                                     </TableRow>
                                 ))

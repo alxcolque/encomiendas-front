@@ -1,6 +1,6 @@
 import { Route } from "react-router-dom";
-import DriverHomePage from "@/pages/DriverHomePage";
-import ActiveDeliveryPage from "@/pages/ActiveDeliveryPage";
+import DriverHomePage from "@/pages/driver/Home";
+import ActiveDeliveryPage from "@/pages/driver/ActiveDelivery";
 
 export const DriverRoutes = (
     <>

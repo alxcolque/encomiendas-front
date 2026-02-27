@@ -39,9 +39,14 @@ export const ProtectedRoute = ({ allowedRoles, children }: ProtectedRouteProps) 
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
-    if (allowedRoles && !allowedRoles.includes(user.role)) {
-        console.warn(`[ProtectedRoute] Role mismatch: user.role="${user.role}", required=${JSON.stringify(allowedRoles)}`);
-        return <Navigate to="/unauthorized" replace />;
+    if (allowedRoles && user) {
+        const userRole = user.role?.toLowerCase();
+        const isAllowed = allowedRoles.some(role => role.toLowerCase() === userRole);
+
+        if (!isAllowed) {
+            console.warn(`[ProtectedRoute] Role mismatch: actual="${user.role}", allowed=${JSON.stringify(allowedRoles)}`);
+            return <Navigate to="/" replace />;
+        }
     }
 
     return children ? <>{children}</> : <Outlet />;
