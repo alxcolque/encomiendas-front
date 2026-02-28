@@ -37,6 +37,7 @@ const AdminClients = lazy(() => import("@/pages/admin/Clients"));
 const AdminDrivers = lazy(() => import("@/pages/admin/Drivers"));
 const AdminOffices = lazy(() => import("@/pages/admin/Offices"));
 const AdminCities = lazy(() => import("@/pages/admin/Cities"));
+const AdminBusinesses = lazy(() => import("@/pages/admin/Businesses"));
 const AdminReports = lazy(() => import("@/pages/admin/Reports"));
 const AdminSettings = lazy(() => import("@/pages/admin/Settings"));
 const ShipmentDetails = lazy(() => import("@/pages/admin/ShipmentDetails"));
@@ -85,12 +86,13 @@ export const AppRouter = () => {
                     <Route path="/admin/drivers" element={<AdminDrivers />} />
                     <Route path="/admin/offices" element={<AdminOffices />} />
                     <Route path="/admin/cities" element={<AdminCities />} />
+                    <Route path="/admin/businesses" element={<AdminBusinesses />} />
                     <Route path="/admin/reports" element={<AdminReports />} />
                     <Route path="/admin/settings" element={<AdminSettings />} />
                 </Route>
 
                 {/* Worker Routes */}
-                <Route element={<ProtectedRoute allowedRoles={['worker']}><WorkerLayout /></ProtectedRoute>}>
+                <Route element={<ProtectedRoute allowedRoles={['worker', 'admin']}><WorkerLayout /></ProtectedRoute>}>
                     <Route path="/worker" element={<AdminDashboard />} /> {/* Placeholder */}
                 </Route>
 
