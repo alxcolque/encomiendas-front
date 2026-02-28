@@ -17,7 +17,6 @@ const TrackingPage = lazy(() => import("@/pages/public/TrackingPage"));
 const AboutPage = lazy(() => import("@/pages/public/AboutPage"));
 const ServicesPage = lazy(() => import("@/pages/public/ServicesPage"));
 const OfficesPage = lazy(() => import("@/pages/public/OfficesPage"));
-const ContactPage = lazy(() => import("@/pages/public/ContactPage"));
 const FaqPage = lazy(() => import("@/pages/public/FaqPage"));
 const TermsPage = lazy(() => import("@/pages/public/TermsPage"));
 const PrivacyPage = lazy(() => import("@/pages/public/PrivacyPage"));
@@ -59,7 +58,6 @@ export const AppRouter = () => {
                     <Route path="/about" element={<AboutPage />} />
                     <Route path="/services" element={<ServicesPage />} />
                     <Route path="/offices" element={<OfficesPage />} />
-                    <Route path="/contact" element={<ContactPage />} />
                     <Route path="/faq" element={<FaqPage />} />
 
                     {/* Legal */}

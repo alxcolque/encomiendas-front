@@ -120,8 +120,8 @@ export default function PublicFooter() {
                     </div>
 
                     {/* Mobile Siguenos Section (Matches Design) */}
-                    <div className="lg:hidden col-span-1 flex flex-col items-center gap-4 text-center">
-                        <h3 className="text-lg font-bold text-orange-600">Síguenos</h3>
+                    <div className="lg:hidden col-span-1 flex flex-col items-center gap-6 py-8 border-t border-border mt-8">
+                        <h3 className="text-xl font-black text-primary uppercase tracking-widest">Síguenos</h3>
                         <div className="flex gap-4">
                             {socials.filter(s => s.active).map((social) => {
                                 const Icon = getSocialIcon(social.platform);
@@ -131,20 +131,20 @@ export default function PublicFooter() {
                                         href={social.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 hover:bg-orange-600 hover:text-white transition-all duration-300"
+                                        className="w-12 h-12 rounded-full border border-primary/20 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all duration-300 shadow-sm"
                                         aria-label={social.platform}
                                     >
-                                        <Icon className="w-5 h-5" />
+                                        <Icon className="w-6 h-6" />
                                     </a>
                                 );
                             })}
                         </div>
-                        <div className="flex gap-4 pt-2 text-[10px] text-gray-400">
-                            <span>Facebook</span>
-                            <span>Twitter</span>
-                            <span>TikTok</span>
-                            <span>YouTube</span>
-                            <span>Instagram</span>
+                        <div className="grid grid-cols-5 w-full gap-2 px-2">
+                            {['facebook', 'twitter', 'tiktok', 'youtube', 'instagram'].map(label => (
+                                <span key={label} className="text-[9px] font-bold text-gray-400 capitalize text-center">
+                                    {label}
+                                </span>
+                            ))}
                         </div>
                     </div>
                 </div>
