@@ -1,24 +1,36 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 
-const data = [
-    { name: "Entregado", value: 65, color: "#10b981" }, // emerald-500
-    { name: "En Tránsito", value: 25, color: "#3b82f6" }, // blue-500
-    { name: "Pendiente", value: 10, color: "#f59e0b" }, // amber-500
-];
+interface StatusChartProps {
+    data: { [key: string]: number };
+}
 
-export function StatusChart() {
+const statusColors: Record<string, string> = {
+    created: "hsl(var(--primary))",
+    in_transit: "#3b82f6",
+    at_office: "#8b5cf6",
+    delivered: "#10b981",
+    cancelled: "#ef4444",
+};
+
+export function StatusChart({ data }: StatusChartProps) {
+    const chartData = Object.entries(data).map(([name, value]) => ({
+        name,
+        value,
+        color: statusColors[name] || "hsl(var(--muted))"
+    }));
+
     return (
-        <Card className="col-span-1 shadow-sm border-border/50 bg-card/50 backdrop-blur-sm">
+        <Card className="shadow-sm border-border/50 bg-card/50 backdrop-blur-sm">
             <CardHeader>
-                <CardTitle className="text-lg font-medium">Estado de Envíos</CardTitle>
+                <CardTitle className="text-lg font-medium">Distribución por Estado</CardTitle>
             </CardHeader>
             <CardContent>
                 <div className="h-[300px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                             <Pie
-                                data={data}
+                                data={chartData}
                                 cx="50%"
                                 cy="50%"
                                 innerRadius={60}
@@ -26,8 +38,8 @@ export function StatusChart() {
                                 paddingAngle={5}
                                 dataKey="value"
                             >
-                                {data.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={entry.color} strokeWidth={0} />
+                                {chartData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.color} />
                                 ))}
                             </Pie>
                             <Tooltip

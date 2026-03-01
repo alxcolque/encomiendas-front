@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { Package, Truck, CheckCircle2, TrendingUp, Users, Building2, Plus, FileText } from "lucide-react";
+import { Package, Truck, CheckCircle2, TrendingUp, Users, Building2, Plus, FileText, Loader2 } from "lucide-react";
+import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { AdminSectionHeader } from "@/components/admin/shared/AdminSectionHeader";
@@ -11,15 +12,37 @@ import { StatusChart } from "@/components/admin/dashboard/StatusChart";
 import { RecentShipmentsTable } from "@/components/admin/dashboard/RecentShipmentsTable";
 import { ActiveDriversList } from "@/components/admin/dashboard/ActiveDriversList";
 import { OfficePerformanceList } from "@/components/admin/dashboard/OfficePerformance";
+import { useDashboardStore } from "@/stores/dashboardStore";
+
+const iconMap: Record<string, any> = {
+  Package,
+  Truck,
+  CheckCircle2,
+  TrendingUp,
+  Users,
+  Building2,
+};
 
 export default function AdminDashboard() {
-  // Mock Data for KPI cards
-  const kpiStats = [
-    { label: "Total Encomiendas (Mes)", value: "1,245", change: 12.5, trend: "up" as const, icon: Package },
-    { label: "En Tránsito", value: "85", change: 5.2, trend: "up" as const, icon: Truck },
-    { label: "Entregadas", value: "1,120", change: 8.1, trend: "up" as const, icon: CheckCircle2 },
-    { label: "Ingresos (Mes)", value: "Bs 145.2k", change: 15.3, trend: "up" as const, icon: TrendingUp },
-  ];
+  const { data, isLoading, fetchDashboardData } = useDashboardStore();
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
+
+  if (isLoading || !data) {
+    return (
+      <div className="flex h-[400px] items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // Map icons for KPI cards
+  const kpiStats = data.kpi.map(stat => ({
+    ...stat,
+    icon: iconMap[stat.icon] || Package
+  }));
 
   const currentDate = format(new Date(), "d 'de' MMMM, yyyy", { locale: es });
 
@@ -49,9 +72,9 @@ export default function AdminDashboard() {
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ShipmentsChart />
-        <RevenueChart />
-        <StatusChart />
+        <ShipmentsChart data={data.charts.shipments} />
+        <RevenueChart data={data.charts.revenue} />
+        <StatusChart data={data.charts.status} />
       </div>
 
       {/* Main Content Grid: Table & Sidebars */}
@@ -59,10 +82,10 @@ export default function AdminDashboard() {
 
         {/* Left Column: Recent Shipments & Office Performance */}
         <div className="xl:col-span-2 space-y-6">
-          <RecentShipmentsTable />
+          <RecentShipmentsTable shipments={data.recent_shipments} />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <OfficePerformanceList />
+            <OfficePerformanceList offices={data.office_performance} />
             {/* Can add another component here or extend OfficePerformance */}
             <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl border border-primary/20 p-6 flex flex-col justify-center items-start space-y-4">
               <div className="p-3 bg-background rounded-full shadow-sm">
@@ -83,18 +106,18 @@ export default function AdminDashboard() {
 
         {/* Right Column: Drivers & Quick Stats */}
         <div className="space-y-6">
-          <ActiveDriversList />
+          <ActiveDriversList drivers={data.active_drivers} />
 
           {/* Quick Stats / Secondary Metrics */}
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-card/50 border border-border/50 p-4 rounded-xl flex flex-col items-center justify-center text-center space-y-2">
               <Users className="w-5 h-5 text-blue-500" />
-              <span className="text-2xl font-bold">24</span>
+              <span className="text-2xl font-bold">{data.active_drivers_count}</span>
               <span className="text-xs text-muted-foreground">Conductores Activos</span>
             </div>
             <div className="bg-card/50 border border-border/50 p-4 rounded-xl flex flex-col items-center justify-center text-center space-y-2">
               <Building2 className="w-5 h-5 text-indigo-500" />
-              <span className="text-2xl font-bold">7</span>
+              <span className="text-2xl font-bold">{data.total_offices_count}</span>
               <span className="text-xs text-muted-foreground">Oficinas Operativas</span>
             </div>
           </div>

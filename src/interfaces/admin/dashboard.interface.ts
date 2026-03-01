@@ -1,10 +1,23 @@
 export interface KPIData {
     label: string;
     value: string | number;
-    change: number; // percentage
+    change: number;
     trend: 'up' | 'down' | 'neutral';
-    icon: React.ElementType;
-    description?: string;
+    icon: any;
+}
+
+export interface AdminDashboardData {
+    kpi: KPIData[];
+    charts: {
+        shipments: { month: string; value: number }[];
+        revenue: { month: string; value: number }[];
+        status: { [key: string]: number };
+    };
+    recent_shipments: any[];
+    office_performance: { name: string; total: number }[];
+    active_drivers: any[];
+    active_drivers_count: number;
+    total_offices_count: number;
 }
 
 export type ShipmentStatus = 'created' | 'pending' | 'in_transit' | 'at_office' | 'out_for_delivery' | 'delivered' | 'cancelled';

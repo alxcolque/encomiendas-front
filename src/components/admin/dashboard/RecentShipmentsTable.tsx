@@ -39,9 +39,16 @@ import {
 
 import { toast } from "sonner";
 
-export function RecentShipmentsTable() {
+interface RecentShipmentsTableProps {
+    shipments?: AdminShipment[];
+}
+
+export function RecentShipmentsTable({ shipments: propShipments }: RecentShipmentsTableProps) {
     const navigate = useNavigate();
-    const { shipments, isLoading, fetchShipments, updateStatus } = useAdminShipmentStore();
+    const { shipments: storeShipments, isLoading, fetchShipments, updateStatus } = useAdminShipmentStore();
+
+    // Choose which shipments to use
+    const displayedShipments = propShipments || storeShipments;
     const [selectedShipment, setSelectedShipment] = useState<AdminShipment | null>(null);
     const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
 
@@ -63,7 +70,7 @@ export function RecentShipmentsTable() {
         fetchShipments();
     }, []);
 
-    if (isLoading && shipments.length === 0) {
+    if (isLoading && displayedShipments.length === 0) {
         return (
             <Card className="shadow-sm border-border/50 bg-card/50 backdrop-blur-sm">
                 <CardContent className="p-12 flex flex-col items-center justify-center space-y-4">
@@ -103,14 +110,14 @@ export function RecentShipmentsTable() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {shipments.length === 0 ? (
+                            {displayedShipments.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                                         No se encontraron encomiendas registradas.
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                shipments.slice(0, 10).map((shipment) => (
+                                displayedShipments.slice(0, 10).map((shipment) => (
                                     <TableRow key={shipment.id} className="hover:bg-muted/50 border-border/50 transition-colors">
                                         <TableCell className="font-mono font-bold text-primary">{shipment.tracking_code}</TableCell>
                                         <TableCell className="text-muted-foreground">{shipment.sender_name}</TableCell>
