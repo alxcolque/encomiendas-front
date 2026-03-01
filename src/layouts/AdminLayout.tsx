@@ -18,13 +18,13 @@ export default function AdminLayout() {
             {/* DESKTOP LAYOUT (lg+) */}
             <div className="hidden lg:flex min-h-screen bg-background">
                 {/* Fixed Sidebar */}
-                <AdminSidebar />
+                <AdminSidebar className="print:hidden" />
 
                 {/* Main Content Area */}
-                <div className="flex-1 ml-64 flex flex-col min-h-screen transition-all duration-300">
-                    <TopNavbar /> {/* Reusing TopNavbar, check if it fits width */}
-                    <main className="flex-1 p-6 overflow-y-auto">
-                        <div className="max-w-7xl mx-auto w-full">
+                <div className="flex-1 lg:ml-64 print:ml-0 flex flex-col min-h-screen transition-all duration-300">
+                    <TopNavbar className="print:hidden" /> {/* Reusing TopNavbar, check if it fits width */}
+                    <main className="flex-1 p-6 print:p-0 overflow-y-auto">
+                        <div className="max-w-7xl mx-auto w-full print:max-w-full">
                             <Outlet />
                         </div>
                     </main>

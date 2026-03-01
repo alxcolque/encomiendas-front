@@ -62,7 +62,11 @@ export default function ShipmentDetails() {
                             <ExternalLink className="w-4 h-4" /> Factura
                         </Button>
                     )}
-                    <Button variant="default" className="gap-2">
+                    <Button
+                        variant="default"
+                        className="gap-2"
+                        onClick={() => window.open(`/admin/ticket/${shipment.id}`, '_blank')}
+                    >
                         <FileText className="w-4 h-4" /> Imprimir Etiqueta
                     </Button>
                 </div>

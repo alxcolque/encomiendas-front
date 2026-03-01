@@ -695,7 +695,7 @@ export default function ShipmentDetailsForm({ onNext }: Props) {
                                     className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                                 />
                                 <Label htmlFor="iva-checkbox" className="text-sm font-bold text-foreground cursor-pointer select-none">
-                                    Facturar con IVA (+16%)
+                                    Con Factura
                                 </Label>
                             </div>
 

@@ -3,7 +3,20 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "../shared/StatusBadge";
-import { Eye, Loader2, FileText } from "lucide-react";
+import {
+    Eye,
+    Loader2,
+    FileText,
+    MoreVertical,
+    CheckCircle2,
+    Truck,
+    Package,
+    RotateCcw,
+    XCircle,
+    Send,
+    ExternalLink,
+    Printer
+} from "lucide-react";
 import { useAdminShipmentStore } from "@/stores/adminShipmentStore";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -23,7 +36,7 @@ import {
     DropdownMenuSubContent,
     DropdownMenuPortal
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical, CheckCircle2, Truck, Package, RotateCcw, XCircle, Send, ExternalLink } from "lucide-react";
+
 import { toast } from "sonner";
 
 export function RecentShipmentsTable() {
@@ -134,6 +147,15 @@ export function RecentShipmentsTable() {
                                                         <Eye className="w-4 h-4 mr-2" />
                                                         Ver detalles
                                                     </DropdownMenuItem>
+
+                                                    <DropdownMenuItem
+                                                        className="cursor-pointer"
+                                                        onClick={() => window.open(`/admin/ticket/${shipment.id}`, '_blank')}
+                                                    >
+                                                        <Printer className="w-4 h-4 mr-2" />
+                                                        Imprimir Etiqueta
+                                                    </DropdownMenuItem>
+
                                                     {shipment.invoice && (
                                                         <>
                                                             <DropdownMenuItem

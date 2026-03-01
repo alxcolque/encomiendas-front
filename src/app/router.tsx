@@ -41,6 +41,7 @@ const AdminBusinesses = lazy(() => import("@/pages/admin/Businesses"));
 const AdminReports = lazy(() => import("@/pages/admin/Reports"));
 const AdminSettings = lazy(() => import("@/pages/admin/Settings"));
 const ShipmentDetails = lazy(() => import("@/pages/admin/ShipmentDetails"));
+const ShipmentTicket = lazy(() => import("@/pages/admin/ShipmentTicket"));
 const InvoicePage = lazy(() => import("@/pages/shared/InvoicePage"));
 
 const Loading = () => <div className="p-4 text-center">Cargando...</div>;
@@ -90,6 +91,8 @@ export const AppRouter = () => {
                     <Route path="/admin/reports" element={<AdminReports />} />
                     <Route path="/admin/settings" element={<AdminSettings />} />
                 </Route>
+                <Route element={<ProtectedRoute allowedRoles={['admin']}><ShipmentTicket /></ProtectedRoute>} path="/admin/ticket/:id" />
+
 
                 {/* Worker Routes */}
                 <Route element={<ProtectedRoute allowedRoles={['worker', 'admin']}><WorkerLayout /></ProtectedRoute>}>

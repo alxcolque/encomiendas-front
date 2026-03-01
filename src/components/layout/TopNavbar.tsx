@@ -14,7 +14,11 @@ import kolmoxLogo from "@/assets/kolmox-logo.png";
 
 type Theme = "light" | "dark" | "system";
 
-export function TopNavbar() {
+interface TopNavbarProps {
+  className?: string;
+}
+
+export function TopNavbar({ className }: TopNavbarProps) {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
   const [theme, setTheme] = useState<Theme>("dark");
@@ -57,7 +61,7 @@ export function TopNavbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
+    <header className={cn("sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border", className)}>
       <div className="flex items-center justify-between px-4 py-3 max-w-lg mx-auto">
         {/* App Logo */}
         <div

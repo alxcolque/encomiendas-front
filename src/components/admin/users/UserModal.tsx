@@ -18,7 +18,7 @@ const baseSchema = z.object({
     name: z.string().min(2, "Nombre requerido"),
     email: z.string().email("Email inválido"),
     phone: z.string().min(8, "Celular requerido"),
-    role: z.enum(["admin", "worker", "driver", "client"]),
+    role: z.enum(["admin", "worker", "driver"]),
     status: z.enum(["active", "inactive"]),
     avatar: z.string().optional(),
 });
@@ -50,7 +50,7 @@ export function UserModal({ userToEdit, open, onOpenChange }: UserModalProps) {
     const form = useForm<UserFormValues>({
         resolver: zodResolver(isEditing ? editSchema : createSchema),
         defaultValues: {
-            role: "client",
+            role: "worker",
             status: "active",
             pin: "",
         }
@@ -75,7 +75,7 @@ export function UserModal({ userToEdit, open, onOpenChange }: UserModalProps) {
                     name: "",
                     email: "",
                     phone: "",
-                    role: "client",
+                    role: "worker",
                     status: "active",
                     pin: "",
                     avatar: undefined
@@ -189,7 +189,7 @@ export function UserModal({ userToEdit, open, onOpenChange }: UserModalProps) {
                             <Label htmlFor="role">Rol</Label>
                             <Select
                                 onValueChange={(val) => form.setValue("role", val as any)}
-                                defaultValue={isEditing ? userToEdit?.role : "client"}
+                                defaultValue={isEditing ? userToEdit?.role : "worker"}
                                 value={form.watch("role")} // Controlled value for edit
                             >
                                 <SelectTrigger>
@@ -199,7 +199,7 @@ export function UserModal({ userToEdit, open, onOpenChange }: UserModalProps) {
                                     <SelectItem value="admin">Administrador</SelectItem>
                                     <SelectItem value="worker">Operador</SelectItem>
                                     <SelectItem value="driver">Conductor</SelectItem>
-                                    <SelectItem value="client">Cliente</SelectItem>
+
                                 </SelectContent>
                             </Select>
                         </div>

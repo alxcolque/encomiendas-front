@@ -35,6 +35,10 @@ export interface AdminShipment {
     current_status: ShipmentStatus;
     estimated_delivery?: string;
     price: number;
+    tracking_pay: number;
+    weight?: number;
+    is_pack?: boolean;
+    observation?: string;
     events?: AdminShipmentEvent[];
     invoice?: Invoice;
     created_at?: string;
