@@ -11,7 +11,7 @@ interface AdminSidebarProps {
 export function AdminSidebar({ className }: AdminSidebarProps) {
     return (
         <aside className={cn(
-            "fixed left-0 top-0 h-screen w-64 bg-card border-r border-border flex flex-col transition-all duration-300 z-40 hidden lg:flex",
+            "fixed left-0 top-0 h-screen w-64 bg-card border-r border-border/50 flex flex-col transition-all duration-300 z-40 hidden lg:flex",
             className
         )}>
             {/* Logo Header */}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { GlassCard } from "@/components/ui/GlassCard";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { StatusTimeline } from "@/components/ui/StatusTimeline";
@@ -42,145 +42,179 @@ export default function TrackingPage() {
     <div className="min-h-screen bg-background">
       {/* Background effect */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-primary/15 rounded-full blur-[100px]" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px]" />
       </div>
 
-      <div className="relative z-10 max-w-lg mx-auto p-4 space-y-6">
+      <div className="relative z-10 max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 space-y-8">
         {/* Header */}
         <div className="text-center pt-8 pb-4">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl gradient-primary shadow-glow mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary shadow-lg shadow-primary/20 mb-6">
             <Package size={32} className="text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-display font-bold">Rastrear Envío</h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            Ingresa tu código de seguimiento
+          <h1 className="text-3xl md:text-5xl font-black text-foreground tracking-tight">Rastrear Envío</h1>
+          <p className="text-muted-foreground text-base md:text-lg mt-2 max-w-md mx-auto">
+            Ingresa tu código de seguimiento para conocer el estado de tu encomienda en tiempo real.
           </p>
         </div>
 
         {/* Search */}
-        <GlassCard className="space-y-4">
-          <div className="relative">
-            <Input
-              placeholder="ENV-2025-001"
-              value={code}
-              onChange={(e) => setCode(e.target.value.toUpperCase())}
-              className="h-14 text-lg bg-muted/50 border-border rounded-xl pr-12 font-mono"
-            />
-            <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
-          </div>
-          <Button
-            onClick={handleSearch}
-            variant="hero"
-            size="lg"
-            className="w-full"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <div className="flex items-center gap-2">
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                Buscando...
-              </div>
-            ) : (
-              "Buscar"
-            )}
-          </Button>
-        </GlassCard>
+        <Card className="max-w-xl mx-auto border-border/50 shadow-md rounded-2xl">
+          <CardContent className="pt-8 space-y-6">
+            <div className="relative">
+              <Input
+                placeholder="ENV-2025-001"
+                value={code}
+                onChange={(e) => setCode(e.target.value.toUpperCase())}
+                className="h-16 text-xl bg-muted/30 border-border rounded-xl pr-12 font-mono shadow-inner"
+              />
+              <Search className="absolute right-5 top-1/2 -translate-y-1/2 text-muted-foreground" size={24} />
+            </div>
+            <Button
+              onClick={handleSearch}
+              size="lg"
+              className="w-full h-14 text-lg font-bold rounded-xl shadow-lg shadow-primary/20"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  Buscando...
+                </div>
+              ) : (
+                "Buscar Paquete"
+              )}
+            </Button>
+          </CardContent>
+        </Card>
 
         {/* Demo codes */}
-        <p className="text-center text-xs text-muted-foreground">
-          Prueba: <span className="text-primary font-mono">ENV-2025-001</span> o{" "}
-          <span className="text-primary font-mono">ENV-2025-002</span>
+        <p className="text-center text-sm font-medium text-muted-foreground">
+          Pruebas rápidas: <span className="text-primary font-mono bg-primary/5 px-2 py-0.5 rounded">ENV-2025-001</span> o{" "}
+          <span className="text-primary font-mono bg-primary/5 px-2 py-0.5 rounded">ENV-2025-002</span>
         </p>
 
         {/* Results */}
         {searched && !currentShipment && (
-          <GlassCard className="text-center py-8">
-            <Package size={48} className="text-muted-foreground mx-auto mb-4" />
-            <h3 className="font-semibold text-lg">Envío no encontrado</h3>
-            <p className="text-muted-foreground text-sm mt-1">
-              Verifica el código e intenta nuevamente
-            </p>
-          </GlassCard>
+          <Card className="max-w-xl mx-auto text-center py-12 border-border/50 shadow-md rounded-2xl">
+            <CardContent className="space-y-4">
+              <div className="w-20 h-20 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-6">
+                <Package size={40} className="text-muted-foreground" />
+              </div>
+              <h3 className="font-black text-2xl">Envío no encontrado</h3>
+              <p className="text-muted-foreground text-sm mt-1 max-w-xs mx-auto">
+                No pudimos encontrar un envío con ese código. Por favor verifica los caracteres e intenta nuevamente.
+              </p>
+            </CardContent>
+          </Card>
         )}
 
         {currentShipment && (
-          <>
+          <div className="max-w-3xl mx-auto space-y-6">
             {/* Shipment Info */}
-            <GlassCard glow className="space-y-4">
-              <div className="flex items-center justify-between">
+            <Card className="border-border/50 shadow-md rounded-2xl overflow-hidden">
+              <div className="bg-primary/5 px-6 py-4 border-b border-border/50 flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-muted-foreground">Código</p>
-                  <p className="font-mono font-bold text-lg">{currentShipment.trackingCode}</p>
+                  <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Código de Seguimiento</p>
+                  <p className="font-mono font-black text-2xl text-primary">{currentShipment.trackingCode}</p>
                 </div>
-                <div className={`status-chip ${currentShipment.currentStatus === 'delivered'
-                  ? 'bg-success/20 text-success'
-                  : 'bg-primary/20 text-primary'
+                <div className={`px-4 py-2 rounded-xl text-sm font-black uppercase tracking-wider shadow-sm ${currentShipment.currentStatus === 'delivered'
+                  ? 'bg-emerald-500 text-white shadow-emerald-500/20'
+                  : 'bg-primary text-primary-foreground shadow-primary/20'
                   }`}>
                   {statusLabels[currentShipment.currentStatus]}
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-start gap-2">
-                  <User size={16} className="text-muted-foreground mt-0.5" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">Remitente</p>
-                    <p className="text-sm font-medium">{currentShipment.senderName}</p>
+              <CardContent className="p-6 space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 rounded-lg bg-muted/50">
+                        <User size={18} className="text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Remitente</p>
+                        <p className="font-bold">{currentShipment.senderName}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 rounded-lg bg-muted/50">
+                        <MapPin size={18} className="text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Origen</p>
+                        <p className="font-bold">{currentShipment.origin}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 rounded-lg bg-muted/50">
+                        <User size={18} className="text-emerald-500" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Destinatario</p>
+                        <p className="font-bold">{currentShipment.receiverName}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 rounded-lg bg-muted/50">
+                        <MapPin size={18} className="text-emerald-500" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Destino</p>
+                        <p className="font-bold">{currentShipment.destination}</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-start gap-2">
-                  <User size={16} className="text-muted-foreground mt-0.5" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">Destinatario</p>
-                    <p className="text-sm font-medium">{currentShipment.receiverName}</p>
+
+                <div className="p-5 bg-primary/5 rounded-2xl flex items-center gap-4 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 p-4 opacity-5 transform group-hover:scale-110 transition-transform">
+                    <Calendar size={64} />
+                  </div>
+                  <div className="p-3 rounded-xl bg-white shadow-sm">
+                    <Calendar size={24} className="text-primary" />
+                  </div>
+                  <div className="relative z-10">
+                    <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Entrega estimada</p>
+                    <p className="text-xl font-black text-primary capitalize">
+                      {format(currentShipment.estimatedDelivery, "EEEE, d 'de' MMMM", { locale: es })}
+                    </p>
                   </div>
                 </div>
-              </div>
-
-              <div className="flex items-center gap-4 text-sm">
-                <div className="flex items-center gap-1.5">
-                  <MapPin size={14} className="text-primary" />
-                  <span>{currentShipment.origin}</span>
-                </div>
-                <span className="text-muted-foreground">→</span>
-                <div className="flex items-center gap-1.5">
-                  <MapPin size={14} className="text-success" />
-                  <span>{currentShipment.destination}</span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 bg-muted/50 rounded-lg p-3">
-                <Calendar size={16} className="text-primary" />
-                <div>
-                  <p className="text-xs text-muted-foreground">Entrega estimada</p>
-                  <p className="font-medium">
-                    {format(currentShipment.estimatedDelivery, "EEEE, d 'de' MMMM", { locale: es })}
-                  </p>
-                </div>
-              </div>
-            </GlassCard>
+              </CardContent>
+            </Card>
 
             {/* Timeline */}
-            <GlassCard>
-              <h3 className="font-display font-bold mb-4">Historial de Eventos</h3>
-              <StatusTimeline
-                items={allStatuses.map((status, index) => {
-                  const currentIndex = getStatusIndex(currentShipment.currentStatus);
-                  const event = currentShipment.events.find(e => e.status === status);
+            <Card className="border-border/50 shadow-md rounded-2xl">
+              <CardContent className="p-8">
+                <h3 className="text-xl font-black mb-8 flex items-center gap-3">
+                  <Clock size={20} className="text-primary" />
+                  Historial de Eventos
+                </h3>
+                <div className="pl-4">
+                  <StatusTimeline
+                    items={allStatuses.map((status, index) => {
+                      const currentIndex = getStatusIndex(currentShipment.currentStatus);
+                      const event = currentShipment.events.find(e => e.status === status);
 
-                  return {
-                    label: statusLabels[status],
-                    icon: statusIcons[status],
-                    completed: index <= currentIndex,
-                    active: index === currentIndex,
-                    timestamp: event
-                      ? format(event.timestamp, "d MMM, HH:mm", { locale: es })
-                      : undefined,
-                  };
-                })}
-              />
-            </GlassCard>
-          </>
+                      return {
+                        label: statusLabels[status],
+                        icon: statusIcons[status],
+                        completed: index <= currentIndex,
+                        active: index === currentIndex,
+                        timestamp: event
+                          ? format(event.timestamp, "d MMM, HH:mm", { locale: es })
+                          : undefined,
+                      };
+                    })}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         )}
       </div>
     </div>

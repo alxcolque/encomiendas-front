@@ -66,8 +66,8 @@ function AnimatedCounter({ target, suffix }: { target: number; suffix: string })
 
 export default function AboutSection() {
   return (
-    <section id="nosotros" className="py-16 md:py-24 bg-background overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="nosotros" className="py-16 md:py-24 bg-background overflow-hidden border-t border-border/50">
+      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-10 md:gap-16 items-center">
           {/* Image */}
           <div className="relative order-2 lg:order-1">

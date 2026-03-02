@@ -61,8 +61,8 @@ export function TopNavbar({ className }: TopNavbarProps) {
   };
 
   return (
-    <header className={cn("sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border", className)}>
-      <div className="flex items-center justify-between px-4 py-3 max-w-lg mx-auto">
+    <header className={cn("sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50", className)}>
+      <div className="flex items-center justify-between px-4 py-3 max-w-screen-xl mx-auto">
         {/* App Logo */}
         <div
           className="flex items-center gap-2 cursor-pointer"
@@ -85,7 +85,7 @@ export function TopNavbar({ className }: TopNavbarProps) {
                 {themeIcon[theme]}
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-popover border-border">
+            <DropdownMenuContent align="end" className="bg-popover border-border/50">
               <DropdownMenuItem
                 onClick={() => handleThemeChange("light")}
                 className={cn(theme === "light" && "bg-accent text-accent-foreground")}
@@ -138,84 +138,77 @@ export function TopNavbar({ className }: TopNavbarProps) {
                 <ChevronDown size={14} className="text-muted-foreground" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 bg-popover border-border">
+            <DropdownMenuContent align="end" className="w-56 bg-popover/90 backdrop-blur-xl border-primary/20 rounded-2xl shadow-xl animate-in fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2">
               {user && (
                 <>
-                  <div className="px-3 py-2">
-                    <p className="font-medium text-sm">{user.name}</p>
-                    <p className="text-xs text-muted-foreground capitalize">{user.role}</p>
+                  <div className="px-4 py-3 border-b border-border/50">
+                    <p className="font-bold text-sm text-foreground">{user.name}</p>
+                    <p className="text-[10px] uppercase tracking-wider font-extrabold text-primary">{user.role}</p>
                   </div>
-                  <DropdownMenuSeparator />
-
-                  {/* ADMIN MOBILE MENU (Visible only on < lg) */}
-                  {/* Ideally we check role, but request says 'In tablet/mobile... user profile dropdown'. 
-                      We can show these ALWAYS for admin role, regardless of screen size, OR strictly for mobile.
-                      Request: "En tablet y móvil, las opciones... dentro del dropdown".
-                      Implies Desktop has Sidebar, Mobile has Dropdown.
-                      We can use `lg:hidden` class on these items to hide them on desktop if needed, 
-                      or just show them always as quick access. Let's start with showing them if role=admin.
-                  */}
-                  {user.role === 'admin' && (
-                    <div className="lg:hidden">
-                      <DropdownMenuItem onClick={() => navigate('/admin')}>
-                        <LayoutDashboard size={16} className="mr-2" />
-                        Dashboard
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => navigate('/admin/shipments')}>
-                        <Package size={16} className="mr-2" />
-                        Encomiendas
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => navigate('/admin/users')}>
-                        <Users size={16} className="mr-2" />
-                        Usuarios
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => navigate('/admin/clients')}>
-                        <UserCheck size={16} className="mr-2" />
-                        Clientes
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => navigate('/admin/businesses')}>
-                        <Building2 size={16} className="mr-2" />
-                        Empresas
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => navigate('/admin/drivers')}>
-                        <Truck size={16} className="mr-2" />
-                        Conductores
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => navigate('/admin/offices')}>
-                        <Building2 size={16} className="mr-2" />
-                        Oficinas
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => navigate('/admin/cities')}>
-                        <MapPin size={16} className="mr-2" />
-                        Ciudades y Rutas
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => navigate('/admin/reports')}>
-                        <FileBarChart size={16} className="mr-2" />
-                        Reportes
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => navigate('/admin/settings')}>
-                        <Settings size={16} className="mr-2" />
-                        Configuración
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                    </div>
-                  )}
-
+                  <div className="p-1">
+                    {user.role === 'admin' && (
+                      <div className="lg:hidden space-y-1">
+                        <DropdownMenuItem onClick={() => navigate('/admin')} className="rounded-xl focus:bg-primary/10 focus:text-primary transition-colors cursor-pointer">
+                          <LayoutDashboard size={16} className="mr-2" />
+                          <span className="font-medium">Dashboard</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/admin/shipments')} className="rounded-xl focus:bg-primary/10 focus:text-primary transition-colors cursor-pointer">
+                          <Package size={16} className="mr-2" />
+                          <span className="font-medium">Encomiendas</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/admin/users')} className="rounded-xl focus:bg-primary/10 focus:text-primary transition-colors cursor-pointer">
+                          <Users size={16} className="mr-2" />
+                          <span className="font-medium">Usuarios</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/admin/clients')} className="rounded-xl focus:bg-primary/10 focus:text-primary transition-colors cursor-pointer">
+                          <UserCheck size={16} className="mr-2" />
+                          <span className="font-medium">Clientes</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/admin/businesses')} className="rounded-xl focus:bg-primary/10 focus:text-primary transition-colors cursor-pointer">
+                          <Building2 size={16} className="mr-2" />
+                          <span className="font-medium">Empresas</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/admin/drivers')} className="rounded-xl focus:bg-primary/10 focus:text-primary transition-colors cursor-pointer">
+                          <Truck size={16} className="mr-2" />
+                          <span className="font-medium">Conductores</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/admin/offices')} className="rounded-xl focus:bg-primary/10 focus:text-primary transition-colors cursor-pointer">
+                          <Building2 size={16} className="mr-2" />
+                          <span className="font-medium">Oficinas</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/admin/cities')} className="rounded-xl focus:bg-primary/10 focus:text-primary transition-colors cursor-pointer">
+                          <MapPin size={16} className="mr-2" />
+                          <span className="font-medium">Ciudades y Rutas</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/admin/reports')} className="rounded-xl focus:bg-primary/10 focus:text-primary transition-colors cursor-pointer">
+                          <FileBarChart size={16} className="mr-2" />
+                          <span className="font-medium">Reportes</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/admin/settings')} className="rounded-xl focus:bg-primary/10 focus:text-primary transition-colors cursor-pointer">
+                          <Settings size={16} className="mr-2" />
+                          <span className="font-medium">Configuración</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator className="bg-border/50" />
+                      </div>
+                    )}
+                  </div>
                 </>
               )}
-              <DropdownMenuItem onClick={() => navigate("/user/profile")}>
-                <User size={16} className="mr-2" />
-                Mi Perfil
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate("/wallet")}>
-                <Settings size={16} className="mr-2" />
-                Ajustes Generales
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
-                <LogOut size={16} className="mr-2" />
-                Cerrar Sesión
-              </DropdownMenuItem>
+              <div className="p-1 space-y-1">
+                <DropdownMenuItem onClick={() => navigate("/user/profile")} className="rounded-xl focus:bg-primary/10 focus:text-primary transition-colors cursor-pointer">
+                  <User size={16} className="mr-2" />
+                  <span className="font-medium">Mi Perfil</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/wallet")} className="rounded-xl focus:bg-primary/10 focus:text-primary transition-colors cursor-pointer">
+                  <Settings size={16} className="mr-2" />
+                  <span className="font-medium">Ajustes Generales</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-border/50" />
+                <DropdownMenuItem onClick={handleLogout} className="rounded-xl text-destructive focus:bg-destructive/10 focus:text-destructive transition-colors cursor-pointer font-bold">
+                  <LogOut size={16} className="mr-2" />
+                  Cerrar Sesión
+                </DropdownMenuItem>
+              </div>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

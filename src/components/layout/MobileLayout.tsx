@@ -35,12 +35,11 @@ export function MobileLayout({
       {/* Top Navbar */}
       {showHeader && <TopNavbar />}
 
-      {/* Main content */}
       <main className={cn(
-        "flex-1 overflow-auto",
-        showNav && navItems.length > 0 && "pb-20"
+        "flex-1 overflow-x-hidden",
+        showNav && navItems.length > 0 && "pb-24"
       )}>
-        <div className="max-w-lg mx-auto">
+        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
           {children ? children : <Outlet />}
         </div>
       </main>

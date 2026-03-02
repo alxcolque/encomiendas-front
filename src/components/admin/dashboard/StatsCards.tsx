@@ -9,9 +9,9 @@ interface StatsCardsProps {
 
 export function StatsCards({ stats }: StatsCardsProps) {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {stats.map((stat, index) => (
-                <Card key={index} className="overflow-hidden border-border/50 shadow-sm hover:shadow-md transition-all duration-200 bg-card/50 backdrop-blur-sm">
+                <Card key={index} className="border-border/50 shadow-md hover:shadow-lg transition-all duration-300 bg-card/50 backdrop-blur-sm">
                     <CardContent className="p-6">
                         <div className="flex items-start justify-between">
                             <div className="p-2 bg-primary/10 rounded-lg text-primary">

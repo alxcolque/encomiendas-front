@@ -21,7 +21,7 @@ export function StatusChart({ data }: StatusChartProps) {
     }));
 
     return (
-        <Card className="shadow-sm border-border/50 bg-card/50 backdrop-blur-sm">
+        <Card className="shadow-md border-border/50 bg-card/50 backdrop-blur-sm">
             <CardHeader>
                 <CardTitle className="text-lg font-medium">Distribución por Estado</CardTitle>
             </CardHeader>

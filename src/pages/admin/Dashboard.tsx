@@ -58,24 +58,25 @@ export default function AdminDashboard() {
         title="Panel Administrativo"
         subtitle={`Resumen de operaciones - ${currentDate}`}
         actions={
-          <>
+          <div className="flex flex-wrap items-center gap-2">
             <Button
               variant="outline"
-              className="gap-2"
+              size="sm"
+              className="md:h-11 md:px-4 md:py-2 md:text-sm gap-2"
               onClick={() => navigate(ADMIN_ROUTES.REPORTS)}
             >
-              <FileText className="w-4 h-4" />
+              <FileText className="w-4 h-4 md:w-5 md:h-5" />
               Ver Reportes
             </Button>
             <NewShipmentModal
               trigger={
-                <Button className="gap-2 shadow-lg shadow-primary/25">
-                  <Plus className="w-4 h-4" />
+                <Button size="sm" className="md:h-11 md:px-4 md:py-2 md:text-sm gap-2 shadow-lg shadow-primary/25">
+                  <Plus className="w-4 h-4 md:w-5 md:h-5" />
                   Nueva Encomienda
                 </Button>
               }
             />
-          </>
+          </div>
         }
       />
 
@@ -99,8 +100,8 @@ export default function AdminDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <OfficePerformanceList offices={data.office_performance} />
             {/* Can add another component here or extend OfficePerformance */}
-            <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl border border-primary/20 p-6 flex flex-col justify-center items-start space-y-4">
-              <div className="p-3 bg-background rounded-full shadow-sm">
+            <div className="bg-card rounded-2xl border border-border/50 shadow-md p-6 flex flex-col justify-center items-start space-y-4">
+              <div className="p-3 bg-primary/10 rounded-xl shadow-sm">
                 <TrendingUp className="w-6 h-6 text-primary" />
               </div>
               <div>
@@ -109,7 +110,7 @@ export default function AdminDashboard() {
                   La eficiencia operativa ha subido un 5% respecto a ayer. Se detectaron 2 retrasos menores en la ruta Oruro-La Paz.
                 </p>
               </div>
-              <Button variant="ghost" className="p-0 h-auto font-medium text-primary hover:text-primary/80 hover:bg-transparent">
+              <Button variant="ghost" className="p-0 h-auto font-bold text-primary hover:text-primary/80 hover:bg-transparent">
                 Ver detalles operativos →
               </Button>
             </div>
@@ -121,16 +122,20 @@ export default function AdminDashboard() {
           <ActiveDriversList drivers={data.active_drivers} />
 
           {/* Quick Stats / Secondary Metrics */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-card/50 border border-border/50 p-4 rounded-xl flex flex-col items-center justify-center text-center space-y-2">
-              <Users className="w-5 h-5 text-blue-500" />
-              <span className="text-2xl font-bold">{data.active_drivers_count}</span>
-              <span className="text-xs text-muted-foreground">Conductores Activos</span>
+          <div className="grid grid-cols-2 gap-6">
+            <div className="bg-card border border-border/50 p-6 rounded-2xl shadow-md flex flex-col items-center justify-center text-center space-y-3">
+              <div className="p-2 bg-blue-500/10 rounded-xl">
+                <Users className="w-5 h-5 text-blue-500" />
+              </div>
+              <span className="text-3xl font-black">{data.active_drivers_count}</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Conductores</span>
             </div>
-            <div className="bg-card/50 border border-border/50 p-4 rounded-xl flex flex-col items-center justify-center text-center space-y-2">
-              <Building2 className="w-5 h-5 text-indigo-500" />
-              <span className="text-2xl font-bold">{data.total_offices_count}</span>
-              <span className="text-xs text-muted-foreground">Oficinas Operativas</span>
+            <div className="bg-card border border-border/50 p-6 rounded-2xl shadow-md flex flex-col items-center justify-center text-center space-y-3">
+              <div className="p-2 bg-indigo-500/10 rounded-xl">
+                <Building2 className="w-5 h-5 text-indigo-500" />
+              </div>
+              <span className="text-3xl font-black">{data.total_offices_count}</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Oficinas</span>
             </div>
           </div>
         </div>

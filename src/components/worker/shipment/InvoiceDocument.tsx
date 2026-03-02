@@ -16,7 +16,7 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, onClo
     };
 
     return (
-        <div className="bg-white text-black p-8 max-w-4xl mx-auto shadow-lg border border-gray-200 print:shadow-none print:border-none print:p-0">
+        <div className="bg-white text-black p-2 max-w-4xl mx-auto shadow-lg border border-gray-200 print:shadow-none print:border-none print:p-0">
             {/* Header controls - hidden when printing */}
             <div className="flex justify-between mb-8 print:hidden">
                 <Button variant="outline" onClick={onClose} className="gap-2">

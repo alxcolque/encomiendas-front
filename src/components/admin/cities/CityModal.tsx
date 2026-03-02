@@ -74,7 +74,7 @@ export function CityModal({ cityToEdit, open, onOpenChange }: CityModalProps) {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md backdrop-blur-xl border-border">
+            <DialogContent className="sm:max-w-lg bg-background/95 backdrop-blur-xl border-border">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <MapPin className="h-5 w-5 text-primary" />

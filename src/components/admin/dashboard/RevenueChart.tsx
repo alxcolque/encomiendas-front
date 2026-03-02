@@ -7,7 +7,7 @@ interface RevenueChartProps {
 
 export function RevenueChart({ data }: RevenueChartProps) {
     return (
-        <Card className="col-span-1 shadow-sm border-border/50 bg-card/50 backdrop-blur-sm">
+        <Card className="col-span-1 shadow-md border-border/50 bg-card/50 backdrop-blur-sm">
             <CardHeader>
                 <CardTitle className="text-lg font-medium">Ingresos Mensuales</CardTitle>
             </CardHeader>

@@ -28,7 +28,7 @@ export default function Settings() {
             />
 
             <Tabs defaultValue="general" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 h-auto lg:h-12 bg-muted/50 p-1">
+                <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 h-auto lg:h-12 bg-muted/30 p-1.5 rounded-2xl border border-border/50">
                     <TabsTrigger value="general" className="flex gap-2 py-2">
                         <SettingsIcon className="h-4 w-4" /> General
                     </TabsTrigger>
@@ -48,7 +48,7 @@ export default function Settings() {
 
                 <div className="mt-6">
                     <TabsContent value="general">
-                        <Card>
+                        <Card className="border-border/50 shadow-md">
                             <CardContent className="pt-6">
                                 <GeneralSettingsTab />
                             </CardContent>
@@ -56,59 +56,61 @@ export default function Settings() {
                     </TabsContent>
 
                     <TabsContent value="logos" className="space-y-4">
-                        <Card>
+                        <Card className="border-border/50 shadow-md">
                             <CardHeader>
-                                <CardTitle>Logos e Identidad</CardTitle>
+                                <CardTitle className="text-xl font-bold">Logos e Identidad</CardTitle>
                                 <CardDescription>
                                     Gestiona el logo principal y el favicon del sitio.
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-6">
                                 <div className="flex items-center gap-6">
-                                    <div className="w-24 h-24 border rounded-lg flex items-center justify-center bg-muted/20 relative overflow-hidden">
+                                    <div className="w-24 h-24 border-2 border-dashed border-primary/20 rounded-2xl flex items-center justify-center bg-card shadow-inner relative overflow-hidden">
                                         {general.logo ? (
-                                            <img src={general.logo} alt="Logo" className="w-full h-full object-contain" />
+                                            <img src={general.logo} alt="Logo" className="w-full h-full object-contain p-2" />
                                         ) : (
-                                            <span className="text-xs text-muted-foreground">Sin Logo</span>
+                                            <span className="text-xs text-muted-foreground font-bold">Sin Logo</span>
                                         )}
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label>Logo Principal</Label>
+                                    <div className="space-y-3">
+                                        <Label className="font-bold">Logo Principal</Label>
                                         <Input
                                             type="file"
                                             accept="image/*"
+                                            className="rounded-xl border-border/50"
                                             onChange={(e) => {
                                                 const file = e.target.files?.[0];
                                                 if (file) uploadLogo(file, 'logo');
                                             }}
                                         />
-                                        <p className="text-xs text-muted-foreground">
+                                        <p className="text-xs text-muted-foreground font-medium">
                                             Recomendado: PNG transparente, 500x500px. Max 2MB.
                                         </p>
                                     </div>
                                 </div>
 
-                                <Separator />
+                                <Separator className="opacity-50" />
 
                                 <div className="flex items-center gap-6">
-                                    <div className="w-16 h-16 border rounded-lg flex items-center justify-center bg-muted/20 relative overflow-hidden">
+                                    <div className="w-16 h-16 border-2 border-dashed border-primary/20 rounded-2xl flex items-center justify-center bg-card shadow-inner relative overflow-hidden">
                                         {general.favicon ? (
-                                            <img src={general.favicon} alt="Favicon" className="w-full h-full object-contain" />
+                                            <img src={general.favicon} alt="Favicon" className="w-full h-full object-contain p-2" />
                                         ) : (
-                                            <span className="text-xs text-muted-foreground">Sin Favicon</span>
+                                            <span className="text-xs text-muted-foreground font-bold">Sin Favicon</span>
                                         )}
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label>Favicon</Label>
+                                    <div className="space-y-3">
+                                        <Label className="font-bold">Favicon</Label>
                                         <Input
                                             type="file"
                                             accept="image/*"
+                                            className="rounded-xl border-border/50"
                                             onChange={(e) => {
                                                 const file = e.target.files?.[0];
                                                 if (file) uploadLogo(file, 'favicon');
                                             }}
                                         />
-                                        <p className="text-xs text-muted-foreground">
+                                        <p className="text-xs text-muted-foreground font-medium">
                                             Recomendado: ICO o PNG, 32x32px. Max 1MB.
                                         </p>
                                     </div>
@@ -118,7 +120,7 @@ export default function Settings() {
                     </TabsContent>
 
                     <TabsContent value="social">
-                        <Card>
+                        <Card className="border-border/50 shadow-md">
                             <CardContent className="pt-6">
                                 <SocialSettingsTab />
                             </CardContent>
@@ -126,7 +128,7 @@ export default function Settings() {
                     </TabsContent>
 
                     <TabsContent value="legal">
-                        <Card>
+                        <Card className="border-border/50 shadow-md">
                             <CardContent className="pt-6">
                                 <LegalSettingsTab />
                             </CardContent>
@@ -134,7 +136,7 @@ export default function Settings() {
                     </TabsContent>
 
                     <TabsContent value="faq">
-                        <Card>
+                        <Card className="border-border/50 shadow-md">
                             <CardContent className="pt-6">
                                 <FAQSettingsTab />
                             </CardContent>

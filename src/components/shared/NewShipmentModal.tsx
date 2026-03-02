@@ -51,41 +51,20 @@ export function NewShipmentModal({
             </DialogTrigger>
 
             {/* Content */}
-            <DialogContent className="max-w-3xl max-h-[92vh] overflow-y-auto p-0 gap-0 bg-background/95 backdrop-blur-xl border-border/60">
+            <DialogContent className="max-w-xl max-h-[92vh] overflow-y-auto p-4 gap-0 bg-background/95 backdrop-blur-xl border-border/60">
 
-                {/* Sticky header */}
-                <div className="sticky top-0 z-10 bg-background/90 backdrop-blur-md border-b border-border/50 px-6 py-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl gradient-primary shadow-md shadow-primary/30">
-                            <Package className="h-5 w-5 text-white" />
-                        </div>
-                        <DialogHeader className="text-left">
-                            <DialogTitle className="text-lg font-black text-foreground leading-tight">
-                                Registro de Encomienda
-                            </DialogTitle>
-                            <p className="text-xs text-muted-foreground">
-                                Completa los pasos para registrar el nuevo envío
-                            </p>
-                        </DialogHeader>
-                    </div>
+                <DialogHeader className="text-left">
+                    <DialogTitle className="text-lg font-black text-foreground leading-tight">
+                        Registro de Encomienda
+                    </DialogTitle>
+                    <p className="text-xs text-muted-foreground">
+                        Completa los pasos para registrar el nuevo envío
+                    </p>
+                </DialogHeader>
 
-                    {/* Date display */}
-                    <div className="flex gap-1.5">
-                        {(["dd", "MM", "yyyy"] as const).map((fmt, i) => (
-                            <div key={fmt} className="flex flex-col items-center">
-                                <div className="bg-muted border border-border/60 rounded-lg px-2.5 py-1 font-mono text-sm font-semibold text-foreground min-w-[2.5rem] text-center">
-                                    {format(currentDate, fmt)}
-                                </div>
-                                <span className="text-[9px] text-muted-foreground uppercase mt-0.5 font-medium">
-                                    {["Día", "Mes", "Año"][i]}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
 
                 {/* Wizard content */}
-                <div className="p-6">
+                <div className="p-0">
                     <ShipmentRegisterWizard
                         onSuccess={() => setOpen(false)}
                         hideHeader

@@ -121,7 +121,7 @@ export function UserModal({ userToEdit, open, onOpenChange }: UserModalProps) {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md bg-background/95 backdrop-blur-xl border-border">
+            <DialogContent className="sm:max-w-lg bg-background/95 backdrop-blur-xl border-border">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         {isEditing ? <UserIcon className="h-5 w-5 text-primary" /> : <UserPlus className="h-5 w-5 text-primary" />}
@@ -129,15 +129,15 @@ export function UserModal({ userToEdit, open, onOpenChange }: UserModalProps) {
                     </DialogTitle>
                 </DialogHeader>
 
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
-                    <div className="flex gap-4 items-start">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-4">
+                    <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
                         {/* Avatar Upload */}
                         <div className="flex flex-col items-center gap-2">
                             <Label htmlFor="avatar" className="cursor-pointer">
-                                <Avatar className="h-20 w-20 border-2 border-dashed border-muted-foreground/50 hover:border-primary transition-colors">
+                                <Avatar className="h-20 w-20 border-2 border-dashed border-primary/30 hover:border-primary transition-all rounded-2xl">
                                     <AvatarImage src={avatarPreview || ""} />
-                                    <AvatarFallback>
-                                        {isEditing ? <UserIcon className="h-8 w-8 text-muted-foreground" /> : <UserPlus className="h-8 w-8 text-muted-foreground" />}
+                                    <AvatarFallback className="rounded-2xl">
+                                        {isEditing ? <UserIcon className="h-8 w-8 text-primary/40" /> : <UserPlus className="h-8 w-8 text-primary/40" />}
                                     </AvatarFallback>
                                 </Avatar>
                             </Label>
@@ -165,7 +165,7 @@ export function UserModal({ userToEdit, open, onOpenChange }: UserModalProps) {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="phone">Celular</Label>
                             <Input id="phone" {...form.register("phone")} placeholder="70000000" />
@@ -184,7 +184,7 @@ export function UserModal({ userToEdit, open, onOpenChange }: UserModalProps) {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="role">Rol</Label>
                             <Select

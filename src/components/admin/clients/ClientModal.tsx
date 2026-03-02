@@ -112,7 +112,7 @@ export function ClientModal({ clientToEdit, open, onOpenChange }: ClientModalPro
 
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
                     {/* Nombre y CI/NIT */}
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="name">Nombre completo</Label>
                             <Input
@@ -142,7 +142,7 @@ export function ClientModal({ clientToEdit, open, onOpenChange }: ClientModalPro
                     </div>
 
                     {/* Teléfono y Estado */}
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="phone">Teléfono</Label>
                             <Input

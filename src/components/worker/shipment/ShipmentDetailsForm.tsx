@@ -239,7 +239,7 @@ function TransportCard({
             type="button"
             onClick={onClick}
             className={cn(
-                "relative flex items-center gap-4 p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer flex-1 group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                "relative flex items-center gap-2 p-2 rounded-xl border-2 transition-all duration-300 cursor-pointer flex-1 group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                 active
                     ? "border-primary bg-primary/10 shadow-md shadow-primary/15"
                     : "border-border bg-card hover:border-primary/40 hover:bg-primary/5"
@@ -376,11 +376,11 @@ export default function ShipmentDetailsForm({ onNext }: Props) {
         <div className="space-y-5">
 
             {/* ── Section 1: Tipo y Ruta ───────────────────────── */}
-            <div className="border border-border/60 rounded-2xl p-5 bg-card/60 backdrop-blur-sm shadow-sm">
+            <div className="border border-border/60 rounded-2xl p-1 bg-card/60 backdrop-blur-sm shadow-sm">
                 <SectionHeader number={1} title="Oficina de Origen y Destino" />
 
-                {/* Type selector */}
-                <div className="flex gap-4 mb-5">
+                {/* Type selector small */}
+                <div className="flex gap-2 mb-5">
                     <ShipmentTypeCard
                         active={type === "paquete"}
                         icon={Package}
@@ -592,7 +592,7 @@ export default function ShipmentDetailsForm({ onNext }: Props) {
                                     type="button"
                                     onClick={() => setService(tier.id)}
                                     className={cn(
-                                        "relative flex flex-col gap-3 p-4 rounded-xl border-2 text-left transition-all duration-300 cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                                        "relative flex flex-col gap-2 p-2 rounded-xl border-2 text-left transition-all duration-300 cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                                         active
                                             ? `bg-gradient-to-br ${tier.bgGradient} ${tier.borderColor} shadow-md scale-[1.02]`
                                             : "border-border/70 bg-card hover:border-muted-foreground/30 hover:bg-muted/30 hover:scale-[1.01]"

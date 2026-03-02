@@ -23,9 +23,9 @@ export default function AdminLayout() {
 
                 {/* Main Content Area */}
                 <div className="flex-1 lg:ml-64 print:ml-0 flex flex-col min-h-screen transition-all duration-300">
-                    <TopNavbar className="print:hidden" /> {/* Reusing TopNavbar, check if it fits width */}
-                    <main className="flex-1 p-6 print:p-0 overflow-y-auto">
-                        <div className="max-w-7xl mx-auto w-full print:max-w-full">
+                    <TopNavbar className="print:hidden" />
+                    <main className="flex-1 overflow-y-auto">
+                        <div className="max-w-screen-xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 md:py-12 print:max-w-full print:p-0">
                             <Outlet />
                         </div>
                     </main>

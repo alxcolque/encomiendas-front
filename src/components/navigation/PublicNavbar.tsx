@@ -1,6 +1,6 @@
 import { useState, useEffect, Fragment } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { User, Package, LogOut, LayoutDashboard, Home, Truck, MapPin, Search, HelpCircle, Phone, Plus } from "lucide-react";
+import { User, Package, LogOut, LayoutDashboard, Home, Truck, MapPin, Search, HelpCircle, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import kolmoxLogo from "@/assets/kolmox-logo.png";
@@ -15,7 +15,6 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { NewShipmentModal } from "@/components/shared/NewShipmentModal";
 
 export default function PublicNavbar() {
     const { general } = useSettingsStore();
@@ -116,27 +115,41 @@ export default function PublicNavbar() {
                                         </Avatar>
                                     </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-56" align="end" forceMount>
-                                    <DropdownMenuLabel className="font-normal">
-                                        <div className="flex flex-col space-y-1">
-                                            <p className="text-sm font-medium leading-none">{user.name}</p>
-                                            <p className="text-xs leading-none text-muted-foreground">
-                                                {user.email || user.phone}
-                                            </p>
-                                        </div>
-                                    </DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem asChild>
-                                        <Link to={getDashboardLink()} className="cursor-pointer">
-                                            <LayoutDashboard className="mr-2 h-4 w-4" />
-                                            <span>Ir al Panel</span>
-                                        </Link>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem onClick={handleLogout} className="text-destructive cursor-pointer">
-                                        <LogOut className="mr-2 h-4 w-4" />
-                                        <span>Cerrar Sesión</span>
-                                    </DropdownMenuItem>
+                                <DropdownMenuContent className="w-64 bg-popover/90 backdrop-blur-xl border-primary/20 rounded-2xl shadow-xl p-1 animate-in fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2" align="end" forceMount>
+                                    <div className="px-4 py-3 border-b border-border/50 mb-1">
+                                        <p className="font-bold text-sm text-foreground">{user.name}</p>
+                                        <p className="text-[10px] uppercase tracking-wider font-extrabold text-primary">
+                                            {user.role}
+                                        </p>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <DropdownMenuItem asChild>
+                                            <Link
+                                                to={getDashboardLink()}
+                                                className="flex items-center rounded-xl px-3 py-2 text-sm font-medium transition-colors focus:bg-primary/10 focus:text-primary cursor-pointer"
+                                            >
+                                                <LayoutDashboard className="mr-2 h-4 w-4" />
+                                                Ir al Panel
+                                            </Link>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem asChild>
+                                            <Link
+                                                to="/user/profile"
+                                                className="flex items-center rounded-xl px-3 py-2 text-sm font-medium transition-colors focus:bg-primary/10 focus:text-primary cursor-pointer"
+                                            >
+                                                <User className="mr-2 h-4 w-4" />
+                                                Mi Perfil
+                                            </Link>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuSeparator className="bg-border/50" />
+                                        <DropdownMenuItem
+                                            onClick={handleLogout}
+                                            className="flex items-center rounded-xl px-3 py-2 text-sm font-bold text-destructive transition-colors focus:bg-destructive/10 focus:text-destructive cursor-pointer"
+                                        >
+                                            <LogOut className="mr-2 h-4 w-4" />
+                                            Cerrar Sesión
+                                        </DropdownMenuItem>
+                                    </div>
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         ) : (
@@ -163,25 +176,6 @@ export default function PublicNavbar() {
 
                             return (
                                 <Fragment key={link.name}>
-                                    {/* Insert Registration Button in the middle (after 2nd item) */}
-                                    {index === 2 && (
-                                        <NewShipmentModal
-                                            trigger={
-                                                <button
-                                                    type="button"
-                                                    className="flex flex-col items-center min-w-fit gap-1 group transition-all px-2 active:scale-95"
-                                                >
-                                                    <div className="p-2.5 rounded-full bg-primary text-white shadow-lg shadow-primary/30 ring-4 ring-primary/10">
-                                                        <Plus className="w-6 h-6" />
-                                                    </div>
-                                                    <span className="text-[10px] font-bold text-primary whitespace-nowrap">
-                                                        Registrar
-                                                    </span>
-                                                </button>
-                                            }
-                                        />
-                                    )}
-
                                     <Link
                                         to={link.href}
                                         className={cn(

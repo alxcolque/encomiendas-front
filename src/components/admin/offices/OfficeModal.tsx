@@ -142,7 +142,7 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
                                 <Input id="name" {...form.register("name")} placeholder="Ej: Sucursal Centro" />
                                 {form.formState.errors.name && <span className="text-xs text-destructive">{form.formState.errors.name.message}</span>}
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="city_id">Ciudad <span className="text-destructive">*</span></Label>
                                     <Select

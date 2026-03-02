@@ -82,7 +82,7 @@ export function RecentShipmentsTable({ shipments: propShipments }: RecentShipmen
     }
 
     return (
-        <Card className="shadow-sm border-border/50 bg-card/50 backdrop-blur-sm">
+        <Card className="border-border/50 shadow-md bg-card/50 backdrop-blur-sm overflow-hidden">
             <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-lg font-medium">Últimas Encomiendas</CardTitle>
                 <Button

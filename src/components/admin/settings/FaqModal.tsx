@@ -57,7 +57,7 @@ export function FaqModal({ open, onOpenChange, onSave, initialData }: FaqModalPr
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-lg bg-background/95 backdrop-blur-xl border-border">
                 <DialogHeader>
                     <DialogTitle>{initialData ? 'Editar Pregunta' : 'Nueva Pregunta'}</DialogTitle>
                 </DialogHeader>

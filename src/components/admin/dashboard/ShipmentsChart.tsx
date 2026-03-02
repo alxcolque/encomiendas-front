@@ -9,7 +9,7 @@ interface ShipmentsChartProps {
 
 export function ShipmentsChart({ data }: ShipmentsChartProps) {
     return (
-        <Card className="col-span-1 lg:col-span-2 shadow-sm border-border/50 bg-card/50 backdrop-blur-sm">
+        <Card className="col-span-1 lg:col-span-2 shadow-md border-border/50 bg-card/50 backdrop-blur-sm">
             <CardHeader>
                 <CardTitle className="text-lg font-medium">Encomiendas por Día</CardTitle>
             </CardHeader>

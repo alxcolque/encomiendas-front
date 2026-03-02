@@ -26,7 +26,7 @@ const chartConfig = {
 
 export function RevenueChart() {
     return (
-        <Card className="col-span-4">
+        <Card className="col-span-4 border-border/50 shadow-md transition-all hover:shadow-lg">
             <CardHeader>
                 <CardTitle>Ingresos Anuales</CardTitle>
                 <CardDescription>Resumen de ingresos generados durante el año 2024</CardDescription>

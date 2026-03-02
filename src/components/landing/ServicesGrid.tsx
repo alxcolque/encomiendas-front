@@ -31,9 +31,9 @@ export default function ServicesGrid() {
     ];
 
     return (
-        <div className="w-full px-4 py-8 lg:py-12 bg-white">
-            <div className="max-w-4xl mx-auto">
-                <div className="flex flex-wrap justify-center gap-x-4 gap-y-10 md:gap-x-12">
+        <div className="w-full py-8 lg:py-16 bg-background">
+            <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex flex-wrap justify-center gap-x-6 gap-y-12 md:gap-x-16">
                     {services.map((service) => (
                         <Link
                             key={service.name}

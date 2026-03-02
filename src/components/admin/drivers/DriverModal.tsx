@@ -150,7 +150,7 @@ export function DriverModal({ driverToEdit, open, onOpenChange }: DriverModalPro
                         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
                             Datos del Vehículo
                         </h3>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label htmlFor="vehicle_type">Tipo de Vehículo</Label>
                                 <Select
@@ -176,7 +176,7 @@ export function DriverModal({ driverToEdit, open, onOpenChange }: DriverModalPro
                                 {form.formState.errors.plate_number && <span className="text-xs text-destructive">{form.formState.errors.plate_number.message}</span>}
                             </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label htmlFor="license_number">Licencia de Conducir</Label>
                                 <Input id="license_number" {...form.register("license_number")} placeholder="Licencia ID" />

@@ -176,7 +176,7 @@ export default function ShipmentRegisterWizard({
             {!hideHeader && !showInvoice && (
                 <div className="mb-6">
                     <div className="flex items-center gap-3 mb-1">
-                        <div className="p-2.5 rounded-xl gradient-primary glow-primary">
+                        <div className="p-2 rounded-xl gradient-primary glow-primary">
                             <Package className="h-6 w-6 text-white" />
                         </div>
                         <div>
