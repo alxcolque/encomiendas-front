@@ -203,7 +203,7 @@ export function TopNavbar({ className }: TopNavbarProps) {
 
                 </>
               )}
-              <DropdownMenuItem onClick={() => navigate("/profile")}>
+              <DropdownMenuItem onClick={() => navigate("/user/profile")}>
                 <User size={16} className="mr-2" />
                 Mi Perfil
               </DropdownMenuItem>

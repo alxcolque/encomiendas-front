@@ -1,7 +1,7 @@
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import slide1 from "@/assets/hero-slide-1.jpg"; // Using existing assets
+import slide1 from "@/assets/slider1.jpeg"; // Using new assets
 import slide2 from "@/assets/hero-slide-2.jpg";
 
 export default function MobileHero() {

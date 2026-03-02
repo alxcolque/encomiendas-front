@@ -12,7 +12,10 @@ import { StatusChart } from "@/components/admin/dashboard/StatusChart";
 import { RecentShipmentsTable } from "@/components/admin/dashboard/RecentShipmentsTable";
 import { ActiveDriversList } from "@/components/admin/dashboard/ActiveDriversList";
 import { OfficePerformanceList } from "@/components/admin/dashboard/OfficePerformance";
+import { NewShipmentModal } from "@/components/shared/NewShipmentModal";
 import { useDashboardStore } from "@/stores/dashboardStore";
+import { useNavigate } from "react-router-dom";
+import { ADMIN_ROUTES } from "@/constants/admin.routes";
 
 const iconMap: Record<string, any> = {
   Package,
@@ -24,6 +27,7 @@ const iconMap: Record<string, any> = {
 };
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
   const { data, isLoading, fetchDashboardData } = useDashboardStore();
 
   useEffect(() => {
@@ -55,14 +59,22 @@ export default function AdminDashboard() {
         subtitle={`Resumen de operaciones - ${currentDate}`}
         actions={
           <>
-            <Button variant="outline" className="gap-2">
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => navigate(ADMIN_ROUTES.REPORTS)}
+            >
               <FileText className="w-4 h-4" />
               Ver Reportes
             </Button>
-            <Button className="gap-2 shadow-lg shadow-primary/25">
-              <Plus className="w-4 h-4" />
-              Nueva Encomienda
-            </Button>
+            <NewShipmentModal
+              trigger={
+                <Button className="gap-2 shadow-lg shadow-primary/25">
+                  <Plus className="w-4 h-4" />
+                  Nueva Encomienda
+                </Button>
+              }
+            />
           </>
         }
       />

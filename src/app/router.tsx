@@ -43,6 +43,7 @@ const AdminSettings = lazy(() => import("@/pages/admin/Settings"));
 const ShipmentDetails = lazy(() => import("@/pages/admin/ShipmentDetails"));
 const ShipmentTicket = lazy(() => import("@/pages/admin/ShipmentTicket"));
 const InvoicePage = lazy(() => import("@/pages/shared/InvoicePage"));
+const ProfilePage = lazy(() => import("@/pages/user/Profile"));
 
 const Loading = () => <div className="p-4 text-center">Cargando...</div>;
 
@@ -101,9 +102,14 @@ export const AppRouter = () => {
 
                 {/* User Routes */}
                 <Route element={<ProtectedRoute allowedRoles={['client', 'driver', 'admin', 'worker']}><UserLayout /></ProtectedRoute>}>
-                    <Route path="/user" element={<Wallet />} /> {/* Placeholder */}
-                    <Route path="/user/profile" element={<Wallet />} /> {/* Placeholder */}
+                    <Route path="/user" element={<Navigate to="/user/profile" replace />} />
+                    <Route path="/user/profile" element={<ProfilePage />} />
                     <Route path="/shipments/:id/invoice" element={<InvoicePage />} />
+                </Route>
+
+                {/* Global Profile Access (within Admin/Worker context if needed, but UserLayout is safer for all) */}
+                <Route path="/profile" element={<ProtectedRoute allowedRoles={['client', 'driver', 'admin', 'worker']}><AdminLayout /></ProtectedRoute>}>
+                    <Route index element={<ProfilePage />} />
                 </Route>
 
                 {/* Fallback */}

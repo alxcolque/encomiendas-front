@@ -163,7 +163,7 @@ export function RecentShipmentsTable({ shipments: propShipments }: RecentShipmen
                                                         Imprimir Etiqueta
                                                     </DropdownMenuItem>
 
-                                                    {shipment.invoice && (
+                                                    {/* {shipment.invoice && (
                                                         <>
                                                             <DropdownMenuItem
                                                                 className="cursor-pointer"
@@ -180,7 +180,7 @@ export function RecentShipmentsTable({ shipments: propShipments }: RecentShipmen
                                                                 Ver factura (Nueva pestaña)
                                                             </DropdownMenuItem>
                                                         </>
-                                                    )}
+                                                    )} */}
                                                     <DropdownMenuSeparator />
                                                     <DropdownMenuSub>
                                                         <DropdownMenuSubTrigger className="cursor-pointer">

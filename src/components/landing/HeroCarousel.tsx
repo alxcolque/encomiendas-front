@@ -1,25 +1,31 @@
 import { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import heroSlide1 from "@/assets/hero-slide-1.jpg";
-import heroSlide2 from "@/assets/hero-slide-2.jpg";
-import heroSlide3 from "@/assets/hero-slide-3.jpg";
+import slider1 from "@/assets/slider1.jpeg";
+import slider2 from "@/assets/slider2.jpeg";
+import slider3 from "@/assets/slider3.jpeg";
+import slider4 from "@/assets/slider4.jpeg";
 
 const slides = [
   {
-    image: heroSlide1,
+    image: slider1,
     title: "Envíos Nacionales en 24 Horas",
     subtitle: "Llegamos a cada rincón del país con seguridad garantizada",
   },
   {
-    image: heroSlide2,
+    image: slider2,
     title: "Soluciones para E-commerce",
     subtitle: "Integra tu tienda y automatiza tus despachos hoy mismo",
   },
   {
-    image: heroSlide3,
+    image: slider3,
     title: "Rastreo Satelital en Tiempo Real",
     subtitle: "Transparencia total desde la recolección hasta la entrega",
+  },
+  {
+    image: slider4,
+    title: "Atención Personalizada 24/7",
+    subtitle: "Estamos contigo en cada paso de tu envío",
   },
 ];
 
@@ -40,49 +46,34 @@ export default function HeroCarousel() {
   }, [nextSlide]);
 
   return (
-    <div className="relative w-full aspect-[4/3] md:aspect-video lg:h-[600px] overflow-hidden">
-      {/* Slides */}
-      {slides.map((slide, index) => (
-        <div
-          key={index}
-          className={cn(
-            "absolute inset-0 transition-opacity duration-1000",
-            index === currentSlide ? "opacity-100" : "opacity-0"
-          )}
-        >
-          {/* Background Image */}
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${slide.image})` }}
-          />
-          {/* Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/60 to-transparent md:via-background/70" />
+    <div className="relative w-full overflow-hidden bg-background">
+      {/* Invisible template image to maintain aspect ratio based on the actual image */}
+      <img
+        src={slides[0].image}
+        className="w-full h-auto opacity-0 block"
+        aria-hidden="true"
+        alt=""
+      />
 
-          {/* Content */}
-          <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center">
-            <div className="max-w-xl pb-10 md:pb-0 pt-16 md:pt-0">
-              <h1
-                className={cn(
-                  "text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 transition-all duration-700",
-                  index === currentSlide ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
-                )}
-                style={{ transitionDelay: "200ms" }}
-              >
-                {slide.title}
-              </h1>
-              <p
-                className={cn(
-                  "text-base sm:text-xl text-muted-foreground transition-all duration-700 max-w-[80%]",
-                  index === currentSlide ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
-                )}
-                style={{ transitionDelay: "400ms" }}
-              >
-                {slide.subtitle}
-              </p>
-            </div>
+      {/* Slides */}
+      <div className="absolute inset-0">
+        {slides.map((slide, index) => (
+          <div
+            key={index}
+            className={cn(
+              "absolute inset-0 transition-opacity duration-1000",
+              index === currentSlide ? "opacity-100" : "opacity-0"
+            )}
+          >
+            <img
+              src={slide.image}
+              alt=""
+              className="w-full h-full object-contain"
+            />
+            {/* Content (Removed text overlays as requested) */}
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
 
       {/* Navigation Arrows - Smaller on mobile */}
       <button

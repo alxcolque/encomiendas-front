@@ -21,6 +21,8 @@ interface Actions {
   checkAuthStatus: () => Promise<void>;
   hasPermission: (permission: string) => boolean;
   hasRole: (role: string) => boolean;
+  updateProfile: (data: { name: string, email: string, phone: string, avatar?: string }) => Promise<void>;
+  changePin: (data: { current_pin: string, pin: string, pin_confirmation: string }) => Promise<void>;
 }
 
 const storeApi: StateCreator<AuthState & Actions> = (set, get) => ({
@@ -162,6 +164,36 @@ const storeApi: StateCreator<AuthState & Actions> = (set, get) => ({
           toast.error("Error al cerrar sesión");
         }
       }
+    }
+  },
+
+  updateProfile: async (data) => {
+    set({ isLoading: true });
+    try {
+      const response = await ENV.post("/profile/update", data);
+      set({ user: response.data.user, isLoading: false });
+      toast.success("Perfil actualizado correctamente");
+    } catch (error) {
+      set({ isLoading: false });
+      if (isAxiosError(error)) {
+        toast.error(error.response?.data.message || "Error al actualizar perfil");
+      }
+      throw error;
+    }
+  },
+
+  changePin: async (data) => {
+    set({ isLoading: true });
+    try {
+      await ENV.post("/profile/change-pin", data);
+      set({ isLoading: false });
+      toast.success("PIN actualizado correctamente");
+    } catch (error) {
+      set({ isLoading: false });
+      if (isAxiosError(error)) {
+        toast.error(error.response?.data.message || "Error al cambiar PIN");
+      }
+      throw error;
     }
   },
 })
