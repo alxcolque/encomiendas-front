@@ -62,10 +62,10 @@ export function TopNavbar({ className }: TopNavbarProps) {
 
   return (
     <header className={cn("sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50", className)}>
-      <div className="flex items-center justify-between px-4 py-3 max-w-screen-xl mx-auto">
+      <div className="flex items-center justify-between lg:justify-end px-2 py-3 max-w-screen-xl mx-auto">
         {/* App Logo */}
         <div
-          className="flex items-center gap-2 cursor-pointer"
+          className="flex items-center gap-2 cursor-pointer lg:hidden"
           onClick={() => navigate("/driver")}
         >
           <img
