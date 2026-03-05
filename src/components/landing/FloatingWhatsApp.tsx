@@ -1,8 +1,10 @@
 import { motion } from "framer-motion";
 import { MessageCircle } from "lucide-react";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 export default function FloatingWhatsApp() {
-    const whatsappNumber = "59170000000"; // Replace with real number from settings if possible
+    const { general } = useSettingsStore();
+    const whatsappNumber = general.supportPhone?.replace(/\D/g, '') || "59170000000";
     const message = "Hola Kolmox, necesito información sobre sus servicios.";
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 

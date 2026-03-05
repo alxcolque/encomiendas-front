@@ -41,7 +41,7 @@ export default function ServicesGrid() {
                             className="flex flex-col items-center gap-3 group w-[28%] md:w-auto"
                         >
                             <div className="relative">
-                                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border-[1.5px] border-primary flex items-center justify-center text-primary bg-white transition-all duration-300 group-hover:bg-primary group-hover:text-white shadow-sm">
+                                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border-[1.5px] border-primary flex items-center justify-center text-primary bg-background transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground shadow-sm">
                                     {service.icon}
                                 </div>
                             </div>

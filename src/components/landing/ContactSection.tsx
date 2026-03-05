@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 export default function ContactSection() {
+  const { general } = useSettingsStore();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -29,12 +31,17 @@ export default function ContactSection() {
     {
       icon: MapPin,
       title: "Dirección",
-      lines: ["Av. Principal #1234", "Zona Central, La Paz", "Bolivia"],
+      lines: [general.address || "La Paz, Bolivia"],
     },
     {
       icon: Phone,
       title: "Teléfono",
-      lines: ["+591 2 1234567", "+591 70000000 (WhatsApp)"],
+      lines: [general.supportPhone || "+591 2 1234567"],
+    },
+    {
+      icon: Mail,
+      title: "Email",
+      lines: [general.supportEmail || "contacto@kolmox.com"],
     },
     {
       icon: Clock,

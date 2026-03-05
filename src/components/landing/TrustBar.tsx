@@ -13,7 +13,7 @@ const partners = [
 
 export default function TrustBar() {
   return (
-    <div className="bg-white border-y border-border py-12 md:py-20 relative overflow-hidden">
+    <div className="bg-background border-y border-border py-12 md:py-20 relative overflow-hidden">
       {/* Decorative background element */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-0 translate-x-1/2 -translate-y-1/2" />
 

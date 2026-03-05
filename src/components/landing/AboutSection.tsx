@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { Package, Globe, Users } from "lucide-react";
 import aboutFleet from "@/assets/about-fleet.jpg";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 const counters = [
   { icon: Package, target: 1000000, suffix: "+", label: "Paquetes Entregados" },
@@ -65,6 +66,7 @@ function AnimatedCounter({ target, suffix }: { target: number; suffix: string })
 }
 
 export default function AboutSection() {
+  const { general } = useSettingsStore();
   return (
     <section id="nosotros" className="py-16 md:py-24 bg-background overflow-hidden border-t border-border/50">
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -74,7 +76,7 @@ export default function AboutSection() {
             <div className="rounded-3xl overflow-hidden shadow-2xl relative z-10 group">
               <img
                 src={aboutFleet}
-                alt="Flota logística KOLMOX"
+                alt={`Flota logística ${general.siteName || 'KOLMOX'}`}
                 className="w-full h-[300px] md:h-[450px] object-cover transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
@@ -99,14 +101,22 @@ export default function AboutSection() {
               <h2 className="text-3xl md:text-5xl font-black text-foreground tracking-tight leading-[1.1]">
                 ¿Quiénes Somos?
               </h2>
-              <p className="text-muted-foreground text-base md:text-xl leading-relaxed">
-                En <span className="text-primary font-bold">KOLMOX</span>, somos más que una empresa de logística.
-                Somos tu socio estratégico en el mundo de las entregas.
-              </p>
-              <p className="text-muted-foreground text-sm md:text-lg leading-relaxed opacity-80">
-                Con más de una década de experiencia, hemos revolucionado la forma en que Bolivia envía y recibe paquetes.
-                Nuestra flota moderna y tecnología de punta garantizan entregas seguras y rápidas.
-              </p>
+              <div className="text-muted-foreground text-base md:text-xl leading-relaxed space-y-4">
+                {general.siteDescription ? (
+                  <p>{general.siteDescription}</p>
+                ) : (
+                  <>
+                    <p>
+                      En <span className="text-primary font-bold">{general.siteName || 'KOLMOX'}</span>, somos más que una empresa de logística.
+                      Somos tu socio estratégico en el mundo de las entregas.
+                    </p>
+                    <p className="text-sm md:text-lg opacity-80">
+                      Con más de una década de experiencia, hemos revolucionado la forma en que Bolivia envía y recibe paquetes.
+                      Nuestra flota moderna y tecnología de punta garantizan entregas seguras y rápidas.
+                    </p>
+                  </>
+                )}
+              </div>
             </div>
 
             {/* Counters */}

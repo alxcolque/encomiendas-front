@@ -110,7 +110,9 @@ export const useSettingsStore = create<SettingsState>((set) => ({
             const response = await PublicService.getPublicSettings();
             set({
                 general: response.general,
-                // you can set other public data here if needed
+                socials: response.socials,
+                faqs: response.faqs,
+                footerLinks: response.footerLinks,
                 isLoading: false,
             });
         } catch (error) {

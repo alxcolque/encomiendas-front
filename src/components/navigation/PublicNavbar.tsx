@@ -1,6 +1,6 @@
 import { useState, useEffect, Fragment } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { User, Package, LogOut, LayoutDashboard, Home, Truck, MapPin, Search, HelpCircle, Phone } from "lucide-react";
+import { User, Package, LogOut, LayoutDashboard, Home, Truck, MapPin, Search, HelpCircle, Phone, Sun, Moon, Monitor } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import kolmoxLogo from "@/assets/kolmox-logo.png";
@@ -20,6 +20,7 @@ export default function PublicNavbar() {
     const { general } = useSettingsStore();
     const { user, logout, authStatus } = useAuthStore();
     const [scrolled, setScrolled] = useState(false);
+    const [theme, setTheme] = useState<"light" | "dark" | "system">("dark");
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -31,6 +32,37 @@ export default function PublicNavbar() {
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
+
+    // Theme handling
+    useEffect(() => {
+        const savedTheme = localStorage.getItem("theme") as "light" | "dark" | "system" | null;
+        if (savedTheme) {
+            setTheme(savedTheme);
+            applyTheme(savedTheme);
+        }
+    }, []);
+
+    const applyTheme = (newTheme: "light" | "dark" | "system") => {
+        const root = document.documentElement;
+        if (newTheme === "system") {
+            const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+            root.classList.toggle("dark", systemDark);
+        } else {
+            root.classList.toggle("dark", newTheme === "dark");
+        }
+    };
+
+    const handleThemeChange = (newTheme: "light" | "dark" | "system") => {
+        setTheme(newTheme);
+        localStorage.setItem("theme", newTheme);
+        applyTheme(newTheme);
+    };
+
+    const themeIcon = {
+        light: <Sun size={18} />,
+        dark: <Moon size={18} />,
+        system: <Monitor size={18} />
+    };
 
     const handleLogout = async () => {
         await logout();
@@ -59,8 +91,8 @@ export default function PublicNavbar() {
     return (
         <nav
             className={cn(
-                "fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white shadow-sm border-b border-gray-100",
-                scrolled && "shadow-md bg-white/95 backdrop-blur-sm"
+                "fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-background shadow-sm border-b border-border/50",
+                scrolled && "shadow-md bg-background/95 backdrop-blur-sm"
             )}
         >
             <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
@@ -70,8 +102,8 @@ export default function PublicNavbar() {
                     <Link to="/" className="flex items-center gap-2 group">
                         <div className="relative w-10 h-10 overflow-hidden rounded-xl">
                             <img
-                                src={kolmoxLogo}
-                                alt={general.siteName}
+                                src={general.logo || kolmoxLogo}
+                                alt={general.siteName || "KOLMOX"}
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
                                     e.currentTarget.style.display = 'none';
@@ -81,7 +113,7 @@ export default function PublicNavbar() {
                             <Package className="w-6 h-6 text-primary-foreground absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden group-hover:block" />
                         </div>
                         <span className="text-xl font-bold font-display tracking-tight text-foreground">
-                            {general.siteName}
+                            {general.siteName || "KOLMOX"}
                         </span>
                     </Link>
 
@@ -105,6 +137,14 @@ export default function PublicNavbar() {
 
                     {/* Auth Section */}
                     <div className="flex items-center">
+                        {/* Theme Toggle (single click) */}
+                        <button
+                            onClick={() => handleThemeChange(theme === "light" ? "dark" : "light")}
+                            className="p-2.5 rounded-xl bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
+                            aria-label="Toggle theme"
+                        >
+                            {themeIcon[theme]}
+                        </button>
                         {authStatus === 'auth' && user ? (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
@@ -166,7 +206,7 @@ export default function PublicNavbar() {
                 </div>
 
                 {/* SECOND ROW: Mobile/Tablet Horizontal Menu (Hidden on Desktop) */}
-                <div className="md:hidden border-t border-gray-50 -mx-4">
+                <div className="md:hidden border-t border-border/50 -mx-4">
                     <div
                         className="flex overflow-x-auto no-scrollbar items-center py-2 px-4 gap-6 scroll-smooth"
                     >

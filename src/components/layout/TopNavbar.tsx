@@ -81,36 +81,14 @@ export function TopNavbar({ className }: TopNavbarProps) {
         {/* Right side actions */}
         <div className="flex items-center gap-2">
           {/* Theme Toggle */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="p-2.5 rounded-xl bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors">
-                {themeIcon[theme]}
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-popover border-border/50">
-              <DropdownMenuItem
-                onClick={() => handleThemeChange("light")}
-                className={cn(theme === "light" && "bg-accent text-accent-foreground")}
-              >
-                <Sun size={16} className="mr-2" />
-                Claro
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => handleThemeChange("dark")}
-                className={cn(theme === "dark" && "bg-accent text-accent-foreground")}
-              >
-                <Moon size={16} className="mr-2" />
-                Oscuro
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => handleThemeChange("system")}
-                className={cn(theme === "system" && "bg-accent text-accent-foreground")}
-              >
-                <Monitor size={16} className="mr-2" />
-                Sistema
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {/* Theme Toggle (single click) */}
+          <button
+            onClick={() => handleThemeChange(theme === "light" ? "dark" : "light")}
+            className="p-2.5 rounded-xl bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Toggle theme"
+          >
+            {theme === "light" ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
 
           {/* Notifications */}
           <button className="relative p-2.5 rounded-xl bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors">
