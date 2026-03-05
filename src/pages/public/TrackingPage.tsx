@@ -62,9 +62,11 @@ export default function TrackingPage() {
           <CardContent className="pt-8 space-y-6">
             <div className="relative">
               <Input
-                placeholder="ENV-2025-001"
+                placeholder="KOL-(Ciudad a)-(Ciudad b)-9999"
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                autoFocus
                 className="h-16 text-xl bg-muted/30 border-border rounded-xl pr-12 font-mono shadow-inner"
               />
               <Search className="absolute right-5 top-1/2 -translate-y-1/2 text-muted-foreground" size={24} />
@@ -86,12 +88,6 @@ export default function TrackingPage() {
             </Button>
           </CardContent>
         </Card>
-
-        {/* Demo codes */}
-        <p className="text-center text-sm font-medium text-muted-foreground">
-          Pruebas rápidas: <span className="text-primary font-mono bg-primary/5 px-2 py-0.5 rounded">ENV-2025-001</span> o{" "}
-          <span className="text-primary font-mono bg-primary/5 px-2 py-0.5 rounded">ENV-2025-002</span>
-        </p>
 
         {/* Results */}
         {searched && !currentShipment && (
