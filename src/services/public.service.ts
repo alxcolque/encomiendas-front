@@ -7,6 +7,11 @@ export const PublicService = {
         const { data } = await ENV.get<{ data: IOffice[] }>("/offices");
         return data.data;
     },
+    // Fetch public settings (logo, site name, etc.)
+    getPublicSettings: async () => {
+        const { data } = await ENV.get<{ data: any }>('/public/settings');
+        return data.data;
+    },
 
     trackShipment: async (code: string) => {
         // Single Resource returns { data: {...} }

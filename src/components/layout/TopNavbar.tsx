@@ -10,7 +10,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import kolmoxLogo from "@/assets/kolmox-logo.png";
+import { useSettingsStore } from '@/stores/settingsStore';
+import defaultLogo from '@/assets/kolmox-logo.png';
 
 type Theme = "light" | "dark" | "system";
 
@@ -21,6 +22,7 @@ interface TopNavbarProps {
 export function TopNavbar({ className }: TopNavbarProps) {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
+  const { general } = useSettingsStore();
   const [theme, setTheme] = useState<Theme>("dark");
   const [notificationCount] = useState(3);
 
@@ -69,11 +71,11 @@ export function TopNavbar({ className }: TopNavbarProps) {
           onClick={() => navigate("/driver")}
         >
           <img
-            src={kolmoxLogo}
-            alt="KOLMOX Logo"
+            src={general.logo ?? defaultLogo}
+            alt={general.siteName ?? "Logo"}
             className="w-9 h-9 rounded-xl object-cover"
           />
-          <span className="font-display font-bold text-lg">KOLMOX</span>
+          <span className="font-display font-bold text-lg">{general.siteName ?? "KOLMOX"}</span>
         </div>
 
         {/* Right side actions */}

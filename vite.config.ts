@@ -7,7 +7,7 @@ import { componentTagger } from "lovable-tagger";
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
-    port: 5001,
+    // port removed to allow Vite to select an available port
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {

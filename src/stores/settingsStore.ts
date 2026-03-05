@@ -1,4 +1,5 @@
 import { ENV } from '../config/env';
+import { PublicService } from '@/services/public.service';
 import { toast } from 'sonner';
 import { create } from 'zustand';
 
@@ -50,6 +51,7 @@ interface SettingsState {
     privacyPolicy: string;
     isLoading: boolean;
     fetchSettings: () => Promise<void>;
+    fetchPublicSettings: () => Promise<void>;
     updateGeneral: (settings: Partial<GeneralSettings>) => Promise<void>;
     updateSocials: (socials: SocialLink[]) => Promise<void>;
     updateFaqs: (faqs: FAQItem[]) => Promise<void>;
@@ -96,6 +98,23 @@ export const useSettingsStore = create<SettingsState>((set) => ({
             });
         } catch (error) {
             console.error('Error fetching settings:', error);
+            set({ isLoading: false });
+        }
+    },
+    // Existing fetchSettings implementation remains unchanged
+    // (no changes here)
+    // New method to fetch public settings (logo, site name, etc.)
+    fetchPublicSettings: async () => {
+        set({ isLoading: true });
+        try {
+            const response = await PublicService.getPublicSettings();
+            set({
+                general: response.general,
+                // you can set other public data here if needed
+                isLoading: false,
+            });
+        } catch (error) {
+            console.error('Error fetching public settings:', error);
             set({ isLoading: false });
         }
     },
