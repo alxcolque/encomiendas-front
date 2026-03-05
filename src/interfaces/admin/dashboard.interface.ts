@@ -20,7 +20,7 @@ export interface AdminDashboardData {
     total_offices_count: number;
 }
 
-export type ShipmentStatus = 'created' | 'pending' | 'in_transit' | 'at_office' | 'out_for_delivery' | 'delivered' | 'cancelled';
+export type ShipmentStatus = 'created' | 'in_transit' | 'at_office' | 'delivered';
 
 export interface ShipmentData {
     id: string;

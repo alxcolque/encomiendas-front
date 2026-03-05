@@ -3,7 +3,7 @@ import { PublicService } from '@/services/public.service';
 import { IShipmentResponse, IShipmentEvent } from '@/interfaces/public.interface';
 import { toast } from 'sonner';
 
-export type ShipmentStatus = 'created' | 'in_transit' | 'at_office' | 'out_for_delivery' | 'delivered';
+export type ShipmentStatus = 'created' | 'in_transit' | 'at_office' | 'delivered';
 
 export interface ShipmentEvent {
   status: ShipmentStatus;

@@ -212,25 +212,10 @@ export function RecentShipmentsTable({ shipments: propShipments }: RecentShipmen
                                                                 </DropdownMenuItem>
                                                                 <DropdownMenuItem
                                                                     className="cursor-pointer"
-                                                                    onClick={() => handleUpdateStatus(shipment.id, 'out_for_delivery')}
-                                                                >
-                                                                    <Send className="w-4 h-4 mr-2 text-cyan-500" />
-                                                                    En Reparto
-                                                                </DropdownMenuItem>
-                                                                <DropdownMenuItem
-                                                                    className="cursor-pointer"
                                                                     onClick={() => handleUpdateStatus(shipment.id, 'delivered')}
                                                                 >
                                                                     <CheckCircle2 className="w-4 h-4 mr-2 text-green-500" />
                                                                     Entregado
-                                                                </DropdownMenuItem>
-                                                                <DropdownMenuSeparator />
-                                                                <DropdownMenuItem
-                                                                    className="cursor-pointer text-destructive focus:text-destructive"
-                                                                    onClick={() => handleUpdateStatus(shipment.id, 'cancelled')}
-                                                                >
-                                                                    <XCircle className="w-4 h-4 mr-2" />
-                                                                    Cancelado
                                                                 </DropdownMenuItem>
                                                             </DropdownMenuSubContent>
                                                         </DropdownMenuPortal>

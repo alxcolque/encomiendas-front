@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bell, Sun, Moon, Monitor, LogOut, User, UserCheck, Settings, ChevronDown, LayoutDashboard, Package, Users, Truck, Building2, FileBarChart, MapPin } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -105,14 +106,15 @@ export function TopNavbar({ className }: TopNavbarProps) {
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-2 p-1.5 pr-3 rounded-xl bg-muted hover:bg-muted/80 transition-colors">
                 {user ? (
-                  <img
-                    src={user.avatar}
-                    alt={user.name}
-                    className="w-8 h-8 rounded-lg border-2 border-primary object-cover"
-                  />
+                  <Avatar className="w-8 h-8 rounded-lg border-2 border-primary">
+                    <AvatarImage src={user.avatar} alt={user.name} className="object-cover" />
+                    <AvatarFallback className="rounded-lg bg-secondary">
+                      <User size={16} className="text-muted-foreground" />
+                    </AvatarFallback>
+                  </Avatar>
                 ) : (
                   <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center">
-                    <User size={16} />
+                    <User size={16} className="text-muted-foreground" />
                   </div>
                 )}
                 <ChevronDown size={14} className="text-muted-foreground" />

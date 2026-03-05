@@ -10,7 +10,6 @@ const statusColors: Record<string, string> = {
     in_transit: "#3b82f6",
     at_office: "#8b5cf6",
     delivered: "#10b981",
-    cancelled: "#ef4444",
 };
 
 export function StatusChart({ data }: StatusChartProps) {

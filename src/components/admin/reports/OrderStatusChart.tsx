@@ -15,9 +15,9 @@ import {
 
 const chartData = [
     { browser: "delivered", visitors: 850, fill: "var(--color-delivered)" },
-    { browser: "transit", visitors: 200, fill: "var(--color-transit)" },
-    { browser: "pending", visitors: 50, fill: "var(--color-pending)" },
-    { browser: "cancelled", visitors: 20, fill: "var(--color-cancelled)" },
+    { browser: "in_transit", visitors: 200, fill: "var(--color-in_transit)" },
+    { browser: "at_office", visitors: 50, fill: "var(--color-at_office)" },
+    { browser: "created", visitors: 20, fill: "var(--color-created)" },
 ]
 
 const chartConfig = {
@@ -25,17 +25,17 @@ const chartConfig = {
         label: "Entregado",
         color: "hsl(var(--chart-1))",
     },
-    transit: {
+    in_transit: {
         label: "En Ruta",
         color: "hsl(var(--chart-2))",
     },
-    pending: {
-        label: "Pendiente",
+    at_office: {
+        label: "En Sucursal",
         color: "hsl(var(--chart-3))",
     },
-    cancelled: {
-        label: "Cancelado",
-        color: "hsl(var(--chart-5))",
+    created: {
+        label: "Creado",
+        color: "hsl(var(--chart-4))",
     },
 } satisfies ChartConfig
 

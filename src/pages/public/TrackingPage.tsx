@@ -12,7 +12,6 @@ const statusIcons: Record<ShipmentStatus, typeof Package> = {
   created: Package,
   in_transit: Truck,
   at_office: Building,
-  out_for_delivery: Truck,
   delivered: CheckCircle,
 };
 
@@ -20,7 +19,6 @@ const statusLabels: Record<ShipmentStatus, string> = {
   created: "Paquete Recibido",
   in_transit: "En Tránsito",
   at_office: "En Oficina",
-  out_for_delivery: "En Reparto",
   delivered: "Entregado",
 };
 
@@ -34,7 +32,7 @@ export default function TrackingPage() {
     setSearched(true);
   };
 
-  const allStatuses: ShipmentStatus[] = ["created", "in_transit", "at_office", "out_for_delivery", "delivered"];
+  const allStatuses: ShipmentStatus[] = ["created", "in_transit", "at_office", "delivered"];
 
   const getStatusIndex = (status: ShipmentStatus) => allStatuses.indexOf(status);
 

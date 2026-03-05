@@ -1,7 +1,7 @@
 import { City } from './city.interface';
 import { Invoice } from './invoice.interface';
 
-export type ShipmentStatus = 'created' | 'in_transit' | 'at_office' | 'out_for_delivery' | 'delivered' | 'cancelled';
+export type ShipmentStatus = 'created' | 'in_transit' | 'at_office' | 'delivered';
 
 export interface AdminOffice {
     id: string;

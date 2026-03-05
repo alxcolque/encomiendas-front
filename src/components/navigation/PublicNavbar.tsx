@@ -150,8 +150,10 @@ export default function PublicNavbar() {
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" className="relative h-10 w-10 rounded-full flex items-center justify-center p-0">
                                         <Avatar className="h-10 w-10 border border-border">
-                                            <AvatarImage src={user.avatar} alt={user.name} />
-                                            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                                            <AvatarImage src={user.avatar} alt={user.name} className="object-cover" />
+                                            <AvatarFallback className="bg-secondary">
+                                                <User className="w-5 h-5 text-muted-foreground" />
+                                            </AvatarFallback>
                                         </Avatar>
                                     </Button>
                                 </DropdownMenuTrigger>
