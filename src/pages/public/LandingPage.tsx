@@ -10,19 +10,13 @@ export default function LandingPage() {
   const { general } = useSettingsStore();
   return (
     <div className="min-h-screen bg-background">
-      {/* Header with dynamic logo and site name */}
-      <header className="flex items-center justify-center py-8">
-        {general.logo && (
-          <img src={general.logo} alt={general.siteName} className="h-12 w-auto mr-4" />
-        )}
-        <h1 className="text-3xl font-bold">{general.siteName}</h1>
-      </header>
+
       {/* Hero Section with Carousel (Widget Removed) */}
       <section className="relative">
         <HeroCarousel />
       </section>
       {/* Quick Services Links (The 5 circular icons) */}
-      <div className="mt-8 lg:mt-12">
+      <div className="mt-4 lg:mt-6">
         <ServicesGrid />
       </div>
       {/* Main Content Sections Flow */}

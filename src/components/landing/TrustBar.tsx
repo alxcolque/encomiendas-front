@@ -13,18 +13,18 @@ const partners = [
 
 export default function TrustBar() {
   return (
-    <div className="bg-background border-y border-border py-12 md:py-20 relative overflow-hidden">
+    <div className="bg-background border-y border-border py-8 md:py-12 relative overflow-hidden">
       {/* Decorative background element */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-0 translate-x-1/2 -translate-y-1/2" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h3 className="text-xs font-bold uppercase tracking-[0.3em] text-primary mb-4">Números que Avalan</h3>
           <h2 className="text-3xl md:text-4xl font-black text-foreground">Resultados que Generan Confianza</h2>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mb-16 md:mb-24">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mb-12 md:mb-16">
           {stats.map((stat, index) => (
             <div key={index} className="group p-6 rounded-3xl bg-muted/30 border border-border/50 hover:bg-background hover:shadow-xl transition-all duration-500 text-center">
               <div className="flex justify-center mb-4 transition-transform duration-500 group-hover:scale-110">
@@ -43,8 +43,8 @@ export default function TrustBar() {
         </div>
 
         {/* Partners Scroll/Grid */}
-        <div className="pt-8 border-t border-border/50">
-          <p className="text-center text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-8">Nuestros Aliados Estratégicos</p>
+        <div className="pt-6 border-t border-border/50">
+          <p className="text-center text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-6">Nuestros Aliados Estratégicos</p>
           <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16">
             {partners.map((partner, index) => (
               <div

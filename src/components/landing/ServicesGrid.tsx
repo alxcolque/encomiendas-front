@@ -31,7 +31,7 @@ export default function ServicesGrid() {
     ];
 
     return (
-        <div className="w-full py-8 lg:py-16 bg-background">
+        <div className="w-full py-4 lg:py-8 bg-background">
             <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-wrap justify-center gap-x-6 gap-y-12 md:gap-x-16">
                     {services.map((service) => (
