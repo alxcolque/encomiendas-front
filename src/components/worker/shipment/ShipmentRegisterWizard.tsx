@@ -80,12 +80,20 @@ interface ShipmentRegisterWizardProps {
     onSuccess?: () => void;
     /** When true, hides the top title/header (useful when embedded inside a modal with its own header). */
     hideHeader?: boolean;
+    /** Pre-fills the sender data, used generally by authenticated clients */
+    defaultSender?: {
+        id: number | string;
+        name: string;
+        ci: string;
+        phone: string;
+    };
 }
 
 /* ─── Main Wizard ────────────────────────────────────────── */
 export default function ShipmentRegisterWizard({
     onSuccess,
     hideHeader = false,
+    defaultSender,
 }: ShipmentRegisterWizardProps) {
     const [step, setStep] = useState(1);
     const [detailsData, setDetailsData] = useState<ShipmentDetailsData | null>(null);
@@ -223,6 +231,7 @@ export default function ShipmentRegisterWizard({
                                     shipmentDetails={detailsData as any}
                                     onBack={handleBack}
                                     onSubmit={handleFinalSubmit}
+                                    defaultSender={defaultSender}
                                 />
                             )}
                         </div>

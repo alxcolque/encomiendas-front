@@ -1,0 +1,179 @@
+import { useEffect, useState } from "react";
+import { ENV } from "@/config/env";
+import { useAuthStore } from "@/stores/authStore";
+import { Package, MapPin, Calendar, ArrowRight, Loader2, AlertCircle, Plus } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { NewShipmentModal } from "@/components/shared/NewShipmentModal";
+
+// Extend with origin_office and destination_office full objects
+interface IShipment {
+    id: number;
+    tracking_code: string;
+    status: string;
+    created_at: string;
+    origin_office: { name: string };
+    destination_office: { name: string };
+}
+
+const STATUS_MAP: Record<string, { label: string; color: string }> = {
+    created: { label: "Registrado", color: "bg-blue-500/10 text-blue-500 border-blue-500/20" },
+    in_transit: { label: "En Tránsito", color: "bg-amber-500/10 text-amber-500 border-amber-500/20" },
+    at_office: { label: "En Oficina Destino", color: "bg-purple-500/10 text-purple-500 border-purple-500/20" },
+    delivered: { label: "Entregado", color: "bg-green-500/10 text-green-500 border-green-500/20" },
+};
+
+export default function ClientOrderHistory() {
+    const [shipments, setShipments] = useState<IShipment[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const { user, authStatus } = useAuthStore();
+
+    useEffect(() => {
+        if (authStatus === 'auth' && user?.role === 'client') {
+            fetchShipments();
+        }
+    }, [authStatus, user]);
+
+    const fetchShipments = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const { data } = await ENV.get("/client/shipments");
+            setShipments(data.shipments);
+        } catch (err: any) {
+            console.error("Error fetching shipments:", err);
+            setError("No se pudo cargar el historial de pedidos.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (authStatus !== 'auth' || user?.role !== 'client') {
+        return null;
+    }
+
+    return (
+        <section className="py-12 bg-muted/30">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h2 className="text-3xl font-display font-bold text-foreground">
+                            Mi Historial de Pedidos
+                        </h2>
+                        <p className="text-muted-foreground mt-2">
+                            Rastrea y revisa el estado de tus encomiendas recientes.
+                        </p>
+                    </div>
+                    {user && (
+                        <NewShipmentModal
+                            defaultSender={{
+                                id: user.id || "",
+                                name: user.name || "",
+                                ci: user.ci_nit || "",
+                                phone: user.phone || ""
+                            }}
+                            trigger={
+                                <Button
+                                    size="lg"
+                                    className="gradient-primary glow-primary text-white shadow-lg shadow-primary/20 font-semibold gap-2 hover:opacity-90 hover:scale-[1.01] transition-all duration-200"
+                                >
+                                    <Plus className="h-5 w-5" />
+                                    Nueva Encomienda
+                                </Button>
+                            }
+                        />
+                    )}
+                </div>
+
+                {error && (
+                    <Alert variant="destructive" className="mb-6">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Error</AlertTitle>
+                        <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                )}
+
+                {loading ? (
+                    <div className="flex flex-col items-center justify-center p-12 bg-card rounded-2xl border border-border shadow-sm">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+                        <p className="text-muted-foreground">Cargando tus encomiendas...</p>
+                    </div>
+                ) : shipments.length === 0 ? (
+                    <div className="bg-card rounded-2xl border border-border p-8 shadow-sm flex flex-col items-center justify-center text-center">
+                        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                            <Package className="w-8 h-8 text-muted-foreground" />
+                        </div>
+                        <h3 className="text-xl font-bold text-foreground">No hay encomiendas</h3>
+                        <p className="text-muted-foreground mt-2 max-w-sm">
+                            Aún no tienes encomiendas registradas con tu número de teléfono y CI/NIT.
+                        </p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {shipments.slice(0, 6).map((shipment) => {
+                            const statusInfo = STATUS_MAP[shipment.status] || { label: shipment.status, color: "bg-muted text-foreground" };
+
+                            return (
+                                <div
+                                    key={shipment.id}
+                                    className="bg-card/50 backdrop-blur-sm border border-border hover:border-primary/50 transition-all rounded-2xl p-6 group hover:shadow-glow flex flex-col"
+                                >
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div>
+                                            <h3 className="font-mono font-semibold text-lg text-foreground tracking-tight">
+                                                {shipment.tracking_code}
+                                            </h3>
+                                            <div className="flex items-center text-xs text-muted-foreground mt-1 gap-1">
+                                                <Calendar className="w-3 h-3" />
+                                                {format(new Date(shipment.created_at), "d 'de' MMMM, yyyy", { locale: es })}
+                                            </div>
+                                        </div>
+                                        <Badge variant="outline" className={statusInfo.color}>
+                                            {statusInfo.label}
+                                        </Badge>
+                                    </div>
+
+                                    <div className="space-y-4 mb-6 flex-1">
+                                        <div className="flex items-start gap-3">
+                                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                                                <MapPin className="w-4 h-4 text-primary" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Origen</p>
+                                                <p className="text-sm font-medium text-foreground">{shipment.origin_office?.name || 'Agencia'}</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="ml-4 border-l-2 border-dashed border-border h-4" />
+
+                                        <div className="flex items-start gap-3">
+                                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                                                <MapPin className="w-4 h-4 text-primary" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Destino</p>
+                                                <p className="text-sm font-medium text-foreground">{shipment.destination_office?.name || 'Destino'}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <Button asChild variant="ghost" className="w-full justify-between hover:bg-primary/5 group-hover:text-primary transition-colors">
+                                        <Link to={`/tracking?code=${shipment.tracking_code}`}>
+                                            Ver ubicación
+                                            <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                                        </Link>
+                                    </Button>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
+        </section>
+    );
+}

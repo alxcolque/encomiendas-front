@@ -19,6 +19,13 @@ interface NewShipmentModalProps {
     open?: boolean;
     /** Called when the dialog open state changes (optional). */
     onOpenChange?: (open: boolean) => void;
+    /** Pre-fills the sender data */
+    defaultSender?: {
+        id: number | string;
+        name: string;
+        ci: string;
+        phone: string;
+    };
 }
 
 /* ─── Component ──────────────────────────────────────────── */
@@ -26,6 +33,7 @@ export function NewShipmentModal({
     trigger,
     open: controlledOpen,
     onOpenChange,
+    defaultSender,
 }: NewShipmentModalProps) {
     const [internalOpen, setInternalOpen] = useState(false);
 
@@ -68,6 +76,7 @@ export function NewShipmentModal({
                     <ShipmentRegisterWizard
                         onSuccess={() => setOpen(false)}
                         hideHeader
+                        defaultSender={defaultSender}
                     />
                 </div>
             </DialogContent>

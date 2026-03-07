@@ -53,7 +53,7 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
             <div className="p-4 border-t border-border/50">
                 <div className="bg-muted/50 rounded-lg p-3 text-xs text-muted-foreground text-center">
                     <p>v1.0.0 Admin Panel</p>
-                    <p className="opacity-70 mt-1">© 2024 Kolmox Inc.</p>
+                    <p className="opacity-70 mt-1">©{new Date().getFullYear()} {import.meta.env.VITE_COMPANY_NAME} Inc.</p>
                 </div>
             </div>
         </aside>

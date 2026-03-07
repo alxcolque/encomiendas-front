@@ -18,6 +18,15 @@ interface Actions {
     phone: string,
     pin: string
   ) => Promise<void>;
+  clientLogin: (
+    phone: string,
+    ci_nit: string
+  ) => Promise<void>;
+  clientRegister: (
+    name: string,
+    phone: string,
+    ci_nit: string
+  ) => Promise<void>;
   checkAuthStatus: () => Promise<void>;
   hasPermission: (permission: string) => boolean;
   hasRole: (role: string) => boolean;
@@ -59,6 +68,55 @@ const storeApi: StateCreator<AuthState & Actions> = (set, get) => ({
             description: error.response?.data.message || "Credenciales incorrectas"
           }
         );
+      }
+    }
+  },
+
+  clientLogin: async (phone: string, ci_nit: string) => {
+    set({ isLoading: true });
+    try {
+      const { data } = await ENV.post<ILoginResponse>("/client/login", { phone, ci_nit });
+
+      set(() => ({
+        user: data.user,
+        token: data.accessToken,
+        authStatus: "auth",
+        isLoading: false
+      }));
+      toast.success(`Bienvenido ${data.user.name}`);
+    } catch (error) {
+      set(() => ({
+        user: undefined,
+        token: undefined,
+        authStatus: "not-auth",
+        isLoading: false
+      }));
+      if (isAxiosError(error)) {
+        toast.error("Error de inicio de sesión", {
+          description: error.response?.data.message || "Credenciales incorrectas"
+        });
+      }
+    }
+  },
+
+  clientRegister: async (name: string, phone: string, ci_nit: string) => {
+    set({ isLoading: true });
+    try {
+      const { data } = await ENV.post<ILoginResponse>("/client/register", { name, phone, ci_nit });
+
+      set(() => ({
+        user: data.user,
+        token: data.accessToken,
+        authStatus: "auth",
+        isLoading: false
+      }));
+      toast.success(`Cuenta creada con éxito, ¡Bienvenido ${data.user.name}!`);
+    } catch (error) {
+      set({ isLoading: false });
+      if (isAxiosError(error)) {
+        toast.error("Error al registrarse", {
+          description: error.response?.data.message || "Ocurrió un error inesperado"
+        });
       }
     }
   },

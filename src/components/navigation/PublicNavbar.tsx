@@ -175,8 +175,9 @@ export default function PublicNavbar() {
                                             </Link>
                                         </DropdownMenuItem>
                                         <DropdownMenuItem asChild>
+
                                             <Link
-                                                to="/user/profile"
+                                                to={user.role === 'client' ? '/me' : '/user/profile'}
                                                 className="flex items-center rounded-xl px-3 py-2 text-sm font-medium transition-colors focus:bg-primary/10 focus:text-primary cursor-pointer"
                                             >
                                                 <User className="mr-2 h-4 w-4" />

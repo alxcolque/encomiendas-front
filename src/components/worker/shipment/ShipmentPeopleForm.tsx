@@ -55,6 +55,12 @@ interface Props {
     shipmentDetails: ShipmentDetailsData;
     onBack: () => void;
     onSubmit: (data: ShipmentPeopleData) => Promise<void>;
+    defaultSender?: {
+        id: number | string;
+        name: string;
+        ci: string;
+        phone: string;
+    };
 }
 
 /* ─── Field helper ───────────────────────────────────────── */
@@ -123,6 +129,7 @@ export default function ShipmentPeopleForm({
     shipmentDetails,
     onBack,
     onSubmit,
+    defaultSender
 }: Props) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { offices } = useOfficeStore();
@@ -160,6 +167,16 @@ export default function ShipmentPeopleForm({
             recipientPhone: "",
             isFragile: false,
         },
+    });
+
+    // Handle default sender initialization
+    useState(() => {
+        if (defaultSender) {
+            setValue("senderId", String(defaultSender.id));
+            setValue("senderName", defaultSender.name);
+            setValue("senderCI", defaultSender.ci);
+            setValue("senderPhone", defaultSender.phone);
+        }
     });
 
     const senderCI = watch("senderCI");
@@ -338,7 +355,7 @@ export default function ShipmentPeopleForm({
                                 <p className="text-xs text-muted-foreground">Quien envía la encomienda</p>
                             </div>
                         </div>
-                        {!isNewSender && (
+                        {!defaultSender && !isNewSender && (
                             <Button
                                 type="button"
                                 variant="ghost"
@@ -350,7 +367,7 @@ export default function ShipmentPeopleForm({
                                 Nuevo cliente
                             </Button>
                         )}
-                        {isNewSender && (
+                        {!defaultSender && isNewSender && (
                             <Button
                                 type="button"
                                 variant="ghost"
@@ -372,13 +389,15 @@ export default function ShipmentPeopleForm({
                         <div className="flex gap-2">
                             <Input
                                 placeholder="Ej: 7654321"
+                                readOnly={!!defaultSender}
                                 className={cn(
                                     "h-11 transition-colors focus:border-primary",
-                                    errors.senderCI && "border-destructive"
+                                    errors.senderCI && "border-destructive",
+                                    defaultSender && "bg-muted cursor-not-allowed text-muted-foreground"
                                 )}
                                 {...register("senderCI")}
                             />
-                            {!isNewSender && (
+                            {!defaultSender && !isNewSender && (
                                 <Button
                                     type="button"
                                     variant="outline"
@@ -409,10 +428,12 @@ export default function ShipmentPeopleForm({
                                     label="Nombre Completo"
                                     icon={User}
                                     placeholder="Ej: Juan Carlos Mamani"
+                                    readOnly={!!defaultSender}
+                                    className={cn(defaultSender && "bg-muted cursor-not-allowed text-muted-foreground")}
                                     error={errors.senderName?.message}
                                     {...register("senderName")}
                                 />
-                                {!isNewSender && watch("senderId") && watch("senderName") !== origSenderName && (
+                                {!defaultSender && !isNewSender && watch("senderId") && watch("senderName") !== origSenderName && (
                                     <Button
                                         type="button"
                                         size="sm"
@@ -435,9 +456,11 @@ export default function ShipmentPeopleForm({
                                     <Input
                                         type="tel"
                                         placeholder="Ej: 71234567"
+                                        readOnly={!!defaultSender}
                                         className={cn(
                                             "h-11 transition-colors focus:border-primary",
-                                            errors.senderPhone && "border-destructive"
+                                            errors.senderPhone && "border-destructive",
+                                            defaultSender && "bg-muted cursor-not-allowed text-muted-foreground"
                                         )}
                                         {...register("senderPhone")}
                                     />
@@ -450,7 +473,7 @@ export default function ShipmentPeopleForm({
                                     >
                                         <MessageCircle className="h-5 w-5" />
                                     </Button>
-                                    {!isNewSender && watch("senderId") && (watch("senderPhone") !== origSenderPhone || watch("senderName") !== origSenderName) && (
+                                    {!defaultSender && !isNewSender && watch("senderId") && (watch("senderPhone") !== origSenderPhone || watch("senderName") !== origSenderName) && (
                                         <Button
                                             type="button"
                                             size="sm"

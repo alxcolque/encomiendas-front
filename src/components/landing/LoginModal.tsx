@@ -3,10 +3,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { Phone, ArrowLeft, Shield } from "lucide-react";
+import { Shield, Loader2, Lock } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface LoginModalProps {
   open: boolean;
@@ -14,46 +14,53 @@ interface LoginModalProps {
 }
 
 export default function LoginModal({ open, onOpenChange }: LoginModalProps) {
-  const [step, setStep] = useState<"phone" | "otp">("phone");
   const [phone, setPhone] = useState("");
-  const [otp, setOtp] = useState("");
+  const [pin, setPin] = useState("");
   const [loading, setLoading] = useState(false);
   const { login } = useAuthStore();
   const navigate = useNavigate();
 
-  const handleSendCode = () => {
-    if (phone.length >= 8) {
-      setLoading(true);
-      // Simulate sending code
-      setTimeout(() => {
-        setLoading(false);
-        setStep("otp");
-      }, 1000);
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!phone || !pin) {
+      toast.error("Por favor completa todos los campos");
+      return;
     }
-  };
 
-  const handleVerifyOtp = () => {
-    if (otp.length === 4) {
-      setLoading(true);
-      // Simulate verification
-      setTimeout(() => {
-        login(phone, "driver");
-        setLoading(false);
-        onOpenChange(false);
-        navigate("/driver");
-      }, 1000);
+    setLoading(true);
+    try {
+      await login(phone, pin);
+      onOpenChange(false);
+
+      const user = useAuthStore.getState().user;
+      if (user) {
+        switch (user.role) {
+          case 'admin':
+            navigate('/admin');
+            break;
+          case 'driver':
+            navigate('/driver');
+            break;
+          case 'worker':
+            navigate('/worker');
+            break;
+          case 'client':
+            navigate('/tracking');
+            break;
+          default:
+            navigate('/');
+        }
+      }
+    } catch (error: any) {
+      // Error is handled by authStore and toast is shown there
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const handleBack = () => {
-    setStep("phone");
-    setOtp("");
   };
 
   const handleClose = () => {
-    setStep("phone");
     setPhone("");
-    setOtp("");
+    setPin("");
     onOpenChange(false);
   };
 
@@ -62,112 +69,67 @@ export default function LoginModal({ open, onOpenChange }: LoginModalProps) {
       <DialogContent className="sm:max-w-md bg-card border-border">
         <DialogHeader>
           <DialogTitle className="text-center text-xl font-bold text-foreground">
-            {step === "phone" ? "Iniciar Sesión" : "Verificar Código"}
+            Acceso Administrativo
           </DialogTitle>
         </DialogHeader>
 
         <div className="py-4">
-          {step === "phone" ? (
-            <div className="space-y-6">
-              {/* Icon */}
-              <div className="flex justify-center">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Phone className="w-8 h-8 text-primary" />
-                </div>
+          <form onSubmit={handleLogin} className="space-y-6">
+            {/* Icon */}
+            <div className="flex justify-center">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                <Shield className="w-8 h-8 text-primary" />
               </div>
-
-              {/* Description */}
-              <p className="text-center text-muted-foreground text-sm">
-                Ingresa tu número de celular para recibir un código de verificación
-              </p>
-
-              {/* Phone Input */}
-              <div className="space-y-2">
-                <Label htmlFor="phone" className="text-foreground">Número de celular</Label>
-                <div className="flex gap-2">
-                  <div className="flex items-center justify-center px-3 bg-muted rounded-lg border border-input text-sm text-muted-foreground">
-                    +591
-                  </div>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="70000000"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 8))}
-                    className="flex-1 bg-background"
-                  />
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <Button
-                onClick={handleSendCode}
-                disabled={phone.length < 8 || loading}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12"
-              >
-                {loading ? "Enviando..." : "Enviar Código"}
-              </Button>
             </div>
-          ) : (
-            <div className="space-y-6">
-              {/* Back Button */}
-              <button
-                onClick={handleBack}
-                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Cambiar número
-              </button>
 
-              {/* Icon */}
-              <div className="flex justify-center">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Shield className="w-8 h-8 text-primary" />
-                </div>
+            {/* Phone Input */}
+            <div className="space-y-2">
+              <Label htmlFor="admin-phone" className="text-foreground">Número de celular</Label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none text-sm">
+                  🇧🇴 +591
+                </span>
+                <Input
+                  id="admin-phone"
+                  type="tel"
+                  placeholder="70000000"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 8))}
+                  className="pl-20 h-12 bg-muted/50"
+                  disabled={loading}
+                />
               </div>
+            </div>
 
-              {/* Description */}
-              <div className="text-center space-y-1">
-                <p className="text-muted-foreground text-sm">
-                  Ingresa el código de 4 dígitos enviado a
-                </p>
-                <p className="text-foreground font-semibold">+591 {phone}</p>
-              </div>
-
-              {/* OTP Input */}
-              <div className="flex justify-center">
-                <InputOTP
+            {/* PIN Input */}
+            <div className="space-y-2">
+              <Label htmlFor="admin-pin" className="text-foreground">PIN de Acceso</Label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none text-sm">
+                  <Lock className="w-4 h-4" />
+                </span>
+                <Input
+                  id="admin-pin"
+                  type="password"
+                  placeholder="••••"
+                  value={pin}
+                  onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                  className="pl-10 h-12 bg-muted/50 tracking-widest text-center"
                   maxLength={4}
-                  value={otp}
-                  onChange={setOtp}
-                >
-                  <InputOTPGroup className="gap-3">
-                    <InputOTPSlot index={0} className="w-14 h-14 text-xl bg-background border-input" />
-                    <InputOTPSlot index={1} className="w-14 h-14 text-xl bg-background border-input" />
-                    <InputOTPSlot index={2} className="w-14 h-14 text-xl bg-background border-input" />
-                    <InputOTPSlot index={3} className="w-14 h-14 text-xl bg-background border-input" />
-                  </InputOTPGroup>
-                </InputOTP>
+                  disabled={loading}
+                />
               </div>
-
-              {/* Submit Button */}
-              <Button
-                onClick={handleVerifyOtp}
-                disabled={otp.length !== 4 || loading}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12"
-              >
-                {loading ? "Verificando..." : "Verificar"}
-              </Button>
-
-              {/* Resend */}
-              <p className="text-center text-sm text-muted-foreground">
-                ¿No recibiste el código?{" "}
-                <button className="text-primary hover:underline font-medium">
-                  Reenviar
-                </button>
-              </p>
             </div>
-          )}
+
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              disabled={phone.length < 8 || pin.length < 4 || loading}
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12"
+            >
+              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Ingresar"}
+            </Button>
+          </form>
         </div>
       </DialogContent>
     </Dialog>

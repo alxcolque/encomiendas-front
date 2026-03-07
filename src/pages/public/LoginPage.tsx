@@ -4,67 +4,41 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { useAuthStore } from "@/stores/authStore";
-import { Package, Loader2 } from "lucide-react";
+import { Package, Loader2, UserPlus, LogIn } from "lucide-react";
 import { toast } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function LoginPage() {
   const [phone, setPhone] = useState("");
-  const [pin, setPin] = useState("");
-  const { login, isLoading, user, authStatus } = useAuthStore();
+  const [ciNit, setCiNit] = useState("");
+  const [name, setName] = useState("");
+  const [activeTab, setActiveTab] = useState<"login" | "register">("login");
+
+  const { clientLogin, clientRegister, isLoading, user, authStatus } = useAuthStore();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (authStatus === 'auth' && user) {
-      switch (user.role) {
-        case 'admin': navigate('/admin'); break;
-        case 'driver': navigate('/driver'); break;
-        case 'worker': navigate('/worker'); break;
-        case 'client': navigate('/tracking'); break;
-        default: navigate('/');
-      }
+      navigate('/');
     }
   }, [authStatus, user, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!phone || !pin) {
+    if (!phone || !ciNit) {
       toast.error("Por favor completa todos los campos");
       return;
     }
+    await clientLogin(phone, ciNit);
+  };
 
-    try {
-      // Sending strictly phone and pin as requested
-      await login(phone, pin);
-      // Redirect is handled by the ProtectedRoute or we can explicit redirect here based on role if needed.
-      // But fetchUser saves the user, and ProtectedRoute will verify it.
-      // Usually good to redirect to a default dashboard.
-      // Let's rely on standard navigation or check role.
-      // For now, let's navigate to /admin or root and let router decide?
-      // Actually, after login, we usually want to know where to go.
-      // Redirect based on role
-      const user = useAuthStore.getState().user;
-      //console.log(user);
-      if (user) {
-        switch (user.role) {
-          case 'admin':
-            navigate('/admin');
-            break;
-          case 'driver':
-            navigate('/driver');
-            break;
-          case 'worker':
-            navigate('/worker');
-            break;
-          case 'client':
-            navigate('/tracking'); // Clients usually want to track packages
-            break;
-          default:
-            navigate('/');
-        }
-      }
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Credenciales incorrectas");
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name || !phone || !ciNit) {
+      toast.error("Por favor completa todos los campos");
+      return;
     }
+    await clientRegister(name, phone, ciNit);
   };
 
   return (
@@ -91,64 +65,104 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Login Form */}
-        <GlassCard className="space-y-4">
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm text-muted-foreground">
-                Número de Celular
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none text-sm">
-                  🇧🇴 +591
-                </span>
-                <Input
-                  type="tel"
-                  placeholder="70000000"
-                  value={phone}
-                  onChange={(e) => {
-                    // Allow only numbers and max 8 chars
-                    const val = e.target.value.replace(/\D/g, '').slice(0, 8);
-                    setPhone(val);
-                  }}
-                  className="h-12 bg-muted/50 border-border rounded-xl pl-20" // padding left for +591
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm text-muted-foreground">
-                PIN de Acceso
-              </label>
-              <Input
-                type="password"
-                placeholder="••••"
-                value={pin}
-                onChange={(e) => {
-                  const val = e.target.value.replace(/\D/g, '').slice(0, 4);
-                  setPin(val);
-                }}
-                className="h-12 bg-muted/50 border-border rounded-xl tracking-widest text-center"
-                disabled={isLoading}
-                maxLength={4}
-              />
-            </div>
+        {/* Login/Register Tabs */}
+        <GlassCard className="p-2">
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsTrigger value="login" className="flex items-center gap-2">
+                <LogIn className="w-4 h-4" /> Ingresar
+              </TabsTrigger>
+              <TabsTrigger value="register" className="flex items-center gap-2">
+                <UserPlus className="w-4 h-4" /> Registrarse
+              </TabsTrigger>
+            </TabsList>
 
-            <Button
-              type="submit"
-              variant="hero"
-              size="lg"
-              className="w-full h-12 text-base"
-              disabled={isLoading || phone.length < 8 || pin.length < 4}
-            >
-              {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Ingresar"}
-            </Button>
-          </form>
+            <TabsContent value="login">
+              <form onSubmit={handleLogin} className="space-y-4 px-2 pb-2">
+                <div className="space-y-2">
+                  <label className="text-sm text-muted-foreground">Número de Celular</label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none text-sm">
+                      🇧🇴 +591
+                    </span>
+                    <Input
+                      type="tel"
+                      placeholder="70000000"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 15))}
+                      className="h-12 bg-muted/50 border-border rounded-xl pl-20"
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm text-muted-foreground">CI / NIT</label>
+                  <Input
+                    type="text"
+                    placeholder="1234567"
+                    value={ciNit}
+                    onChange={(e) => setCiNit(e.target.value)}
+                    className="h-12 bg-muted/50 border-border rounded-xl"
+                    disabled={isLoading}
+                  />
+                </div>
+                <Button type="submit" variant="hero" size="lg" className="w-full h-12 text-base mt-2" disabled={isLoading || !phone || !ciNit}>
+                  {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Ingresar"}
+                </Button>
+              </form>
+            </TabsContent>
+
+            <TabsContent value="register">
+              <form onSubmit={handleRegister} className="space-y-4 px-2 pb-2">
+                <div className="space-y-2">
+                  <label className="text-sm text-muted-foreground">Nombre Completo / Razón Social</label>
+                  <Input
+                    type="text"
+                    placeholder="Juan Pérez"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="h-12 bg-muted/50 border-border rounded-xl"
+                    disabled={isLoading}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm text-muted-foreground">Número de Celular</label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none text-sm">
+                      🇧🇴 +591
+                    </span>
+                    <Input
+                      type="tel"
+                      placeholder="70000000"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 15))}
+                      className="h-12 bg-muted/50 border-border rounded-xl pl-20"
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm text-muted-foreground">CI / NIT</label>
+                  <Input
+                    type="text"
+                    placeholder="1234567"
+                    value={ciNit}
+                    onChange={(e) => setCiNit(e.target.value)}
+                    className="h-12 bg-muted/50 border-border rounded-xl"
+                    disabled={isLoading}
+                  />
+                </div>
+                <Button type="submit" variant="hero" size="lg" className="w-full h-12 text-base mt-2" disabled={isLoading || !name || !phone || !ciNit}>
+                  {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Registrarse"}
+                </Button>
+              </form>
+            </TabsContent>
+          </Tabs>
         </GlassCard>
 
         {/* Footer */}
-        <p className="text-center text-xs text-muted-foreground">
-          Sistema de Gestión Interna • Privado
+        <p className="text-center text-xs text-muted-foreground mt-6">
+          Al registrarte aceptas nuestros <a href="#" className="underline">Términos y Condiciones</a>
         </p>
       </div>
     </div>

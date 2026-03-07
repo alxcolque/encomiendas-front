@@ -7,13 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Building2, Loader2 } from "lucide-react";
+import { Building2, Loader2, ImagePlus } from "lucide-react";
 import { toast } from "sonner";
 import { useOfficeStore } from "@/stores/officeStore";
 import { Office } from "@/interfaces/office.interface";
 import { useUserStore } from "@/stores/userStore";
 import { useCityStore } from "@/stores/cityStore";
 import { MultiSelect } from "@/components/ui/multi-select";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const officeSchema = z.object({
     name: z.string().min(3, "Nombre requerido"),
@@ -22,6 +23,7 @@ const officeSchema = z.object({
     users: z.array(z.string()).optional(),
     status: z.enum(["active", "inactive"]),
     coordinates: z.string().optional(),
+    image: z.string().optional(),
 });
 
 type OfficeFormValues = z.infer<typeof officeSchema>;
@@ -35,6 +37,7 @@ interface OfficeModalProps {
 
 export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpenChange }: OfficeModalProps) {
     const [internalOpen, setInternalOpen] = useState(false);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { createOffice, updateOffice } = useOfficeStore();
     const { users, getUsers } = useUserStore();
@@ -67,7 +70,9 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
                     users: officeToEdit.managers?.map(m => m.id) || [],
                     status: officeToEdit.status,
                     coordinates: officeToEdit.coordinates || "",
+                    image: undefined,
                 });
+                setImagePreview(officeToEdit.image || null);
             } else {
                 form.reset({
                     name: "",
@@ -76,10 +81,25 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
                     users: [],
                     status: "active",
                     coordinates: "",
+                    image: undefined,
                 });
+                setImagePreview(null);
             }
         }
     }, [open, officeToEdit, form, getUsers, fetchCities]);
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64 = reader.result as string;
+                setImagePreview(base64);
+                form.setValue("image", base64);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const onSubmit = async (data: OfficeFormValues) => {
         setIsSubmitting(true);
@@ -90,6 +110,7 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
             status: data.status,
             users: data.users,
             coordinates: data.coordinates,
+            image: data.image,
         };
         try {
             if (isEditing && officeToEdit) {
@@ -137,11 +158,33 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
                             <h3 className="text-sm font-semibold flex items-center gap-2 text-muted-foreground">
                                 <Building2 className="h-4 w-4" /> Información General
                             </h3>
-                            <div className="space-y-2">
-                                <Label htmlFor="name">Nombre de Oficina <span className="text-destructive">*</span></Label>
-                                <Input id="name" {...form.register("name")} placeholder="Ej: Sucursal Centro" />
-                                {form.formState.errors.name && <span className="text-xs text-destructive">{form.formState.errors.name.message}</span>}
+
+                            <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start mb-4">
+                                <div className="flex flex-col items-center gap-2">
+                                    <Label htmlFor="image_office" className="cursor-pointer">
+                                        <Avatar className="h-20 w-20 border-2 border-dashed border-primary/30 hover:border-primary transition-all rounded-2xl">
+                                            <AvatarImage src={imagePreview || ""} />
+                                            <AvatarFallback className="rounded-2xl">
+                                                {isEditing ? <Building2 className="h-8 w-8 text-primary/40" /> : <ImagePlus className="h-8 w-8 text-primary/40" />}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                    </Label>
+                                    <Input
+                                        id="image_office"
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={handleFileChange}
+                                    />
+                                    <span className="text-xs text-muted-foreground">Foto (opcional)</span>
+                                </div>
+                                <div className="flex-1 space-y-2 w-full">
+                                    <Label htmlFor="name">Nombre de Oficina <span className="text-destructive">*</span></Label>
+                                    <Input id="name" {...form.register("name")} placeholder="Ej: Sucursal Centro" />
+                                    {form.formState.errors.name && <span className="text-xs text-destructive">{form.formState.errors.name.message}</span>}
+                                </div>
                             </div>
+
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="city_id">Ciudad <span className="text-destructive">*</span></Label>

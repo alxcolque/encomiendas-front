@@ -502,7 +502,7 @@ export default function ShipmentDetailsForm({ onNext }: Props) {
                                             <Input
                                                 type="number"
                                                 min="0"
-                                                step="0.1"
+                                                step="1"
                                                 placeholder={placeholder}
                                                 value={val}
                                                 onChange={(e) => set(e.target.value)}

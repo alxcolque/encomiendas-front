@@ -11,4 +11,5 @@ export interface Office {
     managers?: { id: string; name: string }[];
     status: OfficeStatus;
     coordinates?: string;
+    image?: string | null;
 }
