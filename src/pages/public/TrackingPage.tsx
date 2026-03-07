@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +26,26 @@ export default function TrackingPage() {
   const [code, setCode] = useState("");
   const [searched, setSearched] = useState(false);
   const { currentShipment, trackShipment, isLoading } = useShipmentStore();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    let queryCode = params.get("CODE_TRACKING") || params.get("code");
+
+    // Fallback para atrapar formatos como ?=CODE_TRACKING=KOL-... 
+    if (!queryCode) {
+      const match = window.location.search.match(/(KOL-[a-zA-Z0-9-]+)/i);
+      if (match) {
+        queryCode = match[1];
+      }
+    }
+
+    if (queryCode) {
+      const formattedCode = queryCode.toUpperCase();
+      setCode(formattedCode);
+      trackShipment(formattedCode);
+      setSearched(true);
+    }
+  }, [trackShipment]);
 
   const handleSearch = () => {
     trackShipment(code);

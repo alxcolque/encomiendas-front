@@ -60,7 +60,7 @@ export const useAdminShipmentStore = create<AdminShipmentState>((set, get) => ({
     updateShipment: async (id, payload) => {
         set({ isLoading: true });
         try {
-            const { data } = await ENV.put<{ data: AdminShipment }>(`/shipments/${id}`, payload);
+            const { data } = await ENV.patch<{ data: AdminShipment }>(`/shipments/${id}`, payload);
             set((state) => ({
                 shipments: state.shipments.map((s) => s.id === id ? data.data : s),
                 isLoading: false,

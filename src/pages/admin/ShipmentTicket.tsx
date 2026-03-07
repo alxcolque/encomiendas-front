@@ -128,14 +128,12 @@ export default function ShipmentTicket() {
                         </div>
                     </div>
 
-                    {/* Row 6 */}
-                    <div className="mb-3 text-[11px] font-bold border-b border-gray-100 pb-0.5">
-                        <span className="font-black uppercase">Desc:</span> <span className="font-medium">{description}</span>
-                    </div>
-
                     {/* Row 7-9 & QR Area */}
                     <div className="flex justify-between items-end">
                         <div className="space-y-2 flex-1">
+                            <div className="text-[11px] font-bold flex gap-2">
+                                <span className="font-black uppercase">Desc:</span> <span className="font-medium">{description}</span>
+                            </div>
                             {/* Row 7 */}
                             <div className="text-[11px] font-bold flex gap-2">
                                 <span className="font-black uppercase">Pago:</span> <span className="font-medium">{paymentStatus}</span>
@@ -154,7 +152,7 @@ export default function ShipmentTicket() {
 
                         {/* QR Code */}
                         <div className="flex flex-col items-center ml-2 border-l border-gray-100 pl-2">
-                            <div className="w-16 h-16 border border-black p-0.5 bg-white">
+                            <div className="w-20 h-20 border border-black p-0.5 bg-white">
                                 <img
                                     src={qrCodeUrl}
                                     alt="Tracking QR"

@@ -1,10 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { MapPin, Phone, Clock, Send, Mail, User, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useSettingsStore } from "@/stores/settingsStore";
+import { IOffice } from "@/interfaces/public.interface";
+import { PublicService } from "@/services/public.service";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import icon from "leaflet/dist/images/marker-icon.png";
+import iconShadow from "leaflet/dist/images/marker-shadow.png";
+
+const DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  tooltipAnchor: [16, -28],
+  shadowSize: [41, 41]
+});
+L.Marker.prototype.options.icon = DefaultIcon;
 
 export default function ContactSection() {
   const { general } = useSettingsStore();
@@ -15,7 +32,10 @@ export default function ContactSection() {
     message: "",
   });
   const [loading, setLoading] = useState(false);
+  const [offices, setOffices] = useState<IOffice[]>([]);
+  const [mapLoading, setMapLoading] = useState(true);
 
+  // Form submission handler
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -26,6 +46,80 @@ export default function ContactSection() {
       setLoading(false);
     }, 1000);
   };
+
+  // Fetch offices for the map
+  useEffect(() => {
+    const fetchOffices = async () => {
+      try {
+        const data = await PublicService.getOffices();
+        setOffices(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setMapLoading(false);
+      }
+    };
+    fetchOffices();
+  }, []);
+
+  // Map initialization
+  const defaultCenter: [number, number] = [-16.2902, -63.5887];
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
+
+  useEffect(() => {
+    if (!mapContainerRef.current || mapLoading) return;
+
+    if (!mapInstanceRef.current) {
+      mapInstanceRef.current = L.map(mapContainerRef.current, {
+        center: defaultCenter,
+        zoom: 5,
+        scrollWheelZoom: false,
+      });
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(mapInstanceRef.current);
+    }
+
+    const map = mapInstanceRef.current;
+
+    // Clear existing markers (if any other than tile layer)
+    map.eachLayer((layer) => {
+      if (layer instanceof L.Marker) {
+        map.removeLayer(layer);
+      }
+    });
+
+    // Add markers for offices
+    offices.forEach((office) => {
+      if (office.coordinates) {
+        const parts = office.coordinates.split(',');
+        if (parts.length === 2) {
+          const lat = parseFloat(parts[0].trim());
+          const lng = parseFloat(parts[1].trim());
+          if (!isNaN(lat) && !isNaN(lng)) {
+            const popupContent = `
+                        <div style="font-family: inherit; min-width: 150px;">
+                            <div style="font-weight: 600; font-size: 14px; margin-bottom: 2px;">${office.name}</div>
+                            <div style="font-size: 12px; color: #4b5563;">${office.address}</div>
+                            <div style="font-size: 12px; font-weight: 500; margin-top: 4px;">${office.city.name}</div>
+                        </div>
+                    `;
+            L.marker([lat, lng]).bindPopup(popupContent).addTo(map);
+          }
+        }
+      }
+    });
+
+    // Cleanup on unmount
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, [offices, mapLoading]);
 
   const contactInfo = [
     {
@@ -171,25 +265,17 @@ export default function ContactSection() {
               ))}
             </div>
 
-            {/* Mini Map Placeholder */}
-            <div className="glass-card p-2 h-48 overflow-hidden">
-              <div className="w-full h-full rounded-xl bg-muted flex items-center justify-center relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10" />
-                <div className="text-center z-10">
-                  <MapPin className="w-8 h-8 text-primary mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">
-                    La Paz, Bolivia
-                  </p>
-                  <a
-                    href="https://maps.google.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary text-sm hover:underline"
-                  >
-                    Ver en Google Maps
-                  </a>
+            {/* Map */}
+            <div className="glass-card p-2 h-64 overflow-hidden relative z-0">
+              {mapLoading ? (
+                <div className="w-full h-full rounded-xl bg-muted flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
                 </div>
-              </div>
+              ) : (
+                <div className="w-full h-full rounded-xl overflow-hidden relative z-0">
+                  <div ref={mapContainerRef} className="w-full h-full" />
+                </div>
+              )}
             </div>
           </div>
         </div>
