@@ -9,6 +9,7 @@ export interface AdminUser extends Omit<User, 'role'> {
     status?: UserStatus;
     password?: string;
     pin?: string;
+    offices?: { id: string; name: string }[];
 }
 
 export interface IGetUsersResponse {

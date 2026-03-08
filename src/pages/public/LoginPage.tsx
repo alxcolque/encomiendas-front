@@ -7,12 +7,14 @@ import { useAuthStore } from "@/stores/authStore";
 import { Package, Loader2, UserPlus, LogIn } from "lucide-react";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import LoginModal from "@/components/landing/LoginModal";
 
 export default function LoginPage() {
   const [phone, setPhone] = useState("");
   const [ciNit, setCiNit] = useState("");
   const [name, setName] = useState("");
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
+  const [adminLoginOpen, setAdminLoginOpen] = useState(false);
 
   const { clientLogin, clientRegister, isLoading, user, authStatus } = useAuthStore();
   const navigate = useNavigate();
@@ -161,10 +163,20 @@ export default function LoginPage() {
         </GlassCard>
 
         {/* Footer */}
-        <p className="text-center text-xs text-muted-foreground mt-6">
-          Al registrarte aceptas nuestros <a href="#" className="underline">Términos y Condiciones</a>
-        </p>
+        <div className="text-center space-y-4 mt-6">
+          <p className="text-xs text-muted-foreground">
+            Al registrarte aceptas nuestros <a href="#" className="underline hover:text-primary">Términos y Condiciones</a>
+          </p>
+          <button
+            onClick={() => setAdminLoginOpen(true)}
+            className="text-xs text-muted-foreground hover:text-primary transition-colors font-medium"
+          >
+            Acceso Administrativo
+          </button>
+        </div>
       </div>
+
+      <LoginModal open={adminLoginOpen} onOpenChange={setAdminLoginOpen} />
     </div>
   );
 }

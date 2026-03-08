@@ -54,9 +54,19 @@ export function OfficesTable({ onEdit }: OfficesTableProps) {
                         <TableRow key={office.id} className="hover:bg-muted/50 transition-colors">
                             <TableCell className="font-medium">
                                 <div className="flex items-center gap-2">
-                                    <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                                        <MapPin className="h-4 w-4" />
-                                    </div>
+                                    {office.image ? (
+                                        <div className="h-8 w-8 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                                            <img
+                                                src={office.image}
+                                                alt={office.name}
+                                                className="h-full w-full object-cover"
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+                                            <MapPin className="h-4 w-4" />
+                                        </div>
+                                    )}
                                     {office.name}
                                 </div>
                             </TableCell>

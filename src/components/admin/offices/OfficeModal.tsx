@@ -65,9 +65,9 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
             if (officeToEdit) {
                 form.reset({
                     name: officeToEdit.name,
-                    city_id: officeToEdit.city_id || String(officeToEdit.city?.id || ""),
+                    city_id: String(officeToEdit.city_id || officeToEdit.city?.id || ""),
                     address: officeToEdit.address,
-                    users: officeToEdit.managers?.map(m => m.id) || [],
+                    users: officeToEdit.managers?.map(m => String(m.id)) || [],
                     status: officeToEdit.status,
                     coordinates: officeToEdit.coordinates || "",
                     image: undefined,
@@ -134,10 +134,13 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
 
     const managerOptions = users
         .filter(u => ['admin', 'worker'].includes(u.role))
-        .map(u => ({
-            value: u.id,
-            label: `${u.name} (${u.role})`
-        }));
+        .map(u => {
+            const currentOffice = u.offices && u.offices.length > 0 ? ` - ${u.offices[0].name}` : '';
+            return {
+                value: String(u.id),
+                label: `${u.name} (${u.role})${currentOffice}`
+            };
+        });
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>

@@ -8,12 +8,10 @@ import FloatingWhatsApp from "@/components/landing/FloatingWhatsApp";
 import ClientOrderHistory from "@/components/landing/ClientOrderHistory";
 import { useAuthStore } from "@/stores/authStore";
 import { useState } from "react";
-import LoginModal from "@/components/landing/LoginModal";
 
 export default function LandingPage() {
   const { general } = useSettingsStore();
   const { user, authStatus } = useAuthStore();
-  const [adminLoginOpen, setAdminLoginOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -39,21 +37,6 @@ export default function LandingPage() {
           <ContactSection />
         </div>
       </main>
-
-      {/* Footer Area with Admin Link */}
-      <footer className="py-6 border-t border-border mt-12 bg-muted/20">
-        <div className="max-w-7xl mx-auto px-4 flex justify-center text-sm">
-          <button
-            onClick={() => setAdminLoginOpen(true)}
-            className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
-          >
-            Administrar
-          </button>
-        </div>
-      </footer>
-
-      {/* Admin Login Modal */}
-      <LoginModal open={adminLoginOpen} onOpenChange={setAdminLoginOpen} />
 
       {/* Floating Elements */}
       <FloatingWhatsApp />
