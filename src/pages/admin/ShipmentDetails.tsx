@@ -1,38 +1,149 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAdminShipmentStore } from "@/stores/adminShipmentStore";
-import { AdminShipment } from "@/interfaces/shipment.interface";
+import { AdminShipment, ShipmentStatus, CreateShipmentPayload } from "@/interfaces/shipment.interface";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { StatusBadge } from "@/components/admin/shared/StatusBadge";
-import { AdminSectionHeader } from "@/components/admin/shared/AdminSectionHeader";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import {
     ArrowLeft,
     Package,
     User,
     MapPin,
-    Calendar,
-    Clock,
     FileText,
     ExternalLink,
     Truck,
-    CheckCircle2,
-    AlertCircle
+    Save,
+    QrCode,
+    CreditCard
 } from "lucide-react";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
+import { toast } from "sonner";
+import { useOfficeStore } from "@/stores/officeStore";
+import { ENV } from "@/config/env";
 
 export default function ShipmentDetails() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { fetchShipmentById, isLoading } = useAdminShipmentStore();
+    const { fetchShipmentById, updateShipment } = useAdminShipmentStore();
+    const { offices, fetchOffices } = useOfficeStore();
+
     const [shipment, setShipment] = useState<AdminShipment | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isGeneratingInvoice, setIsGeneratingInvoice] = useState(false);
+
+    // Form states
+    const [originId, setOriginId] = useState("");
+    const [destinationId, setDestinationId] = useState("");
+    const [status, setStatus] = useState<ShipmentStatus>("created");
+    const [observation, setObservation] = useState("");
+
+    // Sender states
+    const [senderName, setSenderName] = useState("");
+    const [senderCi, setSenderCi] = useState("");
+    const [senderPhone, setSenderPhone] = useState("");
+
+    // Receiver states
+    const [receiverName, setReceiverName] = useState("");
+    const [receiverCi, setReceiverCi] = useState("");
+    const [receiverPhone, setReceiverPhone] = useState("");
+
+    useEffect(() => {
+        if (offices.length === 0) {
+            fetchOffices();
+        }
+    }, []);
 
     useEffect(() => {
         if (id) {
-            fetchShipmentById(id).then(setShipment).catch(() => navigate('/admin/shipments'));
+            loadShipment(id);
         }
-    }, [id, fetchShipmentById, navigate]);
+    }, [id]);
+
+    const loadShipment = async (shipmentId: string) => {
+        setIsLoading(true);
+        try {
+            const data = await fetchShipmentById(shipmentId);
+            setShipment(data);
+
+            // Populate form
+            setOriginId(data.origin_office_id || "");
+            setDestinationId(data.destination_office_id || "");
+            setStatus(data.current_status || "created");
+            setObservation(data.observation || "");
+
+            setSenderName(data.sender_name || "");
+            setSenderCi(data.invoice?.doc_num || ""); // Approximate CI mapping
+            setSenderPhone(data.sender_phone || "");
+
+            setReceiverName(data.receiver_name || "");
+            setReceiverPhone(data.receiver_phone || "");
+
+        } catch (error) {
+            toast.error("Error al cargar la encomienda");
+            navigate('/admin/shipments');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleSave = async () => {
+        if (!shipment) return;
+        setIsSaving(true);
+        try {
+            const payload: Partial<CreateShipmentPayload> = {
+                origin_office_id: originId,
+                destination_office_id: destinationId,
+                current_status: status,
+                observation,
+                sender_name: senderName,
+                sender_ci: senderCi,
+                sender_phone: senderPhone,
+                receiver_name: receiverName,
+                receiver_ci: receiverCi,
+                receiver_phone: receiverPhone,
+            };
+
+            await updateShipment(shipment.id, payload);
+            toast.success("Encomienda actualizada correctamente");
+            loadShipment(shipment.id);
+        } catch (error) {
+            toast.error("Error al actualizar la encomienda");
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const handleGenerateInvoice = async () => {
+        if (!shipment) return;
+
+        const confirm = window.confirm("¿Estás seguro de pagar y generar la factura para esta encomienda?");
+        if (!confirm) return;
+
+        setIsGeneratingInvoice(true);
+        try {
+            await ENV.post(`/shipments/${shipment.id}/invoice`, {
+                invoice_type: "con", // Or based on shipment choice
+                invoice_name: senderName,
+                invoice_nit: senderCi || "0",
+            });
+            toast.success("Factura generada exitosamente");
+            loadShipment(shipment.id);
+        } catch (error) {
+            toast.error("Error al generar factura. Revisa si ya fue generada.");
+        } finally {
+            setIsGeneratingInvoice(false);
+        }
+    };
 
     if (isLoading || !shipment) {
         return (
@@ -42,171 +153,205 @@ export default function ShipmentDetails() {
         );
     }
 
+    const trackingUrl = `${window.location.origin}/tracking?code=${shipment.tracking_code}`;
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(trackingUrl)}`;
+
     return (
-        <div className="space-y-6 max-w-7xl mx-auto pb-12">
-            <div className="flex items-center gap-4">
-                <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-                    <ArrowLeft className="w-5 h-5" />
-                </Button>
-                <div className="flex-1">
-                    <h1 className="text-3xl font-bold tracking-tight">Detalles de Encomienda</h1>
-                    <p className="text-muted-foreground">Código de seguimiento: <span className="font-mono font-bold text-primary">{shipment.tracking_code}</span></p>
+        <div className="space-y-6 max-w-5xl mx-auto pb-12">
+            {/* ── Header ── */}
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                    <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+                        <ArrowLeft className="w-5 h-5" />
+                    </Button>
+                    <div>
+                        <h1 className="text-3xl font-bold tracking-tight">Editar Encomienda</h1>
+                        <p className="text-muted-foreground flex items-center gap-2">
+                            Código: <span className="font-mono font-bold text-primary">{shipment.tracking_code}</span>
+                        </p>
+                    </div>
                 </div>
-                <div className="flex gap-2">
-                    {shipment.invoice && (
+
+                <div className="flex gap-2 shrink-0">
+                    <img src={qrCodeUrl} alt="QR Code" className="w-12 h-12 rounded border p-0.5 bg-white shadow-sm" />
+
+                    {shipment.invoice ? (
                         <Button
                             variant="outline"
-                            className="gap-2"
+                            className="gap-2 h-12 border-green-500 text-green-600 hover:bg-green-50"
                             onClick={() => window.open(`/shipments/${shipment.id}/invoice`, '_blank')}
                         >
-                            <ExternalLink className="w-4 h-4" /> Factura
+                            <ExternalLink className="w-4 h-4" /> Ver Factura
+                        </Button>
+                    ) : (
+                        <Button
+                            variant="default"
+                            className="gap-2 h-12 bg-amber-500 hover:bg-amber-600 text-white"
+                            onClick={handleGenerateInvoice}
+                            disabled={isGeneratingInvoice}
+                        >
+                            <CreditCard className="w-4 h-4" />
+                            {isGeneratingInvoice ? "Procesando..." : "Cobrar"}
                         </Button>
                     )}
+
                     <Button
-                        variant="default"
-                        className="gap-2"
+                        variant="secondary"
+                        className="gap-2 h-12"
                         onClick={() => window.open(`/admin/ticket/${shipment.id}`, '_blank')}
                     >
-                        <FileText className="w-4 h-4" /> Imprimir Etiqueta
+                        <FileText className="w-4 h-4" /> Etiqueta
+                    </Button>
+
+                    <Button
+                        onClick={handleSave}
+                        disabled={isSaving}
+                        className="gap-2 h-12 gradient-primary text-white"
+                    >
+                        <Save className="w-4 h-4" /> {isSaving ? "Guardando..." : "Guardar Cambios"}
                     </Button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Status and Overview */}
-                <Card className="md:col-span-2 border-border/50 shadow-sm overflow-hidden">
-                    <CardHeader className="bg-muted/30 border-b border-border/50">
-                        <div className="flex justify-between items-center">
-                            <CardTitle className="flex items-center gap-2">
-                                <Package className="w-5 h-5 text-primary" />
-                                Resumen del Envío
-                            </CardTitle>
-                            <StatusBadge status={shipment.current_status} className="text-sm px-4 py-1" />
-                        </div>
-                    </CardHeader>
-                    <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-8 p-6">
-                        <div className="space-y-4">
-                            <div>
-                                <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-1 tracking-wider">Fecha de Creación</h3>
-                                <div className="flex items-center gap-2">
-                                    <Calendar className="w-4 h-4 text-slate-400" />
-                                    <span className="font-medium">{format(new Date(shipment.created_at!), 'PPP p', { locale: es })}</span>
-                                </div>
-                            </div>
-                            <div>
-                                <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-1 tracking-wider">Última Actualización</h3>
-                                <div className="flex items-center gap-2">
-                                    <Clock className="w-4 h-4 text-slate-400" />
-                                    <span className="font-medium">{format(new Date(shipment.updated_at!), 'PPP p', { locale: es })}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="space-y-4">
-                            <div>
-                                <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-1 tracking-wider">Costo del Envío</h3>
-                                <div className="text-2xl font-black text-primary">
-                                    Bs. {Number(shipment.price).toFixed(2)}
-                                </div>
-                                <p className="text-xs text-muted-foreground">Sujeto a impuestos de ley</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                {/* Logistics */}
-                <Card className="border-border/50 shadow-sm">
-                    <CardHeader className="border-b border-border/50">
-                        <CardTitle className="text-lg flex items-center gap-2">
-                            <Truck className="w-5 h-5 text-primary" />
-                            Logística
+                {/* ── Status & Options ── */}
+                <Card className="border-border/50 shadow-sm md:col-span-2">
+                    <CardHeader className="bg-muted/30 border-b border-border/50 pb-4">
+                        <CardTitle className="flex items-center gap-2">
+                            <Package className="w-5 h-5 text-primary" />
+                            Estado y Observaciones
                         </CardTitle>
                     </CardHeader>
-                    <CardContent className="p-6 space-y-6">
-                        <div className="relative">
-                            <div className="absolute left-2 top-0 bottom-0 w-[2px] bg-gradient-to-b from-primary via-slate-200 to-indigo-500"></div>
-                            <div className="space-y-8 pl-8 relative">
-                                <div>
-                                    <div className="absolute left-[2px] top-1 w-4 h-4 rounded-full border-2 border-primary bg-white -translate-x-1/2"></div>
-                                    <h4 className="text-xs font-bold text-muted-foreground uppercase flex items-center gap-1">Origen</h4>
-                                    <p className="font-bold text-lg">{shipment.origin_office?.city?.name}</p>
-                                    <p className="text-sm text-muted-foreground">{shipment.origin_office?.address}</p>
-                                </div>
-                                <div>
-                                    <div className="absolute left-[2px] bottom-1 w-4 h-4 rounded-full border-2 border-indigo-500 bg-white -translate-x-1/2"></div>
-                                    <h4 className="text-xs font-bold text-muted-foreground uppercase flex items-center gap-1">Destino</h4>
-                                    <p className="font-bold text-lg">{shipment.destination_office?.city?.name}</p>
-                                    <p className="text-sm text-muted-foreground">{shipment.destination_office?.address}</p>
-                                </div>
-                            </div>
+                    <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-3">
+                            <Label className="font-semibold text-sm">Estado de la encomienda</Label>
+                            <Select value={status} onValueChange={(val: ShipmentStatus) => setStatus(val)}>
+                                <SelectTrigger className="h-11 border-border/80 font-semibold focus:border-primary w-full">
+                                    <SelectValue placeholder="Seleccionar estado" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="created">Registrado (Creado)</SelectItem>
+                                    <SelectItem value="in_transit">En Tránsito</SelectItem>
+                                    <SelectItem value="at_office">En Oficina de Destino</SelectItem>
+                                    <SelectItem value="delivered">Entregado</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="space-y-3">
+                            <Label className="font-semibold text-sm">Observaciones / Detalles</Label>
+                            <Textarea
+                                placeholder="Escribe observaciones o detalles si existen..."
+                                value={observation}
+                                onChange={(e) => setObservation(e.target.value)}
+                                className="resize-none min-h-[80px]"
+                            />
                         </div>
                     </CardContent>
                 </Card>
 
-                {/* Participants */}
-                <Card className="border-border/50 shadow-sm">
-                    <CardHeader className="border-b border-border/50">
+                {/* ── Route ── */}
+                <Card className="border-border/50 shadow-sm md:col-span-2">
+                    <CardHeader className="border-b border-border/50 pb-4">
                         <CardTitle className="text-lg flex items-center gap-2">
-                            <User className="w-5 h-5 text-primary" />
+                            <Truck className="w-5 h-5 text-primary" />
+                            Oficinas (Ruta)
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <Label className="flex items-center gap-1.5 text-sm font-semibold">
+                                <div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
+                                    <MapPin className="h-3 w-3 text-white" />
+                                </div>
+                                Origen
+                            </Label>
+                            <Select value={originId} onValueChange={setOriginId}>
+                                <SelectTrigger className="h-11">
+                                    <SelectValue placeholder="Origen..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {offices.map((o) => (
+                                        <SelectItem key={o.id} value={o.id} disabled={o.id === destinationId}>
+                                            {o.city?.name} - {o.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="flex items-center gap-1.5 text-sm font-semibold">
+                                <div className="w-5 h-5 rounded-full bg-rose-500 flex items-center justify-center">
+                                    <MapPin className="h-3 w-3 text-white" />
+                                </div>
+                                Destino
+                            </Label>
+                            <Select value={destinationId} onValueChange={setDestinationId}>
+                                <SelectTrigger className="h-11">
+                                    <SelectValue placeholder="Destino..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {offices.map((o) => (
+                                        <SelectItem key={o.id} value={o.id} disabled={o.id === originId}>
+                                            {o.city?.name} - {o.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* ── Sender ── */}
+                <Card className="border-border/50 shadow-sm">
+                    <CardHeader className="bg-primary/5 border-b border-border/50 pb-4">
+                        <CardTitle className="text-lg flex items-center gap-2 text-primary">
+                            <User className="w-5 h-5" />
                             Remitente
                         </CardTitle>
                     </CardHeader>
-                    <CardContent className="p-6 space-y-3">
-                        <p className="text-xl font-bold">{shipment.sender_name}</p>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <FileText className="w-4 h-4" />
-                            NIT/CI: {shipment.invoice?.doc_num || 'N/A'}
+                    <CardContent className="p-6 space-y-4">
+                        <div className="space-y-2">
+                            <Label>Nombre Completo</Label>
+                            <Input value={senderName} onChange={e => setSenderName(e.target.value)} />
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Clock className="w-4 h-4" />
-                            Tel: {shipment.sender_phone || 'N/A'}
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label>CI / NIT</Label>
+                                <Input value={senderCi} onChange={e => setSenderCi(e.target.value)} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Teléfono</Label>
+                                <Input value={senderPhone} onChange={e => setSenderPhone(e.target.value)} />
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
 
+                {/* ── Receiver ── */}
                 <Card className="border-border/50 shadow-sm">
-                    <CardHeader className="border-b border-border/50 text-indigo-500">
-                        <CardTitle className="text-lg flex items-center gap-2">
+                    <CardHeader className="bg-indigo-500/5 border-b border-border/50 pb-4">
+                        <CardTitle className="text-lg flex items-center gap-2 text-indigo-500">
                             <User className="w-5 h-5" />
                             Destinatario
                         </CardTitle>
                     </CardHeader>
-                    <CardContent className="p-6 space-y-3">
-                        <p className="text-xl font-bold">{shipment.receiver_name}</p>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Clock className="w-4 h-4" />
-                            Tel: {shipment.receiver_phone || 'N/A'}
+                    <CardContent className="p-6 space-y-4">
+                        <div className="space-y-2">
+                            <Label>Nombre Completo</Label>
+                            <Input value={receiverName} onChange={e => setReceiverName(e.target.value)} />
                         </div>
-                    </CardContent>
-                </Card>
-
-                <Card className="border-border/50 shadow-sm">
-                    <CardHeader className="border-b border-border/50">
-                        <CardTitle className="text-lg flex items-center gap-2">
-                            <Clock className="w-5 h-5 text-primary" />
-                            Historial de Eventos
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-6">
-                        <div className="space-y-4">
-                            {shipment.events && shipment.events.length > 0 ? (
-                                shipment.events.map((event, idx) => (
-                                    <div key={idx} className="flex gap-4 items-start">
-                                        <div className="mt-1">
-                                            <CheckCircle2 className="w-4 h-4 text-green-500" />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-bold capitalize">{event.status.replace(/_/g, ' ')}</p>
-                                            <p className="text-xs text-muted-foreground">{format(new Date(event.timestamp), 'dd MMM, HH:mm')}</p>
-                                            <p className="text-xs mt-1">{event.description}</p>
-                                        </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <div className="flex flex-col items-center justify-center py-4 text-center">
-                                    <AlertCircle className="w-8 h-8 text-slate-300 mb-2" />
-                                    <p className="text-sm text-muted-foreground">Sin eventos registrados</p>
-                                </div>
-                            )}
+                        <div className="grid grid-cols-2 gap-4">
+                            {/* Hidden CI field if you don't use it much, but good to have since backend allows it if needed, or just leave it */}
+                            <div className="space-y-2">
+                                <Label>CI / NIT</Label>
+                                <Input value={receiverCi} onChange={e => setReceiverCi(e.target.value)} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Teléfono</Label>
+                                <Input value={receiverPhone} onChange={e => setReceiverPhone(e.target.value)} />
+                            </div>
                         </div>
                     </CardContent>
                 </Card>

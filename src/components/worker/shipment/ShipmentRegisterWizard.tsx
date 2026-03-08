@@ -11,17 +11,19 @@ import ShipmentPeopleForm, {
 import { cn } from "@/lib/utils";
 import { useAdminShipmentStore } from "@/stores/adminShipmentStore";
 import { CreateShipmentPayload } from "@/interfaces/shipment.interface";
+import { useAuthStore } from "@/stores/authStore";
 
 import { InvoiceDocument } from "./InvoiceDocument";
 import { Invoice } from "@/interfaces/invoice.interface";
 
 /* ─── Step indicator ─────────────────────────────────────── */
-const STEPS = [
+const getSteps = (isClient: boolean) => [
     { number: 1, label: "Detalles del Envío" },
-    { number: 2, label: "Remitente y Destinatario" },
+    ...(isClient ? [] : [{ number: 2, label: "Remitente y Destinatario" }])
 ];
 
-function StepIndicator({ current }: { current: number }) {
+function StepIndicator({ current, isClient }: { current: number, isClient: boolean }) {
+    const STEPS = getSteps(isClient);
     return (
         <div className="flex items-center gap-0 mb-8">
             {STEPS.map((step, idx) => (
@@ -102,11 +104,19 @@ export default function ShipmentRegisterWizard({
     const [createdInvoice, setCreatedInvoice] = useState<Invoice | null>(null);
     const { createShipment } = useAdminShipmentStore();
 
+    const { user, hasRole } = useAuthStore();
+    const isClient = hasRole('client') || user?.role === 'client';
+
     const handleDetailsNext = (data: ShipmentDetailsData) => {
         setDetailsData(data);
         setWithIva(data.withIva);
-        setStep(2);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+
+        if (isClient) {
+            handleFinalSubmit(undefined, data);
+        } else {
+            setStep(2);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
     };
 
     const handleBack = () => {
@@ -114,43 +124,48 @@ export default function ShipmentRegisterWizard({
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    const handleFinalSubmit = async (people: ShipmentPeopleData) => {
-        if (!detailsData) return;
+    const handleFinalSubmit = async (people?: ShipmentPeopleData, currentDetails?: ShipmentDetailsData) => {
+        const details = currentDetails || detailsData;
+        if (!details) return;
 
         try {
+            const isClientFlow = !people && isClient;
+
             const payload: CreateShipmentPayload = {
-                origin_office_id: detailsData.origin_office_id,
-                destination_office_id: detailsData.destination_office_id,
-                sender_id: people.senderId || undefined,
-                receiver_id: people.recipientId || undefined,
+                origin_office_id: details.origin_office_id,
+                destination_office_id: details.destination_office_id,
+
+                sender_id: isClientFlow ? user?.id : (people?.senderId || undefined),
+                receiver_id: isClientFlow ? undefined : (people?.recipientId || undefined),
 
                 // If IDs are missing, the backend will use these
-                sender_name: people.senderName,
-                sender_ci: people.senderCI,
-                sender_phone: people.senderPhone,
-                receiver_name: people.recipientName,
-                receiver_ci: people.recipientCI,
-                receiver_phone: people.recipientPhone,
+                sender_name: isClientFlow ? user?.name : people?.senderName,
+                sender_ci: isClientFlow ? user?.ci_nit : people?.senderCI,
+                sender_phone: isClientFlow ? user?.phone : people?.senderPhone,
 
-                tracking_pay: people.paymentBy === 'remitente' ? 1 : 2,
-                is_pack: detailsData.type === 'paquete',
-                is_fragile: people.isFragile,
-                type_service: detailsData.service,
-                track_type: detailsData.transport === 'terrestre' ? 1 : 2,
-                price: detailsData.total,
+                receiver_name: isClientFlow ? undefined : people?.recipientName,
+                receiver_ci: isClientFlow ? undefined : people?.recipientCI,
+                receiver_phone: isClientFlow ? undefined : people?.recipientPhone,
+
+                tracking_pay: isClientFlow ? 1 : (people?.paymentBy === 'remitente' ? 1 : 2),
+                is_pack: details.type === 'paquete',
+                is_fragile: isClientFlow ? false : people?.isFragile,
+                type_service: details.service,
+                track_type: details.transport === 'terrestre' ? 1 : 2,
+                price: details.total,
                 current_status: 'created'
             };
 
             const result = await createShipment({
                 ...payload,
-                with_invoice: true,
-                invoice_name: people.senderName,
-                invoice_nit: people.senderCI,
-                invoice_type: withIva ? 'con' : 'sin',
+                with_invoice: isClientFlow ? details.withIva : true,
+                invoice_name: isClientFlow ? user?.name : people?.senderName,
+                invoice_nit: isClientFlow ? user?.ci_nit : people?.senderCI,
+                invoice_type: details.withIva ? 'con' : 'sin',
             } as any);
 
             toast.success("¡Encomienda registrada exitosamente!", {
-                description: `Código: ${result.tracking_code} · ${detailsData.total.toFixed(2)} Bs.`,
+                description: `Código: ${result.tracking_code} · ${details.total.toFixed(2)} Bs.`,
             });
 
             if (result.invoice) {
@@ -207,7 +222,7 @@ export default function ShipmentRegisterWizard({
             ) : (
                 <>
                     {/* Step indicator */}
-                    <StepIndicator current={step} />
+                    {!isClient && <StepIndicator current={step} isClient={isClient} />}
 
                     {/* Step content with slide animation */}
                     <div className="relative overflow-hidden">
@@ -217,7 +232,7 @@ export default function ShipmentRegisterWizard({
                                 step === 1 ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0 absolute inset-0 pointer-events-none"
                             )}
                         >
-                            <ShipmentDetailsForm onNext={handleDetailsNext} />
+                            <ShipmentDetailsForm onNext={handleDetailsNext} isClientMode={isClient} />
                         </div>
 
                         <div

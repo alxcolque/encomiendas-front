@@ -49,6 +49,7 @@ export interface ShipmentDetailsData {
 
 interface Props {
     onNext: (data: ShipmentDetailsData) => void;
+    isClientMode?: boolean;
 }
 
 /* ─── Constants ─────────────────────────────────────────── */
@@ -282,7 +283,7 @@ function TransportCard({
 }
 
 /* ─── Main Component ─────────────────────────────────────── */
-export default function ShipmentDetailsForm({ onNext }: Props) {
+export default function ShipmentDetailsForm({ onNext, isClientMode = false }: Props) {
     const { offices, fetchOffices } = useOfficeStore();
     const [type, setType] = useState<ShipmentType>("paquete");
     const [originId, setOriginId] = useState("");
@@ -740,7 +741,7 @@ export default function ShipmentDetailsForm({ onNext }: Props) {
                             : "opacity-40 cursor-not-allowed"
                     )}
                 >
-                    Siguiente — Completar Registro
+                    {isClientMode ? "Registrar Encomienda" : "Siguiente — Completar Registro"}
                     <ArrowRight className="h-5 w-5" />
                 </Button>
 
