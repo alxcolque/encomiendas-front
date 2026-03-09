@@ -13,7 +13,7 @@ import { useState } from "react";
 const statusSteps = [
   { label: "Desafío Aceptado", icon: CheckCircle },
   { label: "En Camino", icon: Truck },
-  { label: "En Oficina Destino", icon: Building },
+  { label: "En Agencia Destino", icon: Building },
   { label: "Entregado", icon: PackageCheck },
 ];
 

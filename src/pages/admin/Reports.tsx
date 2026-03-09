@@ -37,14 +37,14 @@ export default function Reports() {
                 {/* Can add more charts or lists here like Top Drivers or Office Performance */}
                 <Card className="md:col-span-2 border-border/50 shadow-md">
                     <CardHeader>
-                        <CardTitle className="text-lg font-bold">Rendimiento por Oficina</CardTitle>
+                        <CardTitle className="text-lg font-bold">Rendimiento por Agencia</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6">
                         {[
-                            { name: 'Oficina Central Oruro', value: 85, color: 'gradient-primary' },
-                            { name: 'Sucursal Terminal', value: 65, color: 'bg-blue-500' },
-                            { name: 'Oficina La Paz', value: 45, color: 'bg-orange-500' },
-                            { name: 'Oficina Cochabamba', value: 30, color: 'bg-green-500' },
+                            { name: 'Agencia Central Oruro', value: 85, color: 'gradient-primary' },
+                            { name: 'Agencia Santa Cruz', value: 65, color: 'bg-blue-500' },
+                            { name: 'Agencia La Paz', value: 45, color: 'bg-orange-500' },
+                            { name: 'Agencia Cochabamba', value: 30, color: 'bg-green-500' },
                         ].map((office) => (
                             <div key={office.name} className="space-y-2">
                                 <div className="flex justify-between text-sm font-bold">

@@ -29,7 +29,7 @@ export default function OfficesPage() {
                 const data = await PublicService.getOffices();
                 setOffices(data);
             } catch (error) {
-                toast.error("Error al cargar oficinas");
+                toast.error("Error al cargar agencias");
                 console.error(error);
             } finally {
                 setLoading(false);
@@ -102,7 +102,7 @@ export default function OfficesPage() {
     return (
         <div className="container py-12 space-y-12">
             <div className="text-center space-y-4">
-                <h1 className="text-4xl font-display font-bold">Nuestras Oficinas</h1>
+                <h1 className="text-4xl font-display font-bold">Nuestras Agencias</h1>
                 <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
                     Encuentra la sucursal más cercana a ti. Estamos presentes en las principales ciudades del país.
                 </p>
@@ -114,19 +114,19 @@ export default function OfficesPage() {
                 </div>
             ) : (
                 <>
-                    {/* Mapa de Oficinas */}
+                    {/* Mapa de Agencias */}
                     <div className="w-full h-[500px] rounded-2xl overflow-hidden border border-border shadow-lg relative z-0">
                         <div ref={mapContainerRef} className="w-full h-full" />
                     </div>
 
-                    {/* Tarjetas de Oficinas */}
+                    {/* Tarjetas de Agencias */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {offices.map((office) => (
                             <div key={office.id} className="group rounded-2xl overflow-hidden border border-border bg-card hover:shadow-xl transition-all duration-300">
                                 <div className="h-48 overflow-hidden">
                                     <img
                                         src={office.image || "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800"}
-                                        alt={`Oficina ${office.city.name}`}
+                                        alt={`Agencia ${office.city.name}`}
                                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                     />
                                 </div>

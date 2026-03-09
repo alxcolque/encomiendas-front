@@ -41,7 +41,7 @@ export function OfficesTable({ onEdit }: OfficesTableProps) {
             <Table>
                 <TableHeader>
                     <TableRow className="bg-muted/50 hover:bg-muted/50">
-                        <TableHead>Oficina</TableHead>
+                        <TableHead>Agencia</TableHead>
                         <TableHead>Ciudad</TableHead>
                         <TableHead>Dirección</TableHead>
                         <TableHead>Encargados</TableHead>

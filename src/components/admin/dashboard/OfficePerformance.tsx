@@ -10,7 +10,7 @@ export function OfficePerformanceList({ offices }: OfficePerformanceProps) {
     return (
         <Card className="shadow-sm border-border/50 bg-card/50 backdrop-blur-sm">
             <CardHeader>
-                <CardTitle className="text-lg font-medium">Rendimiento por Oficina</CardTitle>
+                <CardTitle className="text-lg font-medium">Rendimiento por Agencia</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
                 {offices.map((office, index) => (

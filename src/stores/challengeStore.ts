@@ -31,7 +31,7 @@ const mockChallenges: Challenge[] = [
   {
     id: 'ch-1',
     type: 'express',
-    origin: 'Oficina Central - La Paz',
+    origin: 'Agencia Central - La Paz',
     destination: 'El Alto - Villa Adela',
     reward: 45,
     points: 150,
@@ -45,7 +45,7 @@ const mockChallenges: Challenge[] = [
   {
     id: 'ch-2',
     type: 'normal',
-    origin: 'Oficina Miraflores',
+    origin: 'Agencia Miraflores',
     destination: 'San Miguel',
     reward: 25,
     points: 75,

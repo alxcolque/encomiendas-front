@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { ENV } from "@/config/env";
 import { useAuthStore } from "@/stores/authStore";
-import { Package, MapPin, Calendar, ArrowRight, Loader2, AlertCircle, Plus } from "lucide-react";
+import { Package, MapPin, Calendar, ArrowRight, Loader2, AlertCircle, Plus, X } from "lucide-react";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -14,16 +15,18 @@ import { NewShipmentModal } from "@/components/shared/NewShipmentModal";
 interface IShipment {
     id: number;
     tracking_code: string;
-    status: string;
+    current_status: string;
     created_at: string;
+    price: number;
     origin_office: { name: string };
     destination_office: { name: string };
 }
 
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
+    quote: { label: "Cotización", color: "bg-background text-red-500 border-red-500 uppercase font-bold tracking-wider" },
     created: { label: "Registrado", color: "bg-blue-500/10 text-blue-500 border-blue-500/20" },
     in_transit: { label: "En Tránsito", color: "bg-amber-500/10 text-amber-500 border-amber-500/20" },
-    at_office: { label: "En Oficina Destino", color: "bg-purple-500/10 text-purple-500 border-purple-500/20" },
+    at_office: { label: "En Agencia Destino", color: "bg-purple-500/10 text-purple-500 border-purple-500/20" },
     delivered: { label: "Entregado", color: "bg-green-500/10 text-green-500 border-green-500/20" },
 };
 
@@ -50,6 +53,18 @@ export default function ClientOrderHistory() {
             setError("No se pudo cargar el historial de pedidos.");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleDeleteQuote = async (id: number) => {
+        if (!window.confirm("¿Está seguro que desea eliminar esta cotización?")) return;
+        try {
+            await ENV.delete(`/shipments/${id}`);
+            setShipments(prev => prev.filter(s => s.id !== id));
+            toast.success("Cotización eliminada correctamente");
+        } catch (err: any) {
+            console.error("Error deleting quote:", err);
+            toast.error("No se pudo eliminar la cotización.");
         }
     };
 
@@ -116,16 +131,33 @@ export default function ClientOrderHistory() {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {shipments.slice(0, 6).map((shipment) => {
-                            const statusInfo = STATUS_MAP[shipment.status] || { label: shipment.status, color: "bg-muted text-foreground" };
+                            const statusInfo = STATUS_MAP[shipment.current_status] || { label: shipment.current_status, color: "bg-muted text-foreground" };
 
                             return (
                                 <div
                                     key={shipment.id}
-                                    className="bg-card/50 backdrop-blur-sm border border-border hover:border-primary/50 transition-all rounded-2xl p-6 group hover:shadow-glow flex flex-col"
+                                    className="bg-card/50 backdrop-blur-sm border border-border hover:border-primary/50 transition-all rounded-2xl p-6 group hover:shadow-glow flex flex-col relative"
                                 >
-                                    <div className="flex justify-between items-start mb-4">
+                                    {shipment.current_status === 'quote' && (
+                                        <button
+                                            onClick={() => handleDeleteQuote(shipment.id)}
+                                            className="text-red-500 hover:text-red-600 hover:bg-red-50 p-1 rounded-full transition-colors absolute top-2 right-2 bg-background shadow-sm z-10"
+                                            title="Eliminar cotización"
+                                        >
+                                            <X className="w-5 h-5" />
+                                        </button>
+                                    )}
+
+                                    <div className="flex justify-between items-start mb-4 relative">
                                         <div>
-                                            <h3 className="font-mono font-semibold text-lg text-foreground tracking-tight">
+                                            {shipment.current_status === 'quote' && (
+                                                <div className="mb-1">
+                                                    <Badge variant="outline" className="bg-background text-red-500 border-red-500 uppercase font-bold text-[10px] tracking-wider px-1.5 py-0 border-2 rounded-sm rounded-tr-xl">
+                                                        Cotización
+                                                    </Badge>
+                                                </div>
+                                            )}
+                                            <h3 className="font-mono font-semibold text-lg text-foreground tracking-tight pr-8">
                                                 {shipment.tracking_code}
                                             </h3>
                                             <div className="flex items-center text-xs text-muted-foreground mt-1 gap-1">
@@ -133,9 +165,22 @@ export default function ClientOrderHistory() {
                                                 {format(new Date(shipment.created_at), "d 'de' MMMM, yyyy", { locale: es })}
                                             </div>
                                         </div>
-                                        <Badge variant="outline" className={statusInfo.color}>
-                                            {statusInfo.label}
-                                        </Badge>
+                                        <div className="flex flex-col items-end gap-1">
+                                            {shipment.current_status !== 'quote' && (
+                                                <Badge variant="outline" className={statusInfo.color}>
+                                                    {statusInfo.label}
+                                                </Badge>
+                                            )}
+
+                                            <div className="mt-1 flex items-baseline justify-end h-8">
+                                                <span className="text-3xl font-display font-medium text-orange-500 tracking-tight">
+                                                    {shipment.price ? Number(shipment.price).toFixed(2) : "0.00"}
+                                                </span>
+                                                <span className="text-lg font-medium text-orange-500 ml-1 uppercase">
+                                                    Bs.
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div className="space-y-4 mb-6 flex-1">
@@ -161,13 +206,19 @@ export default function ClientOrderHistory() {
                                             </div>
                                         </div>
                                     </div>
-
-                                    <Button asChild variant="ghost" className="w-full justify-between hover:bg-primary/5 group-hover:text-primary transition-colors">
-                                        <Link to={`/tracking?code=${shipment.tracking_code}`}>
-                                            Ver ubicación
-                                            <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                                        </Link>
-                                    </Button>
+                                    {shipment.current_status === 'quote' ? (
+                                        <Button disabled variant="ghost" className="w-full justify-between transition-colors opacity-50 cursor-not-allowed">
+                                            <span>Ver ubicación</span>
+                                            <ArrowRight className="w-4 h-4 ml-2" />
+                                        </Button>
+                                    ) : (
+                                        <Button asChild variant="ghost" className="w-full justify-between hover:bg-primary/5 group-hover:text-primary transition-colors">
+                                            <Link to={`/tracking?code=${shipment.tracking_code}`}>
+                                                Ver ubicación
+                                                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                                            </Link>
+                                        </Button>
+                                    )}
                                 </div>
                             );
                         })}

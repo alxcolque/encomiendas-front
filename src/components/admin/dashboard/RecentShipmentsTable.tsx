@@ -15,7 +15,8 @@ import {
     XCircle,
     Send,
     ExternalLink,
-    Printer
+    Printer,
+    Search
 } from "lucide-react";
 import { useAdminShipmentStore } from "@/stores/adminShipmentStore";
 import { format } from "date-fns";
@@ -38,12 +39,23 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
 
 interface RecentShipmentsTableProps {
     shipments?: AdminShipment[];
+    limit?: number; // Optional limit for dashboard (e.g., 10)
+    showSearch?: boolean; // Toggles the search input via tracking code
+    title?: string;
+    showViewAll?: boolean; // Toggles the "Ver todas" button
 }
 
-export function RecentShipmentsTable({ shipments: propShipments }: RecentShipmentsTableProps) {
+export function RecentShipmentsTable({
+    shipments: propShipments,
+    limit,
+    showSearch = false,
+    title = "Últimas Encomiendas",
+    showViewAll = true
+}: RecentShipmentsTableProps) {
     const navigate = useNavigate();
     const { shipments: storeShipments, isLoading, fetchShipments, updateStatus } = useAdminShipmentStore();
 
@@ -51,6 +63,7 @@ export function RecentShipmentsTable({ shipments: propShipments }: RecentShipmen
     const displayedShipments = propShipments || storeShipments;
     const [selectedShipment, setSelectedShipment] = useState<AdminShipment | null>(null);
     const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
 
     const handleViewInvoice = (shipment: AdminShipment) => {
         setSelectedShipment(shipment);
@@ -81,20 +94,54 @@ export function RecentShipmentsTable({ shipments: propShipments }: RecentShipmen
         );
     }
 
+    // Sort by latest first
+    const sortedShipments = [...displayedShipments].sort((a, b) => {
+        const dateA = new Date(a.created_at || 0).getTime();
+        const dateB = new Date(b.created_at || 0).getTime();
+        // If same date, sort by ID descending just in case
+        if (dateB === dateA) {
+            return Number(b.id) - Number(a.id);
+        }
+        return dateB - dateA;
+    });
+
+    // Filter by Tracking Code
+    const filteredShipments = sortedShipments.filter(s =>
+        !searchQuery || s.tracking_code?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    // Apply limit if provided
+    const finalShipments = limit ? filteredShipments.slice(0, limit) : filteredShipments;
+
     return (
-        <Card className="border-border/50 shadow-md bg-card/50 backdrop-blur-sm overflow-hidden">
-            <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-lg font-medium">Últimas Encomiendas</CardTitle>
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-primary hover:text-primary/80"
-                    onClick={() => navigate('/admin/shipments')}
-                >
-                    Ver todas
-                </Button>
+        <Card className="border-border/50 shadow-md bg-card/50 backdrop-blur-sm overflow-hidden flex flex-col h-full">
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <CardTitle className="text-lg font-medium">{title}</CardTitle>
+                <div className="flex items-center gap-3">
+                    {showSearch && (
+                        <div className="relative w-64">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                placeholder="Buscar por código..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="pl-9 h-9"
+                            />
+                        </div>
+                    )}
+                    {showViewAll && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-primary hover:text-primary/80"
+                            onClick={() => navigate('/admin/shipments')}
+                        >
+                            Ver todas
+                        </Button>
+                    )}
+                </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex-1">
                 <div className="overflow-x-auto">
                     <Table>
                         <TableHeader>
@@ -110,14 +157,14 @@ export function RecentShipmentsTable({ shipments: propShipments }: RecentShipmen
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {displayedShipments.length === 0 ? (
+                            {finalShipments.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                                        No se encontraron encomiendas registradas.
+                                        No se encontraron encomiendas.
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                displayedShipments.slice(0, 10).map((shipment) => (
+                                finalShipments.map((shipment) => (
                                     <TableRow key={shipment.id} className="hover:bg-muted/50 border-border/50 transition-colors">
                                         <TableCell className="font-mono font-bold text-primary">{shipment.tracking_code}</TableCell>
                                         <TableCell className="text-muted-foreground">{shipment.sender_name}</TableCell>

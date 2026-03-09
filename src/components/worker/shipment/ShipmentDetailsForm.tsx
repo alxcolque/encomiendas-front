@@ -378,7 +378,7 @@ export default function ShipmentDetailsForm({ onNext, isClientMode = false }: Pr
 
             {/* ── Section 1: Tipo y Ruta ───────────────────────── */}
             <div className="border border-border/60 rounded-2xl p-1 bg-card/60 backdrop-blur-sm shadow-sm">
-                <SectionHeader number={1} title="Oficina de Origen y Destino" />
+                <SectionHeader number={1} title="Agencia de Origen y Destino" />
 
                 {/* Type selector small */}
                 <div className="flex gap-2 mb-5">
@@ -405,7 +405,7 @@ export default function ShipmentDetailsForm({ onNext, isClientMode = false }: Pr
                             <div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
                                 <MapPin className="h-3 w-3 text-white" />
                             </div>
-                            Oficina de Origen
+                            Agencia de Origen
                             <span className="text-destructive">*</span>
                         </Label>
                         <Select value={originId} onValueChange={setOriginId}>
@@ -426,7 +426,7 @@ export default function ShipmentDetailsForm({ onNext, isClientMode = false }: Pr
                             <div className="w-5 h-5 rounded-full bg-rose-500 flex items-center justify-center">
                                 <MapPin className="h-3 w-3 text-white" />
                             </div>
-                            Oficina de Destino
+                            Agencia de Destino
                             <span className="text-destructive">*</span>
                         </Label>
                         <Select value={destinationId} onValueChange={setDestinationId}>
@@ -633,15 +633,17 @@ export default function ShipmentDetailsForm({ onNext, isClientMode = false }: Pr
                                     </div>
 
                                     {/* Price & Days */}
-                                    <div className="mt-auto pt-2 border-t border-border/40 flex items-center justify-between gap-1">
-                                        <span
-                                            className={cn(
-                                                "text-sm font-black",
-                                                active ? tier.colorClass : "text-primary"
-                                            )}
-                                        >
-                                            {tier.delta > 0 ? `+${tier.delta} Bs.` : "Incluido"}
-                                        </span>
+                                    <div className={cn("mt-auto pt-2 border-t border-border/40 flex items-center gap-1", isClientMode ? "justify-end" : "justify-between")}>
+                                        {!isClientMode && (
+                                            <span
+                                                className={cn(
+                                                    "text-sm font-black",
+                                                    active ? tier.colorClass : "text-primary"
+                                                )}
+                                            >
+                                                {tier.delta > 0 ? `+${tier.delta} Bs.` : "Incluido"}
+                                            </span>
+                                        )}
                                         <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground font-medium"	>
                                             <Clock className="h-3 w-3" />
                                             {tier.days}

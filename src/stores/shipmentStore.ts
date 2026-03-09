@@ -51,7 +51,7 @@ export const useShipmentStore = create<ShipmentState>((set) => ({
         receiverName: data.receiver_name,
         events: data.events.map((e) => ({
           status: e.status as ShipmentStatus,
-          location: e.location || 'Oficina',
+          location: e.location || 'Agencia',
           timestamp: new Date(e.timestamp),
           description: e.description || 'Actualización de estado',
         })),

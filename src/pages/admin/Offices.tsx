@@ -23,7 +23,7 @@ export default function Offices() {
     return (
         <div className="space-y-6">
             <AdminSectionHeader
-                title="Gestión de Oficinas"
+                title="Gestión de Agencias"
                 subtitle="Administra sucursales y puntos de entrega"
                 actions={
                     <Button
@@ -31,7 +31,7 @@ export default function Offices() {
                         className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20"
                     >
                         <Building2 className="mr-2 h-4 w-4" />
-                        Nueva Oficina
+                        Nueva Agencia
                     </Button>
                 }
             />

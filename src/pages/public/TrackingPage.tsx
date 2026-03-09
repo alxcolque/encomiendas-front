@@ -18,7 +18,7 @@ const statusIcons: Record<ShipmentStatus, typeof Package> = {
 const statusLabels: Record<ShipmentStatus, string> = {
   created: "Paquete Recibido",
   in_transit: "En Tránsito",
-  at_office: "En Oficina",
+  at_office: "En Agencia",
   delivered: "Entregado",
 };
 

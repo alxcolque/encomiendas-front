@@ -153,7 +153,11 @@ export default function ShipmentRegisterWizard({
                 type_service: details.service,
                 track_type: details.transport === 'terrestre' ? 1 : 2,
                 price: details.total,
-                current_status: 'created'
+                weight: details.weight,
+                width: details.width,
+                length: details.length,
+                height: details.height,
+                current_status: isClientFlow ? 'quote' : 'created'
             };
 
             const result = await createShipment({

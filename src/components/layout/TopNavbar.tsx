@@ -156,7 +156,7 @@ export function TopNavbar({ className }: TopNavbarProps) {
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => navigate('/admin/offices')} className="rounded-xl focus:bg-primary/10 focus:text-primary transition-colors cursor-pointer">
                           <Building2 size={16} className="mr-2" />
-                          <span className="font-medium">Oficinas</span>
+                          <span className="font-medium">Agencias</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => navigate('/admin/cities')} className="rounded-xl focus:bg-primary/10 focus:text-primary transition-colors cursor-pointer">
                           <MapPin size={16} className="mr-2" />

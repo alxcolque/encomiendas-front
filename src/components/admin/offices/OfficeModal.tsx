@@ -115,16 +115,16 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
         try {
             if (isEditing && officeToEdit) {
                 await updateOffice(officeToEdit.id, payload);
-                toast.success("Oficina actualizada correctamente");
+                toast.success("Agencia actualizada correctamente");
             } else {
                 await createOffice(payload);
-                toast.success("Oficina registrada exitosamente");
+                toast.success("Agencia registrada exitosamente");
             }
             setOpen?.(false);
             if (!isEditing) form.reset();
         } catch (error: any) {
             const action = isEditing ? "actualizar" : "registrar";
-            toast.error(`Error al ${action} oficina`, {
+            toast.error(`Error al ${action} agencia`, {
                 description: error.response?.data?.message || "Ocurrió un error inesperado"
             });
         } finally {
@@ -150,7 +150,7 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <Building2 className="h-5 w-5 text-primary" />
-                        {isEditing ? "Editar Oficina" : "Registrar Nueva Oficina"}
+                        {isEditing ? "Editar Agencia" : "Registrar Nueva Agencia"}
                     </DialogTitle>
                 </DialogHeader>
 
@@ -182,7 +182,7 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
                                     <span className="text-xs text-muted-foreground">Foto (opcional)</span>
                                 </div>
                                 <div className="flex-1 space-y-2 w-full">
-                                    <Label htmlFor="name">Nombre de Oficina <span className="text-destructive">*</span></Label>
+                                    <Label htmlFor="name">Nombre de Agencia <span className="text-destructive">*</span></Label>
                                     <Input id="name" {...form.register("name")} placeholder="Ej: Sucursal Centro" />
                                     {form.formState.errors.name && <span className="text-xs text-destructive">{form.formState.errors.name.message}</span>}
                                 </div>
@@ -257,9 +257,9 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
 
                     <div className="pt-4 flex justify-end gap-2">
                         <Button type="button" variant="ghost" onClick={() => setOpen?.(false)}>Cancelar</Button>
-                        <Button type="submit" disabled={isSubmitting}>
+                        <Button type="submit" disabled={isSubmitting} className="min-w-[140px] shadow-md">
                             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            {isEditing ? "Actualizar Oficina" : "Guardar Oficina"}
+                            {isEditing ? "Actualizar Agencia" : "Guardar Agencia"}
                         </Button>
                     </div>
                 </form>

@@ -95,7 +95,7 @@ export default function AdminDashboard() {
 
         {/* Left Column: Recent Shipments & Office Performance */}
         <div className="xl:col-span-2 space-y-6">
-          <RecentShipmentsTable shipments={data.recent_shipments} />
+          <RecentShipmentsTable shipments={data.recent_shipments} limit={10} />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <OfficePerformanceList offices={data.office_performance} />
@@ -135,7 +135,7 @@ export default function AdminDashboard() {
                 <Building2 className="w-5 h-5 text-indigo-500" />
               </div>
               <span className="text-3xl font-black">{data.total_offices_count}</span>
-              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Oficinas</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Agencias</span>
             </div>
           </div>
         </div>

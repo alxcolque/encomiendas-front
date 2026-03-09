@@ -39,7 +39,7 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
                     Operaciones
                 </div>
                 <AdminSidebarItem icon={Truck} label="Conductores" path={ADMIN_ROUTES.DRIVERS} />
-                <AdminSidebarItem icon={Building2} label="Oficinas" path={ADMIN_ROUTES.OFFICES} />
+                <AdminSidebarItem icon={Building2} label="Agencias" path={ADMIN_ROUTES.OFFICES} />
                 <AdminSidebarItem icon={MapPin} label="Ciudades y Rutas" path={ADMIN_ROUTES.CITIES} />
 
                 <div className="px-3 mt-6 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">

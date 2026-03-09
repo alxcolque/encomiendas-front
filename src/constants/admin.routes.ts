@@ -18,7 +18,7 @@ export const ADMIN_MENU_ITEMS = [
     { label: 'Clientes', path: ADMIN_ROUTES.CLIENTS },
     { label: 'Empresas', path: ADMIN_ROUTES.BUSINESSES },
     { label: 'Conductores', path: ADMIN_ROUTES.DRIVERS },
-    { label: 'Oficinas', path: ADMIN_ROUTES.OFFICES },
+    { label: 'Agencias', path: ADMIN_ROUTES.OFFICES },
     { label: 'Ciudades y Rutas', path: ADMIN_ROUTES.CITIES },
     { label: 'Reportes', path: ADMIN_ROUTES.REPORTS },
     { label: 'Configuración', path: ADMIN_ROUTES.SETTINGS },

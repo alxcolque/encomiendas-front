@@ -83,7 +83,7 @@ export default function PublicNavbar() {
     const navLinks = [
         { name: "Inicio", href: "/", icon: Home },
         { name: "Servicios", href: "/services", icon: Truck },
-        { name: "Oficinas", href: "/offices", icon: MapPin },
+        { name: "Agencias", href: "/offices", icon: MapPin },
         { name: "Seguimiento", href: "/tracking", icon: Search },
         { name: "FAQ", href: "/faq", icon: HelpCircle },
     ];

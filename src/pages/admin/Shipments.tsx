@@ -11,8 +11,11 @@ export default function Shipments() {
                 actions={<NewShipmentModal />}
             />
 
-            {/* We can reuse the RecentShipmentsTable or create a full table later */}
-            <RecentShipmentsTable />
+            <RecentShipmentsTable
+                title="Todas las Encomiendas"
+                showSearch={true}
+                showViewAll={false}
+            />
         </div>
     );
 }
