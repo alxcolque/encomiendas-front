@@ -2,15 +2,9 @@ import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
-const chartData = [
-    { day: "Lunes", packages: 120 },
-    { day: "Martes", packages: 150 },
-    { day: "Miércoles", packages: 180 },
-    { day: "Jueves", packages: 200 },
-    { day: "Viernes", packages: 250 },
-    { day: "Sábado", packages: 300 },
-    { day: "Domingo", packages: 190 },
-];
+interface ShipmentVolumeChartProps {
+    chartData: { label: string; packages: number }[];
+}
 
 const chartConfig = {
     packages: {
@@ -19,7 +13,7 @@ const chartConfig = {
     },
 } satisfies ChartConfig;
 
-export function ShipmentVolumeChart() {
+export function ShipmentVolumeChart({ chartData }: ShipmentVolumeChartProps) {
     return (
         <Card className="col-span-3">
             <CardHeader>
@@ -31,11 +25,11 @@ export function ShipmentVolumeChart() {
                     <AreaChart accessibilityLayer data={chartData} margin={{ left: 12, right: 12 }}>
                         <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-muted" />
                         <XAxis
-                            dataKey="day"
+                            dataKey="label"
                             tickLine={false}
                             axisLine={false}
                             tickMargin={8}
-                            tickFormatter={(value) => value.slice(0, 3)}
+                            tickFormatter={(value) => value}
                             className="text-xs"
                         />
                         <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />

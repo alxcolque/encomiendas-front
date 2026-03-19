@@ -181,10 +181,12 @@ export function TopNavbar({ className }: TopNavbarProps) {
                   <User size={16} className="mr-2" />
                   <span className="font-medium">Mi Perfil</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/wallet")} className="rounded-xl focus:bg-primary/10 focus:text-primary transition-colors cursor-pointer">
-                  <Settings size={16} className="mr-2" />
-                  <span className="font-medium">Ajustes Generales</span>
-                </DropdownMenuItem>
+                {user.role === 'admin' && (
+                  <DropdownMenuItem onClick={() => navigate("/admin/settings")} className="rounded-xl focus:bg-primary/10 focus:text-primary transition-colors cursor-pointer">
+                    <Settings size={16} className="mr-2" />
+                    <span className="font-medium">Ajustes Generales</span>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator className="bg-border/50" />
                 <DropdownMenuItem onClick={handleLogout} className="rounded-xl text-destructive focus:bg-destructive/10 focus:text-destructive transition-colors cursor-pointer font-bold">
                   <LogOut size={16} className="mr-2" />

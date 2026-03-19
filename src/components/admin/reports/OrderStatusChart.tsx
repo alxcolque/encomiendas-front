@@ -13,12 +13,9 @@ import {
     ChartTooltipContent,
 } from "@/components/ui/chart"
 
-const chartData = [
-    { browser: "delivered", visitors: 850, fill: "var(--color-delivered)" },
-    { browser: "in_transit", visitors: 200, fill: "var(--color-in_transit)" },
-    { browser: "at_office", visitors: 50, fill: "var(--color-at_office)" },
-    { browser: "created", visitors: 20, fill: "var(--color-created)" },
-]
+interface OrderStatusChartProps {
+    chartData: { browser: string; visitors: number; fill: string }[];
+}
 
 const chartConfig = {
     delivered: {
@@ -39,7 +36,7 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-export function OrderStatusChart() {
+export function OrderStatusChart({ chartData }: OrderStatusChartProps) {
     return (
         <Card className="flex flex-col">
             <CardHeader className="items-center pb-0">

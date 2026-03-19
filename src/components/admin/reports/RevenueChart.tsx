@@ -2,20 +2,9 @@ import { Bar, BarChart, CartesianGrid, XAxis, Tooltip, ResponsiveContainer } fro
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
-const chartData = [
-    { month: "Enero", revenue: 18600 },
-    { month: "Febrero", revenue: 30500 },
-    { month: "Marzo", revenue: 23700 },
-    { month: "Abril", revenue: 17300 },
-    { month: "Mayo", revenue: 20900 },
-    { month: "Junio", revenue: 21400 },
-    { month: "Julio", revenue: 35000 },
-    { month: "Agosto", revenue: 28000 },
-    { month: "Septiembre", revenue: 32000 },
-    { month: "Octubre", revenue: 41000 },
-    { month: "Noviembre", revenue: 45000 },
-    { month: "Diciembre", revenue: 52000 },
-];
+interface RevenueChartProps {
+    chartData: { label: string; revenue: number }[];
+}
 
 const chartConfig = {
     revenue: {
@@ -24,7 +13,7 @@ const chartConfig = {
     },
 } satisfies ChartConfig;
 
-export function RevenueChart() {
+export function RevenueChart({ chartData }: RevenueChartProps) {
     return (
         <Card className="col-span-4 border-border/50 shadow-md transition-all hover:shadow-lg">
             <CardHeader>
@@ -36,11 +25,11 @@ export function RevenueChart() {
                     <BarChart accessibilityLayer data={chartData}>
                         <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-muted" />
                         <XAxis
-                            dataKey="month"
+                            dataKey="label"
                             tickLine={false}
                             tickMargin={10}
                             axisLine={false}
-                            tickFormatter={(value) => value.slice(0, 3)}
+                            tickFormatter={(value) => value}
                             className="text-xs"
                         />
                         <ChartTooltip content={<ChartTooltipContent />} />
