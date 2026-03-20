@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import slider1 from "@/assets/slider1.jpeg";
-import slider2 from "@/assets/slider2.jpeg";
-import slider3 from "@/assets/slider3.jpeg";
-import slider4 from "@/assets/slider4.jpeg";
+import slider1 from "/slides/slider-1.webp";
+import slider2 from "/slides/slider-2.webp";
+import slider3 from "/slides/slider-3.webp";
+import slider4 from "/slides/slider-4.webp";
 
 const slides = [
   {
@@ -46,7 +46,7 @@ export default function HeroCarousel() {
   }, [nextSlide]);
 
   return (
-    <div className="relative w-full overflow-hidden bg-background">
+    <div className="relative w-full overflow-hidden bg-background rounded-xl">
       {/* Invisible template image to maintain aspect ratio based on the actual image */}
       <img
         src={slides[0].image}
