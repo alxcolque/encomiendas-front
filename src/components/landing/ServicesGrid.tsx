@@ -4,7 +4,7 @@ import { Clock, Building2, CreditCard, Handshake, ShoppingCart } from "lucide-re
 export default function ServicesGrid() {
     const services = [
         {
-            name: "Estados",
+            name: "Novedades",
             icon: <Clock className="w-7 h-7 md:w-8 md:h-8" />,
             href: "/tracking",
         },

@@ -54,7 +54,8 @@ function calculateTotal(
     h = 0,
     weight = 0,
     routeValue = 0,
-    discount = 0
+    discount = 0,
+    withInvoice = false
 ): number {
     const minStore = Number(import.meta.env.VITE_STORE_MIN) || 3;
     const maxStore = Number(import.meta.env.VITE_STORE_MAX) || 5;
@@ -80,6 +81,10 @@ function calculateTotal(
     let total = baseResult + serviceDelta - discount;
 
     if (total < 0) total = 0;
+
+    if (withInvoice) {
+        total = total * 1.16;
+    }
 
     return Math.round(total * 100) / 100;
 }
@@ -144,6 +149,7 @@ export default function ShipmentDetails() {
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [isGeneratingInvoice, setIsGeneratingInvoice] = useState(false);
+    const [isReadyForAutoCalc, setIsReadyForAutoCalc] = useState(false);
 
     // Form states
     const [originId, setOriginId] = useState("");
@@ -160,6 +166,7 @@ export default function ShipmentDetails() {
     const [price, setPrice] = useState<string>("");
     const [discount, setDiscount] = useState<string>("0");
     const [isFragile, setIsFragile] = useState(false);
+    const [withInvoice, setWithInvoice] = useState(false);
     const [paymentBy, setPaymentBy] = useState<"remitente" | "destinatario">("remitente");
 
     // Sender states
@@ -248,6 +255,7 @@ export default function ShipmentDetails() {
             setPrice(data.price?.toString() || "");
             setDiscount(data.discount?.toString() || "0");
             setIsFragile(data.is_fragile || false);
+            setWithInvoice(data.with_invoice || false);
             setPaymentBy(data.tracking_pay === 2 ? "destinatario" : "remitente");
 
             setSenderName(data.sender_name || "");
@@ -258,6 +266,10 @@ export default function ShipmentDetails() {
             setReceiverCi(data.receiver_ci || "");
             setReceiverPhone(data.receiver_phone || "");
 
+            setTimeout(() => {
+                setIsReadyForAutoCalc(true);
+            }, 500);
+
         } catch (error) {
             toast.error("Error al cargar la encomienda");
             navigate('/admin/shipments');
@@ -265,6 +277,34 @@ export default function ShipmentDetails() {
             setIsLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (!isReadyForAutoCalc) return;
+        if (!originId || !destinationId) return;
+
+        const origin = offices.find(o => o.id === originId);
+        const dest = offices.find(o => o.id === destinationId);
+
+        if (!origin?.city_id || !dest?.city_id) return;
+
+        const timeout = setTimeout(async () => {
+            const routeVal = await findRouteValue(origin.city_id, dest.city_id);
+            const calculated = calculateTotal(
+                type,
+                service,
+                Number(width) || 0,
+                Number(length) || 0,
+                Number(height) || 0,
+                Number(weight) || 0,
+                Number(routeVal?.value) || 0,
+                Number(discount) || 0,
+                withInvoice
+            );
+            setPrice(calculated.toString());
+        }, 300);
+
+        return () => clearTimeout(timeout);
+    }, [type, service, width, length, height, weight, discount, withInvoice, transport, originId, destinationId, isReadyForAutoCalc]);
 
     const handleCalculatePrice = async () => {
         if (!originId || !destinationId) {
@@ -295,7 +335,8 @@ export default function ShipmentDetails() {
             Number(height) || 0,
             Number(weight) || 0,
             Number(routeVal.value) || 0,
-            Number(discount) || 0
+            Number(discount) || 0,
+            withInvoice
         );
 
         setPrice(calculated.toString());
@@ -329,6 +370,11 @@ export default function ShipmentDetails() {
                 height: height ? parseFloat(height) : 0,
                 price: price ? parseFloat(price) : 0,
                 is_fragile: isFragile,
+                with_invoice: withInvoice,
+                ...(withInvoice ? {
+                    invoice_nit: senderCi || "0",
+                    invoice_name: senderName || "S/N"
+                } : {}),
                 tracking_pay: paymentBy === "destinatario" ? 2 : 1,
                 sender_name: senderName,
                 sender_ci: senderCi,
@@ -425,8 +471,8 @@ export default function ShipmentDetails() {
                         <SectionHeader number={1} title="Agencia de Origen y Destino" />
 
                         <div className="flex gap-2 mb-4">
-                            <ShipmentTypeCard disabled={!isQuote} active={type === "paquete"} icon={Package} label="Paquete" description="Caja o bulto" onClick={() => setType("paquete")} />
-                            <ShipmentTypeCard disabled={!isQuote} active={type === "sobre"} icon={Mail} label="Sobre" description="Documento" onClick={() => setType("sobre")} />
+                            <ShipmentTypeCard active={type === "paquete"} icon={Package} label="Paquete" description="Caja o bulto" onClick={() => setType("paquete")} />
+                            <ShipmentTypeCard active={type === "sobre"} icon={Mail} label="Sobre" description="Documento" onClick={() => setType("sobre")} />
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -437,7 +483,7 @@ export default function ShipmentDetails() {
                                     </div>
                                     Origen
                                 </Label>
-                                <Select disabled={!isQuote} value={originId} onValueChange={setOriginId}>
+                                <Select value={originId} onValueChange={setOriginId}>
                                     <SelectTrigger className="h-11">
                                         <SelectValue placeholder="Origen..." />
                                     </SelectTrigger>
@@ -455,7 +501,7 @@ export default function ShipmentDetails() {
                                     </div>
                                     Destino
                                 </Label>
-                                <Select disabled={!isQuote} value={destinationId} onValueChange={setDestinationId}>
+                                <Select value={destinationId} onValueChange={setDestinationId}>
                                     <SelectTrigger className="h-11">
                                         <SelectValue placeholder="Destino..." />
                                     </SelectTrigger>
@@ -478,25 +524,25 @@ export default function ShipmentDetails() {
                                     <Label className="flex items-center gap-2 text-sm font-semibold">
                                         <Ruler className="h-4 w-4 text-primary" /> Ancho (cm)
                                     </Label>
-                                    <Input disabled={!isQuote} type="number" min="0" step="0.1" value={width} onChange={(e) => setWidth(e.target.value)} className="h-11" placeholder="Ej: 30" />
+                                    <Input type="number" min="0" step="0.1" value={width} onChange={(e) => setWidth(e.target.value)} className="h-11" placeholder="Ej: 30" />
                                 </div>
                                 <div className="space-y-1.5">
                                     <Label className="flex items-center gap-2 text-sm font-semibold">
                                         <Ruler className="h-4 w-4 text-primary" /> Largo (cm)
                                     </Label>
-                                    <Input disabled={!isQuote} type="number" min="0" step="0.1" value={length} onChange={(e) => setLength(e.target.value)} className="h-11" placeholder="Ej: 30" />
+                                    <Input type="number" min="0" step="0.1" value={length} onChange={(e) => setLength(e.target.value)} className="h-11" placeholder="Ej: 30" />
                                 </div>
                                 <div className="space-y-1.5">
                                     <Label className="flex items-center gap-2 text-sm font-semibold">
                                         <Ruler className="h-4 w-4 text-primary" /> Alto (cm)
                                     </Label>
-                                    <Input disabled={!isQuote} type="number" min="0" step="0.1" value={height} onChange={(e) => setHeight(e.target.value)} className="h-11" placeholder="Ej: 30" />
+                                    <Input type="number" min="0" step="0.1" value={height} onChange={(e) => setHeight(e.target.value)} className="h-11" placeholder="Ej: 30" />
                                 </div>
                                 <div className="space-y-1.5">
                                     <Label className="flex items-center gap-2 text-sm font-semibold">
                                         <Weight className="h-4 w-4 text-primary" /> Peso (Kg)
                                     </Label>
-                                    <Input disabled={!isQuote} type="number" min="0" step="0.1" value={weight} onChange={(e) => setWeight(e.target.value)} className="h-11 border-primary/50" placeholder="Ej: 5" />
+                                    <Input type="number" min="0" step="0.1" value={weight} onChange={(e) => setWeight(e.target.value)} className="h-11 border-primary/50" placeholder="Ej: 5" />
                                 </div>
                             </div>
                         </div>
@@ -509,8 +555,8 @@ export default function ShipmentDetails() {
                         <div className="mb-4">
                             <Label className="text-sm font-semibold text-foreground block mb-3">Transporte</Label>
                             <div className="flex gap-3">
-                                <TransportCard disabled={!isQuote} active={transport === "terrestre"} icon={Truck} label="Terrestre" subtitle="Camión/Flota" onClick={() => setTransport("terrestre")} />
-                                <TransportCard disabled={!isQuote} active={transport === "aereo"} icon={Plane} label="Aéreo" subtitle="Avión" onClick={() => setTransport("aereo")} />
+                                <TransportCard active={transport === "terrestre"} icon={Truck} label="Terrestre" subtitle="Camión/Flota" onClick={() => setTransport("terrestre")} />
+                                <TransportCard active={transport === "aereo"} icon={Plane} label="Aéreo" subtitle="Avión" onClick={() => setTransport("aereo")} />
                             </div>
                         </div>
 
@@ -518,7 +564,7 @@ export default function ShipmentDetails() {
                             <Label className="text-sm font-semibold text-foreground block mb-3">Servicio</Label>
                             <div className="grid grid-cols-3 gap-2 sm:gap-3">
                                 {SERVICE_TIERS.map((tier) => (
-                                    <button disabled={!isQuote} key={tier.id} type="button" onClick={() => setService(tier.id as any)} className={cn("relative flex flex-col gap-2 p-2 rounded-xl border-2 text-left transition-all duration-300", service === tier.id ? `bg-gradient-to-br ${tier.bgGradient} ${tier.borderColor} shadow-md` : "border-border/70 bg-card hover:bg-muted/30", !isQuote && "opacity-50 pointer-events-none")}>
+                                    <button key={tier.id} type="button" onClick={() => setService(tier.id as any)} className={cn("relative flex flex-col gap-2 p-2 rounded-xl border-2 text-left transition-all duration-300", service === tier.id ? `bg-gradient-to-br ${tier.bgGradient} ${tier.borderColor} shadow-md` : "border-border/70 bg-card hover:bg-muted/30", "")}>
                                         <div className={cn("w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center", service === tier.id ? tier.badgeBg : "bg-muted")}>
                                             <tier.icon className={cn("h-4 w-4 sm:h-5 sm:w-5", service === tier.id ? tier.colorClass : "text-muted-foreground")} />
                                         </div>
@@ -542,11 +588,11 @@ export default function ShipmentDetails() {
                             <div className="flex flex-col items-end gap-2 shrink-0">
                                 <div className="flex items-center gap-2">
                                     <Label className="text-xs font-bold text-muted-foreground">Descuento</Label>
-                                    <Input disabled={!isQuote} type="number" step="0.5" value={discount} onChange={e => setDiscount(e.target.value)} className="h-8 w-20 text-right" />
+                                    <Input type="number" step="0.5" value={discount} onChange={e => setDiscount(e.target.value)} className="h-8 w-20 text-right" />
                                 </div>
                                 <div className="flex items-center gap-2 mt-1 border-t border-border pt-1">
                                     <Label className="text-sm border flex items-center bg-background px-2 py-1 rounded-md font-bold text-muted-foreground w-full">Precio Final</Label>
-                                    <Input disabled={!isQuote} type="number" step="0.5" value={price} onChange={e => setPrice(e.target.value)} className="h-10 w-28 text-right font-black text-xl text-primary" />
+                                    <Input type="number" step="0.5" value={price} onChange={e => setPrice(e.target.value)} className="h-10 w-28 text-right font-black text-xl text-primary" />
                                 </div>
                             </div>
                         </div>
@@ -595,7 +641,7 @@ export default function ShipmentDetails() {
                         <div className="space-y-2">
                             <Label>CI / NIT <span className="text-destructive">*</span></Label>
                             <div className="flex gap-2">
-                                <Input disabled={!isQuote} value={senderCi} onChange={e => setSenderCi(e.target.value)} placeholder="Buscar por CI..." className={!senderCi.trim() ? "border-destructive/50" : ""} />
+                                <Input value={senderCi} onChange={e => setSenderCi(e.target.value)} placeholder="Buscar por CI..." className={!senderCi.trim() ? "border-destructive/50" : ""} />
                                 <Button disabled={!isQuote || isSearchingSender || senderCi.length < 5} type="button" variant="outline" size="icon" className="shrink-0 h-10 w-10 text-primary hover:text-primary transition-colors hover:bg-primary/10" onClick={() => handleSearchClient('sender')}>
                                     {isSearchingSender ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
                                 </Button>
@@ -604,11 +650,11 @@ export default function ShipmentDetails() {
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-2">
                                 <Label>Nombre Completo <span className="text-destructive">*</span></Label>
-                                <Input disabled={!isQuote} value={senderName} onChange={e => setSenderName(e.target.value)} className={!senderName.trim() ? "border-destructive/50" : ""} />
+                                <Input value={senderName} onChange={e => setSenderName(e.target.value)} className={!senderName.trim() ? "border-destructive/50" : ""} />
                             </div>
                             <div className="space-y-2">
                                 <Label>Teléfono <span className="text-destructive">*</span></Label>
-                                <Input disabled={!isQuote} value={senderPhone} onChange={e => setSenderPhone(e.target.value)} className={!senderPhone.trim() ? "border-destructive/50" : ""} />
+                                <Input value={senderPhone} onChange={e => setSenderPhone(e.target.value)} className={!senderPhone.trim() ? "border-destructive/50" : ""} />
                             </div>
                         </div>
                     </div>
@@ -625,7 +671,7 @@ export default function ShipmentDetails() {
                         <div className="space-y-2">
                             <Label>CI / NIT</Label>
                             <div className="flex gap-2">
-                                <Input disabled={!isQuote} value={receiverCi} onChange={e => setReceiverCi(e.target.value)} placeholder="Buscar por CI..." />
+                                <Input value={receiverCi} onChange={e => setReceiverCi(e.target.value)} placeholder="Buscar por CI..." />
                                 <Button disabled={!isQuote || isSearchingReceiver || receiverCi.length < 5} type="button" variant="outline" size="icon" className="shrink-0 h-10 w-10 text-primary hover:text-primary transition-colors hover:bg-primary/10" onClick={() => handleSearchClient('recipient')}>
                                     {isSearchingReceiver ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
                                 </Button>
@@ -653,15 +699,15 @@ export default function ShipmentDetails() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     <div className="space-y-2">
                                         <Label>Nombre Completo <span className="text-destructive">*</span></Label>
-                                        <Input disabled={!isQuote} value={receiverName} onChange={e => setReceiverName(e.target.value)} placeholder="Ej: Juan Perez" autoFocus className={!receiverName.trim() ? "border-destructive/50" : ""} />
+                                        <Input value={receiverName} onChange={e => setReceiverName(e.target.value)} placeholder="Ej: Juan Perez" autoFocus className={!receiverName.trim() ? "border-destructive/50" : ""} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label>Teléfono <span className="text-destructive">*</span></Label>
-                                        <Input disabled={!isQuote} value={receiverPhone} onChange={e => setReceiverPhone(e.target.value)} placeholder="Ej: 76543210" className={!receiverPhone.trim() ? "border-destructive/50" : ""} />
+                                        <Input value={receiverPhone} onChange={e => setReceiverPhone(e.target.value)} placeholder="Ej: 76543210" className={!receiverPhone.trim() ? "border-destructive/50" : ""} />
                                     </div>
                                 </div>
                                 <div className="flex items-center justify-end gap-2 pt-2">
-                                    <Button type="button" variant="outline" size="sm" onClick={() => { setIsNewReceiver(false); setReceiverName(""); setReceiverPhone(""); setReceiverCi(""); }} disabled={!isQuote}>
+                                    <Button type="button" variant="outline" size="sm" onClick={() => { setIsNewReceiver(false); setReceiverName(""); setReceiverPhone(""); setReceiverCi(""); }} >
                                         Cancelar
                                     </Button>
                                     <Button type="button" size="sm" className="bg-primary text-white" disabled={!isQuote || !receiverName.trim() || !receiverPhone.trim()} onClick={() => setIsNewReceiver(false)}>
@@ -676,22 +722,31 @@ export default function ShipmentDetails() {
                     <div className="border border-border/60 rounded-2xl p-4 sm:p-5 bg-card/60 shadow-sm space-y-5">
                         <h3 className="font-bold text-sm text-foreground">Opción de Pago y Fragilidad</h3>
                         <div className="grid grid-cols-2 gap-3">
-                            <button disabled={!isQuote} type="button" onClick={() => setPaymentBy("remitente")} className={cn("flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all", paymentBy === "remitente" ? "border-emerald-500 bg-emerald-500/10 text-emerald-600" : "border-border bg-card", !isQuote && "opacity-50 pointer-events-none")}>
+                            <button type="button" onClick={() => setPaymentBy("remitente")} className={cn("flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all", paymentBy === "remitente" ? "border-emerald-500 bg-emerald-500/10 text-emerald-600" : "border-border bg-card", "")}>
                                 <Wallet className="h-5 w-5 mb-1" />
                                 <span className="text-xs font-bold">Origen</span>
                             </button>
-                            <button disabled={!isQuote} type="button" onClick={() => setPaymentBy("destinatario")} className={cn("flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all", paymentBy === "destinatario" ? "border-sky-500 bg-sky-500/10 text-sky-600" : "border-border bg-card", !isQuote && "opacity-50 pointer-events-none")}>
+                            <button type="button" onClick={() => setPaymentBy("destinatario")} className={cn("flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all", paymentBy === "destinatario" ? "border-sky-500 bg-sky-500/10 text-sky-600" : "border-border bg-card", "")}>
                                 <MapPinOff className="h-5 w-5 mb-1" />
                                 <span className="text-xs font-bold">Destino</span>
                             </button>
                         </div>
 
-                        <div className={cn("flex items-center space-x-2 pt-2 border-t border-border", isQuote ? "cursor-pointer" : "opacity-50 pointer-events-none")} onClick={() => isQuote && setIsFragile(!isFragile)}>
+                        <div className={cn("flex items-center space-x-2 pt-2 border-t border-border", isQuote ? "cursor-pointer" : "opacity-50 pointer-events-none")} onClick={() => setIsFragile(!isFragile)}>
                             <div className={cn("w-6 h-6 rounded border-2 flex items-center justify-center transition-all", isFragile ? "bg-amber-500 border-amber-500" : "border-border bg-muted")}>
                                 {isFragile && <CheckCircle2 className="h-4 w-4 text-white" />}
                             </div>
                             <Label className="text-sm font-bold text-foreground cursor-pointer flex items-center gap-2">
                                 <Star className={cn("h-4 w-4", isFragile ? "text-amber-500" : "text-muted-foreground")} /> Contiene objetos frágiles
+                            </Label>
+                        </div>
+
+                        <div className={cn("flex items-center space-x-2 pt-2 border-t border-border", isQuote ? "cursor-pointer" : "opacity-50 pointer-events-none")} onClick={() => isQuote && setWithInvoice(!withInvoice)}>
+                            <div className={cn("w-6 h-6 rounded border-2 flex items-center justify-center transition-all", withInvoice ? "bg-blue-500 border-blue-500" : "border-border bg-muted")}>
+                                {withInvoice && <CheckCircle2 className="h-4 w-4 text-white" />}
+                            </div>
+                            <Label className="text-sm font-bold text-foreground cursor-pointer flex items-center gap-2">
+                                <FileText className={cn("h-4 w-4", withInvoice ? "text-blue-500" : "text-muted-foreground")} /> Con Factura
                             </Label>
                         </div>
                     </div>

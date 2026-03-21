@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Package, CheckCircle2 } from "lucide-react";
+import { Package, CheckCircle2, FileText, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import ShipmentDetailsForm, {
     type ShipmentDetailsData,
     type ServiceTier,
@@ -18,8 +20,9 @@ import { Invoice } from "@/interfaces/invoice.interface";
 
 /* ─── Step indicator ─────────────────────────────────────── */
 const getSteps = (isClient: boolean) => [
-    { number: 1, label: "Detalles del Envío" },
-    ...(isClient ? [] : [{ number: 2, label: "Remitente y Destinatario" }])
+    { number: 1, label: "Términos y Condiciones" },
+    { number: 2, label: "Detalles del Envío" },
+    ...(isClient ? [] : [{ number: 3, label: "Remitente y Destinatario" }])
 ];
 
 function StepIndicator({ current, isClient }: { current: number, isClient: boolean }) {
@@ -98,6 +101,7 @@ export default function ShipmentRegisterWizard({
     defaultSender,
 }: ShipmentRegisterWizardProps) {
     const [step, setStep] = useState(1);
+    const [termsAccepted, setTermsAccepted] = useState(false);
     const [detailsData, setDetailsData] = useState<ShipmentDetailsData | null>(null);
     const [withIva, setWithIva] = useState(false);
     const [showInvoice, setShowInvoice] = useState(false);
@@ -114,13 +118,13 @@ export default function ShipmentRegisterWizard({
         if (isClient) {
             handleFinalSubmit(undefined, data);
         } else {
-            setStep(2);
+            setStep(3);
             window.scrollTo({ top: 0, behavior: "smooth" });
         }
     };
 
     const handleBack = () => {
-        setStep(1);
+        setStep(prev => Math.max(1, prev - 1));
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
@@ -229,20 +233,72 @@ export default function ShipmentRegisterWizard({
                     {!isClient && <StepIndicator current={step} isClient={isClient} />}
 
                     {/* Step content with slide animation */}
-                    <div className="relative overflow-hidden">
+                    <div className="relative overflow-hidden min-h-[400px]">
                         <div
                             className={cn(
                                 "transition-all duration-300",
-                                step === 1 ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0 absolute inset-0 pointer-events-none"
+                                step === 1 ? "translate-x-0 opacity-100 relative" : "-translate-x-full opacity-0 absolute inset-0 pointer-events-none"
                             )}
                         >
-                            <ShipmentDetailsForm onNext={handleDetailsNext} isClientMode={isClient} />
+                            <div className="border border-border/60 rounded-2xl p-6 bg-card/60 backdrop-blur-sm shadow-sm space-y-6">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <div className="w-10 h-10 rounded-full gradient-primary flex items-center justify-center text-primary-foreground shadow-md">
+                                        <FileText className="h-5 w-5" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-lg text-foreground">Términos y Condiciones del Servicio</h3>
+                                        <p className="text-sm text-muted-foreground">Por favor, lea detalladamente las normativas antes de continuar.</p>
+                                    </div>
+                                </div>
+                                <div className="bg-muted/50 p-4 rounded-xl text-sm text-foreground max-h-40 overflow-y-auto border border-border/40">
+                                    <p className="mb-2"><strong>1. Condiciones de Envío:</strong> Kolmox no se hace responsable por mercancía frágil no declarada de antemano. Prohibido el transporte de armas de fuego, efectivo, sustancias controladas o artículos perecederos.</p>
+                                    <p className="mb-2"><strong>2. Inspección:</strong> Nos reservamos el derecho de inspeccionar el contenido del paquete por motivos de seguridad.</p>
+                                    <p className="mb-2"><strong>3. Seguros y Reembolsos:</strong> Cualquier reclamo por extravío debe realizarse en un plazo de 24 horas tras la confirmación de la ruta completada.</p>
+                                </div>
+                                <div className="flex items-center gap-3 bg-background/50 px-4 py-3 rounded-xl border border-primary/20 cursor-pointer hover:border-primary/50 transition-colors" onClick={() => setTermsAccepted(!termsAccepted)}>
+                                    <Checkbox
+                                        id="terms-checkbox"
+                                        checked={termsAccepted}
+                                        onCheckedChange={(c) => setTermsAccepted(!!c)}
+                                        className="data-[state=checked]:bg-primary"
+                                    />
+                                    <label htmlFor="terms-checkbox" className="text-sm font-bold text-foreground cursor-pointer select-none flex-1">
+                                        He leído y acepto expresamente las condiciones del servicio de transporte.
+                                    </label>
+                                </div>
+                                <div className="pt-2">
+                                    <Button
+                                        type="button"
+                                        size="lg"
+                                        onClick={() => { setStep(2); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                                        disabled={!termsAccepted}
+                                        className={cn(
+                                            "w-full h-13 text-base font-bold transition-all duration-300 gap-2",
+                                            termsAccepted
+                                                ? "gradient-primary glow-primary hover:opacity-90 hover:scale-[1.01] shadow-lg"
+                                                : "opacity-40 cursor-not-allowed"
+                                        )}
+                                    >
+                                        Siguiente – Iniciar Registro
+                                        <ArrowRight className="h-5 w-5" />
+                                    </Button>
+                                </div>
+                            </div>
                         </div>
 
                         <div
                             className={cn(
                                 "transition-all duration-300",
-                                step === 2 ? "translate-x-0 opacity-100" : "translate-x-full opacity-0 absolute inset-0 pointer-events-none"
+                                step === 2 ? "translate-x-0 opacity-100 relative" : step > 2 ? "-translate-x-full opacity-0 absolute inset-0 pointer-events-none" : "translate-x-full opacity-0 absolute inset-0 pointer-events-none"
+                            )}
+                        >
+                            <ShipmentDetailsForm onNext={handleDetailsNext} onBack={handleBack} isClientMode={isClient} />
+                        </div>
+
+                        <div
+                            className={cn(
+                                "transition-all duration-300",
+                                step === 3 ? "translate-x-0 opacity-100 relative" : "translate-x-full opacity-0 absolute inset-0 pointer-events-none"
                             )}
                         >
                             {detailsData && (

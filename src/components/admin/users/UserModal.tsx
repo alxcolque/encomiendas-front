@@ -18,7 +18,7 @@ const baseSchema = z.object({
     name: z.string().min(2, "Nombre requerido"),
     email: z.string().email("Email inválido"),
     phone: z.string().min(8, "Celular requerido"),
-    role: z.enum(["admin", "worker", "driver", "client"]),
+    role: z.enum(["admin", "worker", "driver", "client", "company", "partner"]),
     status: z.enum(["active", "inactive"]),
     avatar: z.string().optional(),
 });
@@ -200,6 +200,8 @@ export function UserModal({ userToEdit, open, onOpenChange }: UserModalProps) {
                                     <SelectItem value="worker">Operador</SelectItem>
                                     <SelectItem value="driver">Conductor</SelectItem>
                                     <SelectItem value="client">Cliente</SelectItem>
+                                    <SelectItem value="company">Empresa</SelectItem>
+                                    <SelectItem value="partner">Socio</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>

@@ -2,7 +2,7 @@ import { User } from "./auth.interface";
 
 export type UserStatus = 'active' | 'inactive';
 
-export type AdminRole = 'admin' | 'worker' | 'driver';
+export type AdminRole = 'admin' | 'worker' | 'driver' | 'company' | 'partner';
 
 export interface AdminUser extends Omit<User, 'role'> {
     role: AdminRole;

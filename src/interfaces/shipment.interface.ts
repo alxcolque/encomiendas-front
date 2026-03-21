@@ -47,6 +47,7 @@ export interface AdminShipment {
     height?: number;
     is_pack: boolean;
     is_fragile: boolean;
+    with_invoice: boolean;
     type_service: 'normal' | 'standard' | 'express';
     track_type: number;
     observation?: string;
@@ -85,4 +86,8 @@ export interface CreateShipmentPayload {
     length?: number;
     height?: number;
     discount?: number;
+
+    with_invoice?: boolean;
+    invoice_nit?: string;
+    invoice_name?: string;
 }

@@ -27,6 +27,7 @@ import { cn } from "@/lib/utils";
 import { useOfficeStore } from "@/stores/officeStore";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useRouteValueStore } from "@/stores/routeValueStore";
+import { useAuthStore } from "@/stores/authStore";
 
 /* ─── Types ─────────────────────────────────────────────── */
 export type ShipmentType = "paquete" | "sobre";
@@ -49,6 +50,7 @@ export interface ShipmentDetailsData {
 
 interface Props {
     onNext: (data: ShipmentDetailsData) => void;
+    onBack?: () => void;
     isClientMode?: boolean;
 }
 
@@ -283,7 +285,9 @@ function TransportCard({
 }
 
 /* ─── Main Component ─────────────────────────────────────── */
-export default function ShipmentDetailsForm({ onNext, isClientMode = false }: Props) {
+export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = false }: Props) {
+    const { user } = useAuthStore();
+    const role = user?.role;
     const { offices, fetchOffices } = useOfficeStore();
     const [type, setType] = useState<ShipmentType>("paquete");
     const [originId, setOriginId] = useState("");
@@ -445,7 +449,7 @@ export default function ShipmentDetailsForm({ onNext, isClientMode = false }: Pr
                 </div>
 
                 {/* Route preview */}
-                {originOffice && destinationOffice && (
+                {originOffice && destinationOffice && role === 'admin' && (
                     <div className="mt-3 space-y-2">
                         <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground bg-muted/40 rounded-lg px-3 py-2">
                             <span className="font-semibold text-emerald-600 dark:text-emerald-400">{originOffice.city?.name} ({originOffice.name})</span>
@@ -731,21 +735,35 @@ export default function ShipmentDetailsForm({ onNext, isClientMode = false }: Pr
 
             {/* ── Next Button ──────────────────────────────────── */}
             <div className="space-y-2">
-                <Button
-                    type="button"
-                    size="lg"
-                    onClick={handleNext}
-                    disabled={!isValid}
-                    className={cn(
-                        "w-full h-13 text-base font-bold transition-all duration-300 gap-2",
-                        isValid
-                            ? "gradient-primary glow-primary hover:opacity-90 hover:scale-[1.01] shadow-lg"
-                            : "opacity-40 cursor-not-allowed"
+                <div className="flex gap-3">
+                    {onBack && (
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="lg"
+                            onClick={onBack}
+                            className="w-1/3 h-13 text-base font-bold dark:border-border/60 hover:bg-muted/80 shadow-sm"
+                        >
+                            Atrás
+                        </Button>
                     )}
-                >
-                    {isClientMode ? "Registrar Encomienda" : "Siguiente — Completar Registro"}
-                    <ArrowRight className="h-5 w-5" />
-                </Button>
+                    <Button
+                        type="button"
+                        size="lg"
+                        onClick={handleNext}
+                        disabled={!isValid}
+                        className={cn(
+                            onBack ? "w-2/3" : "w-full",
+                            "h-13 text-base font-bold transition-all duration-300 gap-2",
+                            isValid
+                                ? "gradient-primary glow-primary hover:opacity-90 hover:scale-[1.01] shadow-lg"
+                                : "opacity-40 cursor-not-allowed"
+                        )}
+                    >
+                        {isClientMode ? "Registrar Encomienda" : "Siguiente — Completar Registro"}
+                        <ArrowRight className="h-5 w-5" />
+                    </Button>
+                </div>
 
                 {!isValid && (
                     <p className="text-center text-xs text-muted-foreground">

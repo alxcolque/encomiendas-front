@@ -73,6 +73,8 @@ export function UsersTable() {
             case 'admin': return <Badge variant="destructive" className="bg-purple-500/10 text-purple-500 hover:bg-purple-500/20 border-purple-500/20">Admin</Badge>;
             case 'worker': return <Badge variant="secondary" className="bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 border-blue-500/20">Operador</Badge>;
             case 'driver': return <Badge variant="outline" className="bg-orange-500/10 text-orange-500 hover:bg-orange-500/20 border-orange-500/20">Conductor</Badge>;
+            case 'company': return <Badge variant="default" className="bg-teal-500/10 text-teal-500 hover:bg-teal-500/20 border-teal-500/20">Empresa</Badge>;
+            case 'partner': return <Badge variant="destructive" className="bg-pink-500/10 text-pink-500 hover:bg-pink-500/20 border-pink-500/20">Socio</Badge>;
             default: return <Badge variant="outline">Cliente</Badge>;
         }
     };
