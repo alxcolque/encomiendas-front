@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Building2, Loader2, ImagePlus } from "lucide-react";
+import { Building2, ImagePlus } from "lucide-react";
+import { LoadingLogo } from "@/components/shared/LoadingLogo";
 import { toast } from "sonner";
 import { useOfficeStore } from "@/stores/officeStore";
 import { Office } from "@/interfaces/office.interface";
@@ -258,7 +259,7 @@ export function OfficeModal({ officeToEdit, trigger, open: controlledOpen, onOpe
                     <div className="pt-4 flex justify-end gap-2">
                         <Button type="button" variant="ghost" onClick={() => setOpen?.(false)}>Cancelar</Button>
                         <Button type="submit" disabled={isSubmitting} className="min-w-[140px] shadow-md">
-                            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {isSubmitting && <LoadingLogo className="mr-2 h-4 w-4 animate-pulse" />}
                             {isEditing ? "Actualizar Agencia" : "Guardar Agencia"}
                         </Button>
                     </div>

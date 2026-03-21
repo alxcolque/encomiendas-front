@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User as UserIcon, LogOut, Camera, ShieldCheck, Loader2 } from "lucide-react";
+import { User as UserIcon, LogOut, Camera, ShieldCheck } from "lucide-react";
+import { LoadingLogo } from "@/components/shared/LoadingLogo";
 import { toast } from "sonner";
 
 // Profile Schema
@@ -189,7 +190,7 @@ export default function ProfilePage() {
                             <div className="pt-4 flex justify-end">
                                 <Button type="submit" disabled={isSubmittingProfile}>
                                     {isSubmittingProfile ? (
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        <LoadingLogo className="mr-2 h-4 w-4 animate-pulse" />
                                     ) : null}
                                     Guardar Cambios
                                 </Button>
@@ -258,7 +259,7 @@ export default function ProfilePage() {
                                     className="bg-secondary/20 hover:bg-secondary/30"
                                 >
                                     {isSubmittingPin ? (
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        <LoadingLogo className="mr-2 h-4 w-4 animate-pulse" />
                                     ) : null}
                                     Cambiar PIN
                                 </Button>

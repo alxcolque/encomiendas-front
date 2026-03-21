@@ -1,3 +1,4 @@
+import { LoadingLogo } from "@/components/shared/LoadingLogo";
 import { useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { StatusBadge } from "../shared/StatusBadge";
 import {
     Eye,
-    Loader2,
+    
     FileText,
     MoreVertical,
     CheckCircle2,
@@ -87,7 +88,7 @@ export function RecentShipmentsTable({
         return (
             <Card className="shadow-sm border-border/50 bg-card/50 backdrop-blur-sm">
                 <CardContent className="p-12 flex flex-col items-center justify-center space-y-4">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    <LoadingLogo className="h-8 w-8 animate-pulse text-primary" />
                     <p className="text-muted-foreground text-sm">Cargando encomiendas...</p>
                 </CardContent>
             </Card>

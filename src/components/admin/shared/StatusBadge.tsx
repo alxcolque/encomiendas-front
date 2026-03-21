@@ -22,6 +22,7 @@ const statusLabels: Record<string, string> = {
     in_transit: "En Tránsito",
     delivered: "Entregado",
     created: "Creado",
+    quote: "Cotizado",
     at_office: "En Sucursal",
     available: "Disponible",
     busy: "Ocupado",

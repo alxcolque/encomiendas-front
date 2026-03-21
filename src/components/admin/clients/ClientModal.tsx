@@ -19,7 +19,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { UserCheck, Loader2 } from 'lucide-react';
+import { UserCheck } from 'lucide-react';
+import { LoadingLogo } from "@/components/shared/LoadingLogo";
 import { toast } from 'sonner';
 import { useClientStore } from '@/stores/clientStore';
 import { Client } from '@/interfaces/client.interface';
@@ -191,7 +192,7 @@ export function ClientModal({ clientToEdit, open, onOpenChange }: ClientModalPro
                             Cancelar
                         </Button>
                         <Button type="submit" disabled={isSubmitting}>
-                            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {isSubmitting && <LoadingLogo className="mr-2 h-4 w-4 animate-pulse" />}
                             {isEditing ? 'Actualizar Cliente' : 'Registrar Cliente'}
                         </Button>
                     </div>

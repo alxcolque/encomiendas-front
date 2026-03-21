@@ -19,7 +19,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { Building2, Loader2 } from 'lucide-react';
+import { Building2 } from 'lucide-react';
+import { LoadingLogo } from "@/components/shared/LoadingLogo";
 import { toast } from 'sonner';
 import { useBusinessStore } from '@/stores/businessStore';
 import { Business } from '@/interfaces/business.interface';
@@ -178,7 +179,7 @@ export function BusinessModal({ businessToEdit, open, onOpenChange }: BusinessMo
                             Cancelar
                         </Button>
                         <Button type="submit" disabled={isSubmitting}>
-                            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {isSubmitting && <LoadingLogo className="mr-2 h-4 w-4 animate-pulse" />}
                             {isEditing ? 'Actualizar Empresa' : 'Registrar Empresa'}
                         </Button>
                     </div>

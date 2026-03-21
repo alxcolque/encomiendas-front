@@ -3,7 +3,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Shield, Loader2, Lock } from "lucide-react";
+import { Shield, Lock } from "lucide-react";
+import { LoadingLogo } from "@/components/shared/LoadingLogo";
 import { useAuthStore } from "@/stores/authStore";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -127,7 +128,7 @@ export default function LoginModal({ open, onOpenChange }: LoginModalProps) {
               disabled={phone.length < 8 || pin.length < 4 || loading}
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12"
             >
-              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Ingresar"}
+              {loading ? <LoadingLogo className="w-5 h-5 animate-pulse" /> : "Ingresar"}
             </Button>
           </form>
         </div>

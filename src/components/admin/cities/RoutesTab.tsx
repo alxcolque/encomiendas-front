@@ -13,7 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { ArrowRight, Loader2, Plus, Route, Trash2 } from "lucide-react";
+import { ArrowRight, Plus, Route, Trash2 } from "lucide-react";
+import { LoadingLogo } from "@/components/shared/LoadingLogo";
 import { toast } from "sonner";
 
 export function RoutesTab() {
@@ -165,7 +166,7 @@ export function RoutesTab() {
                     </div>
                     <Button onClick={handleCreate} disabled={isCreating} className="gap-2">
                         {isCreating ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <LoadingLogo className="h-4 w-4 animate-pulse" />
                         ) : (
                             <Plus className="h-4 w-4" />
                         )}
@@ -232,7 +233,7 @@ export function RoutesTab() {
                                                 onClick={() => handleUpdate(rv.id)}
                                             >
                                                 {updatingId === rv.id ? (
-                                                    <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                                                    <LoadingLogo className="h-3 w-3 animate-pulse mr-1" />
                                                 ) : null}
                                                 Actualizar
                                             </Button>

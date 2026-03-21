@@ -11,7 +11,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { MapPin, Loader2 } from "lucide-react";
+import { MapPin } from "lucide-react";
+import { LoadingLogo } from "@/components/shared/LoadingLogo";
 import { toast } from "sonner";
 import { useCityStore } from "@/stores/cityStore";
 import { City } from "@/interfaces/city.interface";
@@ -122,7 +123,7 @@ export function CityModal({ cityToEdit, open, onOpenChange }: CityModalProps) {
                             Cancelar
                         </Button>
                         <Button type="submit" disabled={isSubmitting}>
-                            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {isSubmitting && <LoadingLogo className="mr-2 h-4 w-4 animate-pulse" />}
                             {isEditing ? "Actualizar Ciudad" : "Guardar Ciudad"}
                         </Button>
                     </div>

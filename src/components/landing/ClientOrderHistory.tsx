@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { ENV } from "@/config/env";
 import { useAuthStore } from "@/stores/authStore";
-import { Package, MapPin, Calendar, ArrowRight, Loader2, AlertCircle, Plus, X } from "lucide-react";
+import { Package, MapPin, Calendar, ArrowRight, AlertCircle, Plus, X } from "lucide-react";
+import { LoadingLogo } from "@/components/shared/LoadingLogo";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
@@ -115,7 +116,7 @@ export default function ClientOrderHistory() {
 
                 {loading ? (
                     <div className="flex flex-col items-center justify-center p-12 bg-card rounded-2xl border border-border shadow-sm">
-                        <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+                        <LoadingLogo className="h-8 w-8 animate-pulse text-primary mb-4" />
                         <p className="text-muted-foreground">Cargando tus encomiendas...</p>
                     </div>
                 ) : shipments.length === 0 ? (

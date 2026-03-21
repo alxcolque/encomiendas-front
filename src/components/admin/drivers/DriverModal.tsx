@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Truck, Loader2, User as UserIcon } from "lucide-react";
+import { Truck, User as UserIcon } from "lucide-react";
+import { LoadingLogo } from "@/components/shared/LoadingLogo";
 import { toast } from "sonner";
 import { useDriverStore } from "@/stores/driverStore";
 import { useUserStore } from "@/stores/userStore";
@@ -205,7 +206,7 @@ export function DriverModal({ driverToEdit, open, onOpenChange }: DriverModalPro
                     <div className="pt-4 flex justify-end gap-2">
                         <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Cancelar</Button>
                         <Button type="submit" disabled={isSubmitting}>
-                            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {isSubmitting && <LoadingLogo className="mr-2 h-4 w-4 animate-pulse" />}
                             {isEditing ? "Actualizar Conductor" : "Asignar Conductor"}
                         </Button>
                     </div>

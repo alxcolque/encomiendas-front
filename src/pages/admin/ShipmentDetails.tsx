@@ -1,3 +1,4 @@
+import { LoadingLogo } from "@/components/shared/LoadingLogo";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAdminShipmentStore } from "@/stores/adminShipmentStore";
@@ -35,8 +36,7 @@ import {
     Clock,
     User,
     Phone,
-    Search,
-    Loader2
+    Search
 } from "lucide-react";
 import { toast } from "sonner";
 import { useOfficeStore } from "@/stores/officeStore";
@@ -418,7 +418,7 @@ export default function ShipmentDetails() {
     if (isLoading || !shipment) {
         return (
             <div className="flex items-center justify-center p-24">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                <div className="animate-pulse rounded-full h-12 w-12 border-b-2 border-primary"></div>
             </div>
         );
     }
@@ -643,7 +643,7 @@ export default function ShipmentDetails() {
                             <div className="flex gap-2">
                                 <Input value={senderCi} onChange={e => setSenderCi(e.target.value)} placeholder="Buscar por CI..." className={!senderCi.trim() ? "border-destructive/50" : ""} />
                                 <Button disabled={!isQuote || isSearchingSender || senderCi.length < 5} type="button" variant="outline" size="icon" className="shrink-0 h-10 w-10 text-primary hover:text-primary transition-colors hover:bg-primary/10" onClick={() => handleSearchClient('sender')}>
-                                    {isSearchingSender ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                                    {isSearchingSender ? <LoadingLogo className="w-4 h-4 animate-pulse" /> : <Search className="w-4 h-4" />}
                                 </Button>
                             </div>
                         </div>
@@ -673,7 +673,7 @@ export default function ShipmentDetails() {
                             <div className="flex gap-2">
                                 <Input value={receiverCi} onChange={e => setReceiverCi(e.target.value)} placeholder="Buscar por CI..." />
                                 <Button disabled={!isQuote || isSearchingReceiver || receiverCi.length < 5} type="button" variant="outline" size="icon" className="shrink-0 h-10 w-10 text-primary hover:text-primary transition-colors hover:bg-primary/10" onClick={() => handleSearchClient('recipient')}>
-                                    {isSearchingReceiver ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                                    {isSearchingReceiver ? <LoadingLogo className="w-4 h-4 animate-pulse" /> : <Search className="w-4 h-4" />}
                                 </Button>
                             </div>
                         </div>

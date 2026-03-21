@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { useAuthStore } from "@/stores/authStore";
-import { Package, Loader2, UserPlus, LogIn } from "lucide-react";
+import { Package, UserPlus, LogIn } from "lucide-react";
+import { LoadingLogo } from "@/components/shared/LoadingLogo";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LoginModal from "@/components/landing/LoginModal";
@@ -109,7 +110,7 @@ export default function LoginPage() {
                   />
                 </div>
                 <Button type="submit" variant="hero" size="lg" className="w-full h-12 text-base mt-2" disabled={isLoading || !phone || !ciNit}>
-                  {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Ingresar"}
+                  {isLoading ? <LoadingLogo className="w-5 h-5 animate-pulse" /> : "Ingresar"}
                 </Button>
               </form>
             </TabsContent>
@@ -155,7 +156,7 @@ export default function LoginPage() {
                   />
                 </div>
                 <Button type="submit" variant="hero" size="lg" className="w-full h-12 text-base mt-2" disabled={isLoading || !name || !phone || !ciNit}>
-                  {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Registrarse"}
+                  {isLoading ? <LoadingLogo className="w-5 h-5 animate-pulse" /> : "Registrarse"}
                 </Button>
               </form>
             </TabsContent>

@@ -5,7 +5,8 @@ import { useSettingsStore } from "@/stores/settingsStore";
 import { AdminShipment } from "@/interfaces/shipment.interface";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { Loader2, Printer, X } from "lucide-react";
+import {  Printer, X } from "lucide-react";
+import { LoadingLogo } from "@/components/shared/LoadingLogo";
 import { Button } from "@/components/ui/button";
 
 export default function ShipmentTicket() {
@@ -27,7 +28,7 @@ export default function ShipmentTicket() {
     if (isLoading) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center space-y-4">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <LoadingLogo className="h-8 w-8 animate-pulse text-primary" />
                 <p>Generando ticket...</p>
             </div>
         );
