@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { useAuthStore } from "@/stores/authStore";
+import { useSettingsStore } from "@/stores/settingsStore";
 import { Package, UserPlus, LogIn } from "lucide-react";
 import { LoadingLogo } from "@/components/shared/LoadingLogo";
 import { toast } from "sonner";
@@ -18,7 +19,12 @@ export default function LoginPage() {
   const [adminLoginOpen, setAdminLoginOpen] = useState(false);
 
   const { clientLogin, clientRegister, isLoading, user, authStatus } = useAuthStore();
+  const { general, fetchPublicSettings } = useSettingsStore();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchPublicSettings();
+  }, []);
 
   useEffect(() => {
     if (authStatus === 'auth' && user) {
@@ -55,12 +61,16 @@ export default function LoginPage() {
       <div className="relative z-10 w-full max-w-sm space-y-8">
         {/* Logo */}
         <div className="text-center space-y-4">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl gradient-primary shadow-glow animate-float">
+          <div className={`inline-flex items-center justify-center animate-float ${general?.logo ? '' : 'w-20 h-20 shadow-glow rounded-2xl gradient-primary'}`}>
+          {general?.logo ? (
+            <img src={general.logo} alt="Logo" className="h-28 w-auto object-contain drop-shadow-md" />
+          ) : (
             <Package size={40} className="text-primary-foreground" />
+          )}
           </div>
           <div>
             <h1 className="text-3xl font-display font-bold text-gradient-primary">
-              EnvíoExpress
+              {general?.siteName || "Kolmox"}
             </h1>
             <p className="text-muted-foreground mt-1">
               Ingresa a tu cuenta

@@ -153,7 +153,7 @@ function calculateTotal(
         total = total * 1.16;
     }
 
-    return Math.round(total * 100) / 100;
+    return Math.ceil(total * 2) / 2;
 }
 
 /* ─── Section Header ─────────────────────────────────────── */

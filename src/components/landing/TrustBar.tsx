@@ -43,7 +43,7 @@ export default function TrustBar() {
         </div>
 
         {/* Partners Scroll/Grid */}
-        <div className="pt-6 border-t border-border/50">
+        {/* <div className="pt-6 border-t border-border/50">
           <p className="text-center text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-6">Nuestros Aliados Estratégicos</p>
           <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16">
             {partners.map((partner, index) => (
@@ -55,7 +55,7 @@ export default function TrustBar() {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

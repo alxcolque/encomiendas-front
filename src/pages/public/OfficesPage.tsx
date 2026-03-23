@@ -142,10 +142,10 @@ export default function OfficesPage() {
                                             <Phone className="w-5 h-5 text-primary shrink-0" />
                                             <span>{office.phone || "No especificado"}</span>
                                         </div>
-                                        <div className="flex items-start gap-3 text-muted-foreground">
+                                        {/* <div className="flex items-start gap-3 text-muted-foreground">
                                             <Clock className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                                             <span>{office.hours || "No especificado"}</span>
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </div>
                             </div>
