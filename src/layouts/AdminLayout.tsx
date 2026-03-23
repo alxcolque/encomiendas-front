@@ -5,6 +5,7 @@ import { Outlet } from "react-router-dom";
 import { LayoutDashboard, Users, Package, Settings, Plus } from "lucide-react";
 import { NewShipmentModal } from "@/components/shared/NewShipmentModal";
 import { ADMIN_ROUTES } from "@/constants/admin.routes";
+import { useAuthStore } from "@/stores/authStore";
 
 const mobileNavItems: NavItem[] = [
     { icon: LayoutDashboard, label: "Panel", path: ADMIN_ROUTES.DASHBOARD },
@@ -14,6 +15,16 @@ const mobileNavItems: NavItem[] = [
 ];
 
 export default function AdminLayout() {
+    const { user } = useAuthStore();
+    const role = user?.role || 'client';
+    const isAdmin = role === 'admin';
+
+    const filteredNavItems = mobileNavItems.filter(item => {
+        if (item.path === ADMIN_ROUTES.USERS) return isAdmin;
+        if (item.path === ADMIN_ROUTES.SETTINGS) return isAdmin;
+        return true;
+    });
+
     return (
         <>
             {/* DESKTOP LAYOUT (lg+) */}
@@ -35,7 +46,7 @@ export default function AdminLayout() {
             {/* MOBILE/TABLET LAYOUT (<lg) */}
             <div className="lg:hidden">
                 <MobileLayout
-                    navItems={mobileNavItems}
+                    navItems={filteredNavItems}
                     title="Panel Admin"
                     showNav={true}
                     centerAction={

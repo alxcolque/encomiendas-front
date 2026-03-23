@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { StatusBadge } from "../shared/StatusBadge";
 import {
     Eye,
-    
+
     FileText,
     MoreVertical,
     CheckCircle2,
@@ -17,9 +17,11 @@ import {
     Send,
     ExternalLink,
     Printer,
-    Search
+    Search,
+    Trash2
 } from "lucide-react";
 import { useAdminShipmentStore } from "@/stores/adminShipmentStore";
+import { useAuthStore } from "@/stores/authStore";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -58,7 +60,9 @@ export function RecentShipmentsTable({
     showViewAll = true
 }: RecentShipmentsTableProps) {
     const navigate = useNavigate();
-    const { shipments: storeShipments, isLoading, fetchShipments, updateStatus } = useAdminShipmentStore();
+    const { user } = useAuthStore();
+    const role = user?.role || 'client';
+    const { shipments: storeShipments, isLoading, fetchShipments, updateStatus, deleteShipment } = useAdminShipmentStore();
 
     // Choose which shipments to use
     const displayedShipments = propShipments || storeShipments;
@@ -77,6 +81,16 @@ export function RecentShipmentsTable({
             toast.success(`Estado actualizado a ${status}`);
         } catch (error) {
             toast.error("Error al actualizar el estado");
+        }
+    };
+
+    const handleDelete = async (id: string) => {
+        if (!confirm("¿Seguro que desea eliminar esta encomienda?")) return;
+        try {
+            await deleteShipment(id);
+            toast.success("Encomienda eliminada");
+        } catch (error) {
+            toast.error("Error al eliminar la encomienda");
         }
     };
 
@@ -186,90 +200,92 @@ export function RecentShipmentsTable({
                                             <StatusBadge status={shipment.current_status} />
                                         </TableCell>
                                         <TableCell className="text-right">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted">
-                                                        <MoreVertical className="w-4 h-4 text-muted-foreground" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="w-56">
-                                                    <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                                                    <DropdownMenuSeparator />
-                                                    <DropdownMenuItem
-                                                        className="cursor-pointer"
-                                                        onClick={() => navigate(`/admin/shipments/${shipment.id}`)}
-                                                    >
-                                                        <Eye className="w-4 h-4 mr-2" />
-                                                        Ver detalles
-                                                    </DropdownMenuItem>
+                                            {(shipment.current_status === 'quote' || role !== 'company') && (
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted">
+                                                            <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end" className="w-56">
+                                                        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                                                        <DropdownMenuSeparator />
 
-                                                    <DropdownMenuItem
-                                                        className="cursor-pointer"
-                                                        onClick={() => window.open(`/admin/ticket/${shipment.id}`, '_blank')}
-                                                    >
-                                                        <Printer className="w-4 h-4 mr-2" />
-                                                        Imprimir Etiqueta
-                                                    </DropdownMenuItem>
+                                                        {role !== 'company' && (
+                                                            <>
+                                                                <DropdownMenuItem
+                                                                    className="cursor-pointer"
+                                                                    onClick={() => navigate(`/admin/shipments/${shipment.id}`)}
+                                                                >
+                                                                    <Eye className="w-4 h-4 mr-2" />
+                                                                    Ver detalles
+                                                                </DropdownMenuItem>
 
-                                                    {/* {shipment.invoice && (
-                                                        <>
-                                                            <DropdownMenuItem
-                                                                className="cursor-pointer"
-                                                                onClick={() => handleViewInvoice(shipment)}
-                                                            >
-                                                                <FileText className="w-4 h-4 mr-2" />
-                                                                Ver factura (Modal)
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem
-                                                                className="cursor-pointer"
-                                                                onClick={() => window.open(`/shipments/${shipment.id}/invoice`, '_blank')}
-                                                            >
-                                                                <ExternalLink className="w-4 h-4 mr-2" />
-                                                                Ver factura (Nueva pestaña)
-                                                            </DropdownMenuItem>
-                                                        </>
-                                                    )} */}
-                                                    <DropdownMenuSeparator />
-                                                    <DropdownMenuSub>
-                                                        <DropdownMenuSubTrigger className="cursor-pointer">
-                                                            <RotateCcw className="w-4 h-4 mr-2" />
-                                                            Cambiar estado
-                                                        </DropdownMenuSubTrigger>
-                                                        <DropdownMenuPortal>
-                                                            <DropdownMenuSubContent>
                                                                 <DropdownMenuItem
                                                                     className="cursor-pointer"
-                                                                    onClick={() => handleUpdateStatus(shipment.id, 'created')}
+                                                                    onClick={() => window.open(`/admin/ticket/${shipment.id}`, '_blank')}
                                                                 >
-                                                                    <Package className="w-4 h-4 mr-2 text-purple-500" />
-                                                                    Creado
+                                                                    <Printer className="w-4 h-4 mr-2" />
+                                                                    Imprimir Etiqueta
                                                                 </DropdownMenuItem>
+
+                                                                <DropdownMenuSeparator />
+                                                                <DropdownMenuSub>
+                                                                    <DropdownMenuSubTrigger className="cursor-pointer">
+                                                                        <RotateCcw className="w-4 h-4 mr-2" />
+                                                                        Cambiar estado
+                                                                    </DropdownMenuSubTrigger>
+                                                                    <DropdownMenuPortal>
+                                                                        <DropdownMenuSubContent>
+                                                                            <DropdownMenuItem
+                                                                                className="cursor-pointer"
+                                                                                onClick={() => handleUpdateStatus(shipment.id, 'created')}
+                                                                            >
+                                                                                <Package className="w-4 h-4 mr-2 text-purple-500" />
+                                                                                Creado
+                                                                            </DropdownMenuItem>
+                                                                            <DropdownMenuItem
+                                                                                className="cursor-pointer"
+                                                                                onClick={() => handleUpdateStatus(shipment.id, 'in_transit')}
+                                                                            >
+                                                                                <Truck className="w-4 h-4 mr-2 text-blue-500" />
+                                                                                En Tránsito
+                                                                            </DropdownMenuItem>
+                                                                            <DropdownMenuItem
+                                                                                className="cursor-pointer"
+                                                                                onClick={() => handleUpdateStatus(shipment.id, 'at_office')}
+                                                                            >
+                                                                                <Package className="w-4 h-4 mr-2 text-indigo-500" />
+                                                                                En Sucursal
+                                                                            </DropdownMenuItem>
+                                                                            <DropdownMenuItem
+                                                                                className="cursor-pointer"
+                                                                                onClick={() => handleUpdateStatus(shipment.id, 'delivered')}
+                                                                            >
+                                                                                <CheckCircle2 className="w-4 h-4 mr-2 text-green-500" />
+                                                                                Entregado
+                                                                            </DropdownMenuItem>
+                                                                        </DropdownMenuSubContent>
+                                                                    </DropdownMenuPortal>
+                                                                </DropdownMenuSub>
+                                                            </>
+                                                        )}
+
+                                                        {shipment.current_status === 'quote' && (
+                                                            <>
+                                                                {role !== 'company' && <DropdownMenuSeparator />}
                                                                 <DropdownMenuItem
-                                                                    className="cursor-pointer"
-                                                                    onClick={() => handleUpdateStatus(shipment.id, 'in_transit')}
+                                                                    className="cursor-pointer text-red-600 hover:text-red-700 hover:bg-red-50 focus:text-red-700"
+                                                                    onClick={() => handleDelete(shipment.id)}
                                                                 >
-                                                                    <Truck className="w-4 h-4 mr-2 text-blue-500" />
-                                                                    En Tránsito
+                                                                    <Trash2 className="w-4 h-4 mr-2" />
+                                                                    Eliminar
                                                                 </DropdownMenuItem>
-                                                                <DropdownMenuItem
-                                                                    className="cursor-pointer"
-                                                                    onClick={() => handleUpdateStatus(shipment.id, 'at_office')}
-                                                                >
-                                                                    <Package className="w-4 h-4 mr-2 text-indigo-500" />
-                                                                    En Sucursal
-                                                                </DropdownMenuItem>
-                                                                <DropdownMenuItem
-                                                                    className="cursor-pointer"
-                                                                    onClick={() => handleUpdateStatus(shipment.id, 'delivered')}
-                                                                >
-                                                                    <CheckCircle2 className="w-4 h-4 mr-2 text-green-500" />
-                                                                    Entregado
-                                                                </DropdownMenuItem>
-                                                            </DropdownMenuSubContent>
-                                                        </DropdownMenuPortal>
-                                                    </DropdownMenuSub>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                                                            </>
+                                                        )}
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            )}
                                         </TableCell>
                                     </TableRow>
                                 ))

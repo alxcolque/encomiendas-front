@@ -80,27 +80,33 @@ export const AppRouter = () => {
                     <Route path="/driver/wallet" element={<Wallet />} />
                 </Route>
 
-                {/* Admin Routes */}
-                <Route element={<ProtectedRoute allowedRoles={['admin']}><AdminLayout /></ProtectedRoute>}>
+                {/* Admin/Staff Routes */}
+                <Route element={<ProtectedRoute allowedRoles={['admin', 'worker', 'company', 'partner']}><AdminLayout /></ProtectedRoute>}>
+                    {/* Accessible by all staff (admin, worker, company, partner) */}
                     <Route path="/admin" element={<AdminDashboard />} />
                     <Route path="/admin/shipments" element={<AdminShipments />} />
                     <Route path="/admin/shipments/:id" element={<ShipmentDetails />} />
-                    <Route path="/admin/users" element={<AdminUsers />} />
-                    <Route path="/admin/clients" element={<AdminClients />} />
-                    <Route path="/admin/drivers" element={<AdminDrivers />} />
-                    <Route path="/admin/offices" element={<AdminOffices />} />
-                    <Route path="/admin/cities" element={<AdminCities />} />
-                    <Route path="/admin/businesses" element={<AdminBusinesses />} />
-                    <Route path="/admin/reports" element={<AdminReports />} />
-                    <Route path="/admin/settings" element={<AdminSettings />} />
-                </Route>
-                <Route element={<ProtectedRoute allowedRoles={['admin']}><ShipmentTicket /></ProtectedRoute>} path="/admin/ticket/:id" />
 
+                    {/* Accessible by admin and worker */}
+                    <Route element={<ProtectedRoute allowedRoles={['admin', 'worker']} />}>
+                        <Route path="/admin/clients" element={<AdminClients />} />
+                        <Route path="/admin/reports" element={<AdminReports />} />
+                    </Route>
 
-                {/* Worker Routes */}
-                <Route element={<ProtectedRoute allowedRoles={['worker', 'admin']}><WorkerLayout /></ProtectedRoute>}>
-                    <Route path="/worker" element={<AdminDashboard />} /> {/* Placeholder */}
+                    {/* Accessible only by admin */}
+                    <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+                        <Route path="/admin/users" element={<AdminUsers />} />
+                        <Route path="/admin/drivers" element={<AdminDrivers />} />
+                        <Route path="/admin/offices" element={<AdminOffices />} />
+                        <Route path="/admin/cities" element={<AdminCities />} />
+                        <Route path="/admin/businesses" element={<AdminBusinesses />} />
+                        <Route path="/admin/settings" element={<AdminSettings />} />
+                    </Route>
                 </Route>
+                <Route element={<ProtectedRoute allowedRoles={['admin', 'worker']}><ShipmentTicket /></ProtectedRoute>} path="/admin/ticket/:id" />
+
+                {/* Worker Layout Fallback (if any old links remain) */}
+                <Route element={<ProtectedRoute allowedRoles={['worker']}><Navigate to="/admin" replace /></ProtectedRoute>} path="/worker" />
 
                 {/* User Routes */}
                 <Route element={<ProtectedRoute allowedRoles={['client', 'driver', 'admin', 'worker']}><UserLayout /></ProtectedRoute>}>

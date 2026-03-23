@@ -2,13 +2,20 @@ import { LayoutDashboard, Package, Users, UserCheck, Truck, Building2, FileBarCh
 import { AdminSidebarItem } from "./AdminSidebarItem";
 import { ADMIN_ROUTES } from "@/constants/admin.routes";
 import { cn } from "@/lib/utils";
-import kolmoxLogo from "@/assets/kolmox-logo.png"; // reusing existing asset
+import kolmoxLogo from "@/assets/kolmox-logo.png";
+import { useAuthStore } from "@/stores/authStore";
 
 interface AdminSidebarProps {
     className?: string;
 }
 
 export function AdminSidebar({ className }: AdminSidebarProps) {
+    const { user } = useAuthStore();
+    const role = user?.role || 'client';
+
+    const isWorker = role === 'worker';
+    const isAdmin = role === 'admin';
+
     return (
         <aside className={cn(
             "fixed left-0 top-0 h-screen w-64 bg-card border-r border-border/50 flex flex-col transition-all duration-300 z-40 hidden lg:flex",
@@ -31,22 +38,27 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
                 </div>
                 <AdminSidebarItem icon={LayoutDashboard} label="Dashboard" path={ADMIN_ROUTES.DASHBOARD} />
                 <AdminSidebarItem icon={Package} label="Encomiendas" path={ADMIN_ROUTES.SHIPMENTS} />
-                <AdminSidebarItem icon={Users} label="Usuarios" path={ADMIN_ROUTES.USERS} />
-                <AdminSidebarItem icon={UserCheck} label="Clientes" path={ADMIN_ROUTES.CLIENTS} />
-                <AdminSidebarItem icon={Building2} label="Empresas" path={ADMIN_ROUTES.BUSINESSES} />
 
-                <div className="px-3 mt-6 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Operaciones
-                </div>
-                <AdminSidebarItem icon={Truck} label="Conductores" path={ADMIN_ROUTES.DRIVERS} />
-                <AdminSidebarItem icon={Building2} label="Agencias" path={ADMIN_ROUTES.OFFICES} />
-                <AdminSidebarItem icon={MapPin} label="Ciudades y Rutas" path={ADMIN_ROUTES.CITIES} />
+                {isAdmin && <AdminSidebarItem icon={Users} label="Usuarios" path={ADMIN_ROUTES.USERS} />}
+                {(isAdmin || isWorker) && <AdminSidebarItem icon={UserCheck} label="Clientes" path={ADMIN_ROUTES.CLIENTS} />}
+                {isAdmin && <AdminSidebarItem icon={Building2} label="Empresas" path={ADMIN_ROUTES.BUSINESSES} />}
+
+                {isAdmin && (
+                    <>
+                        <div className="px-3 mt-6 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                            Operaciones
+                        </div>
+                        <AdminSidebarItem icon={Truck} label="Conductores" path={ADMIN_ROUTES.DRIVERS} />
+                        <AdminSidebarItem icon={Building2} label="Agencias" path={ADMIN_ROUTES.OFFICES} />
+                        <AdminSidebarItem icon={MapPin} label="Ciudades y Rutas" path={ADMIN_ROUTES.CITIES} />
+                    </>
+                )}
 
                 <div className="px-3 mt-6 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Sistema
                 </div>
-                <AdminSidebarItem icon={FileBarChart} label="Reportes" path={ADMIN_ROUTES.REPORTS} />
-                <AdminSidebarItem icon={Settings} label="Configuración" path={ADMIN_ROUTES.SETTINGS} />
+                {(isAdmin || isWorker) && <AdminSidebarItem icon={FileBarChart} label="Reportes" path={ADMIN_ROUTES.REPORTS} />}
+                {isAdmin && <AdminSidebarItem icon={Settings} label="Configuración" path={ADMIN_ROUTES.SETTINGS} />}
             </nav>
 
             {/* Footer / User Info could go here if not in TopNavbar */}
