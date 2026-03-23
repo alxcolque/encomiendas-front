@@ -140,7 +140,11 @@ export default function OfficesPage() {
                                         </div>
                                         <div className="flex items-center gap-3 text-muted-foreground">
                                             <Phone className="w-5 h-5 text-primary shrink-0" />
-                                            <span>{office.phone || "No especificado"}</span>
+                                            <span>
+                                                {office.managers && office.managers.length > 0
+                                                    ? office.managers.map(m => m.phone).filter(Boolean).join(', ')
+                                                    : "No especificado"}
+                                            </span>
                                         </div>
                                         {/* <div className="flex items-start gap-3 text-muted-foreground">
                                             <Clock className="w-5 h-5 text-primary shrink-0 mt-0.5" />

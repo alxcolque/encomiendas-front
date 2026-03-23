@@ -12,6 +12,7 @@ export interface IOffice {
     hours?: string;
     image?: string;
     coordinates?: string;
+    managers?: { id: string; name: string; phone?: string }[];
 }
 
 export interface IShipmentEvent {
