@@ -222,12 +222,12 @@ export default function PublicNavbar() {
                                     <Link
                                         to={link.href}
                                         className={cn(
-                                            "flex flex-col items-center min-w-fit gap-1 group transition-colors px-1",
-                                            isActive ? "text-primary" : "text-muted-foreground"
+                                            "flex flex-col items-center min-w-fit gap-0.5 group transition-all px-2 pb-1 border-b-[3px] rounded-t-sm",
+                                            isActive ? "text-primary border-primary" : "text-muted-foreground border-transparent hover:border-border/50"
                                         )}
                                     >
                                         <div className={cn(
-                                            "p-1.5 rounded-lg transition-colors",
+                                            "p-1 rounded-lg transition-colors",
                                             isActive ? "bg-primary/10" : "group-hover:bg-muted"
                                         )}>
                                             <Icon className="w-5 h-5" />
