@@ -125,28 +125,23 @@ export default function ContactSection() {
     {
       icon: MapPin,
       title: "Dirección",
-      lines: [general.address || "La Paz, Bolivia"],
+      lines: [general.address || "Oruro, Bolivia"],
     },
     {
       icon: Phone,
       title: "Teléfono",
-      lines: [general.supportPhone || "+591 2 1234567"],
+      lines: [general.supportPhone || "+591 67239563"],
     },
     {
       icon: Mail,
       title: "Email",
-      lines: [general.supportEmail || "contacto@kolmox.com"],
-    },
-    {
-      icon: Clock,
-      title: "Horarios",
-      lines: ["Lun - Vie: 8:00 - 18:00", "Sábados: 9:00 - 13:00"],
-    },
+      lines: [general.supportEmail || "contacto@kolmox.com.bo"],
+    }
   ];
 
   return (
-    <section id="contacto" className="py-10 md:py-16 bg-muted/30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="contacto" className="py-8 md:py-16 bg-muted/30 overflow-hidden relative">
+      <div className="max-w-7xl mx-auto px-0 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             Contáctanos
@@ -158,86 +153,7 @@ export default function ContactSection() {
 
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Form */}
-          <div className="glass-card p-6 md:p-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name" className="text-foreground flex items-center gap-2">
-                    <User className="w-4 h-4 text-primary" />
-                    Nombre
-                  </Label>
-                  <Input
-                    id="name"
-                    placeholder="Tu nombre completo"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    required
-                    className="bg-background/50"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-foreground flex items-center gap-2">
-                    <Mail className="w-4 h-4 text-primary" />
-                    Email
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="tu@email.com"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    required
-                    className="bg-background/50"
-                  />
-                </div>
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="subject" className="text-foreground flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-primary" />
-                  Asunto
-                </Label>
-                <Input
-                  id="subject"
-                  placeholder="¿En qué podemos ayudarte?"
-                  value={formData.subject}
-                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  required
-                  className="bg-background/50"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="message" className="text-foreground">
-                  Mensaje
-                </Label>
-                <Textarea
-                  id="message"
-                  placeholder="Escribe tu mensaje aquí..."
-                  value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  required
-                  rows={5}
-                  className="bg-background/50 resize-none"
-                />
-              </div>
-
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
-              >
-                {loading ? (
-                  "Enviando..."
-                ) : (
-                  <>
-                    <Send className="w-4 h-4 mr-2" />
-                    Enviar Mensaje
-                  </>
-                )}
-              </Button>
-            </form>
-          </div>
 
           {/* Contact Info & Map */}
           <div className="space-y-6">

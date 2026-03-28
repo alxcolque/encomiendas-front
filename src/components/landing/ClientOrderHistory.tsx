@@ -75,7 +75,7 @@ export default function ClientOrderHistory() {
 
     return (
         <section className="py-12 bg-muted/30">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto px-0 sm:px-6 lg:px-8">
                 <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <h2 className="text-3xl font-display font-bold text-foreground">

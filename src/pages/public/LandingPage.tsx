@@ -17,7 +17,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-background flex flex-col">
       <main className="flex-grow">
         {/* Hero Section with Carousel (Widget Removed) */}
-        <section className="relative">
+        <section className="relative mt-4 lg:mt-0">
           <HeroCarousel />
         </section>
 

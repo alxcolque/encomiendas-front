@@ -50,7 +50,10 @@ export function MobileLayout({
           <div className="flex justify-around items-center max-w-lg mx-auto py-2">
             {navItems.map((item, index) => {
               const Icon = item.icon;
-              const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + "/");
+              // Evitar que las rutas raíz (como /admin) se marquen activas para cualquier subruta
+              const isRootPath = ['/', '/admin', '/worker', '/client', '/company', '/partner'].includes(item.path);
+              const isActive = location.pathname === item.path || 
+                               (!isRootPath && location.pathname.startsWith(item.path + "/"));
 
               return (
                 <Fragment key={item.path}>

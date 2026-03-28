@@ -13,11 +13,11 @@ const partners = [
 
 export default function TrustBar() {
   return (
-    <div className="bg-background border-y border-border py-8 md:py-12 relative overflow-hidden">
+    <div className="md:py-4 bg-muted/30 border-y border-border/50 relative overflow-hidden">
       {/* Decorative background element */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-0 translate-x-1/2 -translate-y-1/2" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-0 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-8">
           <h3 className="text-xs font-bold uppercase tracking-[0.3em] text-primary mb-4">Números que Avalan</h3>
           <h2 className="text-3xl md:text-4xl font-black text-foreground">Resultados que Generan Confianza</h2>

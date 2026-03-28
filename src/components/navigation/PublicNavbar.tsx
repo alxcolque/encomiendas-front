@@ -95,7 +95,7 @@ export default function PublicNavbar() {
                 scrolled && "shadow-md bg-background/95 backdrop-blur-sm"
             )}
         >
-            <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto px-0 md:px-6 lg:px-8">
                 {/* FIRST ROW: Logo and Auth (Mobile/Tablet/Desktop) */}
                 <div className="flex items-center justify-between h-16">
                     {/* Logo Section */}
@@ -110,7 +110,7 @@ export default function PublicNavbar() {
                                     e.currentTarget.parentElement?.classList.add('bg-primary', 'flex', 'items-center', 'justify-center');
                                 }}
                             />
-                            <Package className="w-6 h-6 text-primary-foreground absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden group-hover:block" />
+                            {/* <Package className="w-6 h-6 text-primary-foreground absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden group-hover:block" /> */}
                         </div>
                         <span className="text-xl font-bold font-display tracking-tight text-foreground">
                             {general.siteName || "KOLMOX"}
@@ -211,7 +211,7 @@ export default function PublicNavbar() {
                 {/* SECOND ROW: Mobile/Tablet Horizontal Menu (Hidden on Desktop) */}
                 <div className="md:hidden border-t border-border/50 -mx-4">
                     <div
-                        className="flex overflow-x-auto no-scrollbar items-center py-2 px-4 gap-6 scroll-smooth"
+                        className="flex overflow-x-auto no-scrollbar items-center justify-center py-2 px-4 gap-3 scroll-smooth"
                     >
                         {navLinks.map((link, index) => {
                             const Icon = link.icon;

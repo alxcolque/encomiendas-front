@@ -88,9 +88,12 @@ export default function ServicesPage() {
                     <p className="text-primary-foreground/80 max-w-xl mx-auto">
                         Contáctanos hoy mismo y uno de nuestros asesores te ayudará a encontrar la mejor opción logística para tu negocio.
                     </p>
-                    <Button variant="secondary" size="lg" className="font-semibold text-primary">
-                        Contactar Asesor
-                    </Button>
+                    {/* WhatsApp Button with link to WhatsApp */}
+                    <a href="https://wa.me/59167239563" target="_blank" rel="noopener noreferrer">
+                        <Button variant="secondary" size="lg" className="font-semibold text-primary">
+                            Contactar Asesor
+                        </Button>
+                    </a>
                 </div>
             </section>
         </div>

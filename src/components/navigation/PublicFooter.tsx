@@ -21,7 +21,7 @@ export default function PublicFooter() {
 
     return (
         <footer className="bg-card/50 border-t border-border mt-auto">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
+            <div className="max-w-7xl mx-auto px-0 sm:px-6 lg:px-8 pt-16 pb-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8">
 
                     {/* Brand & Info */}
@@ -138,13 +138,6 @@ export default function PublicFooter() {
                                     </a>
                                 );
                             })}
-                        </div>
-                        <div className="grid grid-cols-5 w-full gap-2 px-2">
-                            {['facebook', 'twitter', 'tiktok', 'youtube', 'instagram'].map(label => (
-                                <span key={label} className="text-[9px] font-bold text-gray-400 capitalize text-center">
-                                    {label}
-                                </span>
-                            ))}
                         </div>
                     </div>
                 </div>

@@ -760,7 +760,7 @@ export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = fal
                                 : "opacity-40 cursor-not-allowed"
                         )}
                     >
-                        {isClientMode ? "Registrar Encomienda" : "Siguiente — Completar Registro"}
+                        {isClientMode ? "Registrar Encomienda" : "Siguiente - Finalizar"}
                         <ArrowRight className="h-5 w-5" />
                     </Button>
                 </div>

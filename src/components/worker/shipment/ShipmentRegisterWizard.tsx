@@ -240,7 +240,7 @@ export default function ShipmentRegisterWizard({
                                 step === 1 ? "translate-x-0 opacity-100 relative" : "-translate-x-full opacity-0 absolute inset-0 pointer-events-none"
                             )}
                         >
-                            <div className="border border-border/60 rounded-2xl p-6 bg-card/60 backdrop-blur-sm shadow-sm space-y-6">
+                            <div className="border border-border/60 rounded-2xl p-2 bg-card/60 backdrop-blur-sm shadow-sm space-y-6">
                                 <div className="flex items-center gap-3 mb-2">
                                     <div className="w-10 h-10 rounded-full gradient-primary flex items-center justify-center text-primary-foreground shadow-md">
                                         <FileText className="h-5 w-5" />
