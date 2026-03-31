@@ -110,6 +110,7 @@ export default function ShipmentRegisterWizard({
 
     const { user, hasRole } = useAuthStore();
     const isClient = hasRole('client') || user?.role === 'client';
+    const isAdmin = hasRole('admin') || user?.role === 'admin';
 
     const handleDetailsNext = (data: ShipmentDetailsData) => {
         setDetailsData(data);
@@ -292,7 +293,7 @@ export default function ShipmentRegisterWizard({
                                 step === 2 ? "translate-x-0 opacity-100 relative" : step > 2 ? "-translate-x-full opacity-0 absolute inset-0 pointer-events-none" : "translate-x-full opacity-0 absolute inset-0 pointer-events-none"
                             )}
                         >
-                            <ShipmentDetailsForm onNext={handleDetailsNext} onBack={handleBack} isClientMode={isClient} />
+                            <ShipmentDetailsForm onNext={handleDetailsNext} onBack={handleBack} isClientMode={isClient} isAdminMode={isAdmin} />
                         </div>
 
                         <div

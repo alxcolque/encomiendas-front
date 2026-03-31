@@ -32,6 +32,7 @@ interface Actions {
   hasRole: (role: string) => boolean;
   updateProfile: (data: { name: string, email: string, phone: string, avatar?: string }) => Promise<void>;
   changePin: (data: { current_pin: string, pin: string, pin_confirmation: string }) => Promise<void>;
+  deleteAccount: (data: { pin: string, reasons: string[] }) => Promise<void>;
 }
 
 const storeApi: StateCreator<AuthState & Actions> = (set, get) => ({
@@ -250,6 +251,29 @@ const storeApi: StateCreator<AuthState & Actions> = (set, get) => ({
       set({ isLoading: false });
       if (isAxiosError(error)) {
         toast.error(error.response?.data.message || "Error al cambiar PIN");
+      }
+      throw error;
+    }
+  },
+
+  deleteAccount: async (data) => {
+    set({ isLoading: true });
+    try {
+      const response = await ENV.post("/profile/delete-me", data);
+      
+      // Logout and clear state
+      set(() => ({
+        user: undefined,
+        token: undefined,
+        authStatus: "not-auth",
+        isLoading: false
+      }));
+      
+      toast.success(response.data.message || "Cuenta eliminada correctamente");
+    } catch (error) {
+      set({ isLoading: false });
+      if (isAxiosError(error)) {
+        toast.error(error.response?.data.message || "Error al eliminar la cuenta");
       }
       throw error;
     }

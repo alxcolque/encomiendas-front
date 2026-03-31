@@ -52,6 +52,7 @@ interface Props {
     onNext: (data: ShipmentDetailsData) => void;
     onBack?: () => void;
     isClientMode?: boolean;
+    isAdminMode?: boolean;
 }
 
 /* ─── Constants ─────────────────────────────────────────── */
@@ -285,7 +286,7 @@ function TransportCard({
 }
 
 /* ─── Main Component ─────────────────────────────────────── */
-export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = false }: Props) {
+export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = false, isAdminMode = false }: Props) {
     const { user } = useAuthStore();
     const role = user?.role;
     const { offices, fetchOffices } = useOfficeStore();
@@ -535,7 +536,7 @@ export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = fal
                                 <Input
                                     type="number"
                                     min="0"
-                                    step="0.1"
+                                    step="1"
                                     placeholder="0.0"
                                     value={weight}
                                     onChange={(e) => setWeight(e.target.value)}
@@ -571,14 +572,27 @@ export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = fal
                             badge="Económico"
                             onClick={() => setTransport("terrestre")}
                         />
-                        <TransportCard
+                        {/* disabled */}
+                        <div className="flex flex-col gap-2 p-2 rounded-xl border-2 border-border/70 bg-card hover:border-muted-foreground/30 hover:bg-muted/30 hover:scale-[1.01]">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Plane className="h-5 w-5 text-muted-foreground" />
+                                    <span className="text-sm font-semibold text-foreground">Aéreo</span>
+                                </div>
+                                <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                                    Próximamente
+                                </span>
+                            </div>
+                            <span className="text-xs text-muted-foreground">Vuelo directo</span>
+                        </div>
+                        {/* <TransportCard
                             active={transport === "aereo"}
                             icon={Plane}
                             label="Aéreo"
                             subtitle="Vuelo directo"
                             badge="+40% tarifa"
                             onClick={() => setTransport("aereo")}
-                        />
+                        /> */}
                     </div>
                 </div>
 
@@ -638,7 +652,7 @@ export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = fal
 
                                     {/* Price & Days */}
                                     <div className={cn("mt-auto pt-2 border-t border-border/40 flex items-center gap-1", isClientMode ? "justify-end" : "justify-between")}>
-                                        {!isClientMode && (
+                                        {isAdminMode && (
                                             <span
                                                 className={cn(
                                                     "text-sm font-black",

@@ -266,6 +266,26 @@ export default function ProfilePage() {
                             </div>
                         </form>
                     </GlassCard>
+
+                    {/* Danger Zone */}
+                    <GlassCard className="p-6 border-destructive/20 bg-destructive/5">
+                        <div className="flex items-center gap-2 mb-4 text-destructive">
+                            <ShieldCheck size={20} />
+                            <h3 className="text-lg font-bold">Zona de Peligro</h3>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-4">
+                            Si eliminas tu cuenta, todos tus datos personales serán borrados o anonimizados. Esta acción es irreversible.
+                        </p>
+                        <div className="flex justify-start">
+                            <Button 
+                                variant="link" 
+                                className="text-destructive hover:text-destructive/80 p-0 h-auto font-medium"
+                                onClick={() => window.location.href = "/user/profile/delete-me"}
+                            >
+                                Deseo eliminar mi cuenta definitivamente
+                            </Button>
+                        </div>
+                    </GlassCard>
                 </div>
             </div>
         </div>

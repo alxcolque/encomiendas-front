@@ -45,6 +45,7 @@ const ShipmentTicket = lazy(() => import("@/pages/admin/ShipmentTicket"));
 const InvoicePage = lazy(() => import("@/pages/shared/InvoicePage"));
 // User
 const ProfilePage = lazy(() => import("@/pages/user/Profile"));
+const DeleteAccountPage = lazy(() => import("@/pages/user/DeleteAccount"));
 const ClientProfilePage = lazy(() => import("@/pages/client/ProfilePage"));
 
 const Loading = () => <div className="p-4 text-center">Cargando...</div>;
@@ -112,6 +113,7 @@ export const AppRouter = () => {
                 <Route element={<ProtectedRoute allowedRoles={['client', 'driver', 'admin', 'worker']}><UserLayout /></ProtectedRoute>}>
                     <Route path="/user" element={<Navigate to="/user/profile" replace />} />
                     <Route path="/user/profile" element={<ProfilePage />} />
+                    <Route path="/user/profile/delete-me" element={<DeleteAccountPage />} />
                     <Route path="/shipments/:id/invoice" element={<InvoicePage />} />
                 </Route>
 

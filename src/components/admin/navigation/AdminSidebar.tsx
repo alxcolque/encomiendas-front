@@ -22,14 +22,16 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
             className
         )}>
             {/* Logo Header */}
-            <div className="h-16 flex items-center gap-3 px-6 border-b border-border/50">
-                <img
-                    src={kolmoxLogo}
-                    alt="KOLMOX"
-                    className="w-8 h-8 rounded-lg object-cover"
-                />
-                <span className="font-display font-bold text-lg tracking-tight">KOLMOX</span>
-            </div>
+            <a href="/">
+                <div className="h-16 flex items-center gap-3 px-6 border-b border-border/50">
+                    <img
+                        src={kolmoxLogo}
+                        alt="KOLMOX"
+                        className="w-8 h-8 rounded-lg object-cover"
+                    />
+                    <span className="font-display font-bold text-lg tracking-tight">KOLMOX</span>
+                </div>
+            </a>
 
             {/* Navigation */}
             <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
