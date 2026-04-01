@@ -17,5 +17,10 @@ export const PublicService = {
         // Single Resource returns { data: {...} }
         const { data } = await ENV.get<{ data: IShipmentResponse }>(`/shipments/track/${code}`);
         return data.data;
+    },
+
+    verifyBusinessByCode: async (code: string) => {
+        const { data } = await ENV.get<{ data: any }>(`/public/businesses/verify/${code}`);
+        return data.data;
     }
 };

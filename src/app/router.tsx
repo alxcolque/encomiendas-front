@@ -22,6 +22,7 @@ const TermsPage = lazy(() => import("@/pages/public/TermsPage"));
 const PrivacyPage = lazy(() => import("@/pages/public/PrivacyPage"));
 const RefundPolicyPage = lazy(() => import("@/pages/public/RefundPolicyPage"));
 const ClaimsPage = lazy(() => import("@/pages/public/ClaimsPage"));
+const MyBusinessPage = lazy(() => import("@/pages/public/MyBusinessPage"));
 
 // Driver
 const DriverHome = lazy(() => import("@/pages/driver/Home"));
@@ -71,6 +72,7 @@ export const AppRouter = () => {
                     <Route path="/privacy" element={<PrivacyPage />} />
                     <Route path="/refunds" element={<RefundPolicyPage />} />
                     <Route path="/claims" element={<ClaimsPage />} />
+                    <Route path="/my-business" element={<MyBusinessPage />} />
                 </Route>
 
                 {/* Driver Routes */}

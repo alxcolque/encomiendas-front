@@ -21,7 +21,7 @@ export default function ServicesGrid() {
         {
             name: "Mi Negocio",
             icon: <Handshake className="w-7 h-7 md:w-8 md:h-8" />,
-            href: "/business",
+            href: "/my-business",
         },
         {
             name: "Mi Tienda",
