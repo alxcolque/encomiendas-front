@@ -9,5 +9,6 @@ const config: CapacitorConfig = {
     cleartext: true
   }
 };
-
+//capacitor run android --livereload --external
+//npx cap sync android
 export default config;
