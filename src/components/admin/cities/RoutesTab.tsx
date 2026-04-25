@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { ArrowRight, Plus, Route, Trash2 } from "lucide-react";
+import { ArrowRight, Route, Trash2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
 export function RoutesTab() {
@@ -25,11 +25,7 @@ export function RoutesTab() {
     const [editedValues, setEditedValues] = useState<Record<string, string>>({});
     const [updatingId, setUpdatingId] = useState<string | null>(null);
 
-    // New route form
-    const [newCityA, setNewCityA] = useState("");
-    const [newCityB, setNewCityB] = useState("");
-    const [newValue, setNewValue] = useState("");
-    const [isCreating, setIsCreating] = useState(false);
+    const [isGenerating, setIsGenerating] = useState(false);
 
     useEffect(() => {
         fetchRouteValues();
@@ -78,33 +74,19 @@ export function RoutesTab() {
         }
     };
 
-    const handleCreate = async () => {
-        if (!newCityA || !newCityB || !newValue) {
-            toast.error("Completa todos los campos para agregar una ruta");
-            return;
-        }
-        if (newCityA === newCityB) {
-            toast.error("Las ciudades de origen y destino no pueden ser iguales");
-            return;
-        }
-        const val = parseFloat(newValue);
-        if (isNaN(val) || val < 0) {
-            toast.error("El valor debe ser un número positivo");
-            return;
-        }
-        setIsCreating(true);
+    const handleGenerate = async () => {
+        setIsGenerating(true);
         try {
-            await createRouteValue({ city_a: newCityA, city_b: newCityB, value: val });
-            toast.success("Ruta creada correctamente");
-            setNewCityA("");
-            setNewCityB("");
-            setNewValue("");
+            await useRouteValueStore.getState().generateRoutes();
+            toast.success("Rutas generadas correctamente", {
+                description: "Se calcularon las distancias entre todas las ciudades disponibles."
+            });
         } catch (error: any) {
-            toast.error("Error al crear ruta", {
-                description: error.response?.data?.message || "Error inesperado",
+            toast.error("Error al generar rutas", {
+                description: error.response?.data?.message || "Ocurrió un error inesperado"
             });
         } finally {
-            setIsCreating(false);
+            setIsGenerating(false);
         }
     };
 
@@ -114,62 +96,24 @@ export function RoutesTab() {
 
     return (
         <div className="space-y-6">
-            {/* Add new route form */}
-            <div className="rounded-xl border border-border bg-card shadow-sm p-4">
-                <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
-                    <Plus className="h-4 w-4" /> Agregar nueva ruta
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_120px_auto] gap-3 items-end">
-                    <div className="space-y-1">
-                        <Label className="text-xs">Ciudad A</Label>
-                        <Select value={newCityA} onValueChange={setNewCityA}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Origen" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {cities.map((c) => (
-                                    <SelectItem key={c.id} value={c.id}>
-                                        {c.name}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="space-y-1">
-                        <Label className="text-xs">Ciudad B</Label>
-                        <Select value={newCityB} onValueChange={setNewCityB}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Destino" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {cities.map((c) => (
-                                    <SelectItem key={c.id} value={c.id}>
-                                        {c.name}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="space-y-1">
-                        <Label className="text-xs">Valor (Bs.)</Label>
-                        <Input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            placeholder="0.00"
-                            value={newValue}
-                            onChange={(e) => setNewValue(e.target.value)}
-                        />
-                    </div>
-                    <Button onClick={handleCreate} disabled={isCreating} className="gap-2">
-                        {isCreating ? (
-                            <div className={`loading-logo ${"h-4 w-4 animate-pulse"}`}></div>
-                        ) : (
-                            <Plus className="h-4 w-4" />
-                        )}
-                        Agregar
-                    </Button>
+            {/* Action Header */}
+            <div className="flex justify-between items-center rounded-xl border border-border bg-card shadow-sm p-4">
+                <div>
+                    <h3 className="text-sm font-semibold text-foreground mb-1">
+                        Generación automática
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                        Genera todas las combinaciones posibles de rutas basadas en la distancia geográfica entre las ciudades registradas.
+                    </p>
                 </div>
+                <Button onClick={handleGenerate} disabled={isGenerating} className="gap-2 shrink-0">
+                    {isGenerating ? (
+                        <div className={`loading-logo ${"h-4 w-4 animate-pulse"}`}></div>
+                    ) : (
+                        <RefreshCw className="h-4 w-4" />
+                    )}
+                    Generar rutas
+                </Button>
             </div>
 
             {/* Routes table */}

@@ -11,6 +11,7 @@ interface RouteValueState {
     updateRouteValue: (id: string, value: number) => Promise<void>;
     deleteRouteValue: (id: string) => Promise<void>;
     findRouteValue: (cityA: string, cityB: string) => Promise<RouteValue | null>;
+    generateRoutes: () => Promise<void>;
 }
 
 export const useRouteValueStore = create<RouteValueState>((set) => ({
@@ -80,6 +81,19 @@ export const useRouteValueStore = create<RouteValueState>((set) => ({
         } catch (error) {
             console.error(error);
             return null;
+        }
+    },
+
+    generateRoutes: async () => {
+        set({ isLoading: true });
+        try {
+            await ENV.post('/route-values/generate');
+            // Re-fetch after generating
+            const { data } = await ENV.get<{ data: RouteValue[] }>('/route-values');
+            set({ routeValues: data.data || [], isLoading: false });
+        } catch (error) {
+            set({ isLoading: false });
+            throw error;
         }
     },
 }));
