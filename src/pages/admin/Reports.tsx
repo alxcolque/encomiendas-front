@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useReportStore } from "@/stores/reportStore";
-import { LoadingLogo } from "@/components/shared/LoadingLogo";
 import { format, subDays, startOfWeek, startOfMonth, startOfYear, endOfMonth, endOfYear, endOfWeek } from "date-fns";
 
 type DateFilter = 'today' | 'week' | 'month' | 'year' | 'custom';
@@ -102,7 +101,7 @@ export default function Reports() {
 
             {isLoading ? (
                 <div className="flex items-center justify-center p-12">
-                    <LoadingLogo className="w-12 h-12 animate-pulse text-primary" />
+                    <div className={`loading-logo ${"w-12 h-12 animate-pulse text-primary"}`}></div>
                 </div>
             ) : !data ? (
                 <div className="text-center text-muted-foreground p-12">No hay datos disponibles</div>

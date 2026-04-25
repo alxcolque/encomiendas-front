@@ -80,7 +80,7 @@ export function UsersTable() {
     };
 
     if (isLoading && users.length === 0) {
-        return <div className="p-8 text-center text-muted-foreground">Cargando usuarios...</div>;
+        return <div className="loading-logo-section"></div>;
     }
 
     return (
@@ -119,7 +119,7 @@ export function UsersTable() {
                         {isLoading && users.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
-                                    Cargando usuarios...
+                                    <div className={`loading-logo ${"mx-auto"}`}></div>
                                 </TableCell>
                             </TableRow>
                         ) : filtered.length === 0 ? (

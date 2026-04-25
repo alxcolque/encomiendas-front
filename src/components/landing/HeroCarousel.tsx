@@ -1,10 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import slider1 from "/slides/slider-1.webp";
-import slider2 from "/slides/slider-2.webp";
-import slider3 from "/slides/slider-3.webp";
-import slider4 from "/slides/slider-4.webp";
+import slider1 from "/slides/slider-5.jpeg";
+import slider2 from "/slides/slider-6.jpeg";
+import slider3 from "/slides/slider-7.jpeg";
 
 const slides = [
   {
@@ -21,11 +20,6 @@ const slides = [
     image: slider3,
     title: "Rastreo Satelital en Tiempo Real",
     subtitle: "Transparencia total desde la recolección hasta la entrega",
-  },
-  {
-    image: slider4,
-    title: "Atención Personalizada 24/7",
-    subtitle: "Estamos contigo en cada paso de tu envío",
   },
 ];
 

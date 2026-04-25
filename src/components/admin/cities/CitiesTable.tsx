@@ -38,9 +38,7 @@ export function CitiesTable({ onEdit }: CitiesTableProps) {
     };
 
     if (isLoading && cities.length === 0) {
-        return (
-            <div className="p-8 text-center text-muted-foreground">Cargando ciudades...</div>
-        );
+        return <div className="loading-logo-section"></div>;
     }
 
     if (cities.length === 0) {

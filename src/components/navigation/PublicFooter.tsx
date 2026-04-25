@@ -27,8 +27,15 @@ export default function PublicFooter() {
                     {/* Brand & Info */}
                     <div className="lg:col-span-4 space-y-6">
                         <Link to="/" className="flex items-center gap-2 group">
-                            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform duration-300">
-                                <Package className="w-6 h-6 text-primary-foreground" />
+                            <div className="relative w-10 h-10 overflow-hidden rounded-xl">
+                                <img
+                                    src={'logo.png'}
+                                    alt={general.siteName || "KOLMOX"}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                        e.currentTarget.src = 'logo.png';
+                                    }}
+                                />
                             </div>
                             <span className="text-xl font-bold font-display text-foreground">{general.siteName}</span>
                         </Link>

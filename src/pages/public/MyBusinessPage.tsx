@@ -3,7 +3,6 @@ import { PublicService } from "@/services/public.service";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { LoadingLogo } from "@/components/shared/LoadingLogo";
 import { MapPin, Phone, Building2, Search, CheckCircle2, AlertCircle } from "lucide-react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -247,7 +246,7 @@ export default function MyBusinessPage() {
                             disabled={isLoading}
                             className="h-12 px-8 font-bold text-base shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all uppercase"
                         >
-                            {isLoading ? <LoadingLogo className="h-5 w-5 mr-2 animate-pulse" /> : "Verificar"}
+                            {isLoading ? <div className={`loading-logo ${"h-5 w-5 mr-2 animate-pulse"}`}></div> : "Verificar"}
                         </Button>
                     </div>
                 </div>

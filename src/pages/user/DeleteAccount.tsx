@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { AlertTriangle, ArrowLeft, Trash2, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
-import { LoadingLogo } from "@/components/shared/LoadingLogo";
 
 const REASONS = [
     "No lo uso frecuentemente",
@@ -189,7 +188,7 @@ export default function DeleteAccountPage() {
                                 disabled={pin.length !== 4 || isLoading}
                             >
                                 {isLoading ? (
-                                    <LoadingLogo className="mr-2 h-4 w-4 animate-pulse" />
+                                    <div className={`loading-logo ${"mr-2 h-4 w-4 animate-pulse"}`}></div>
                                 ) : (
                                     <Trash2 size={18} className="mr-2" />
                                 )}

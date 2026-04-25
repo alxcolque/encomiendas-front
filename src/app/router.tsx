@@ -49,7 +49,8 @@ const ProfilePage = lazy(() => import("@/pages/user/Profile"));
 const DeleteAccountPage = lazy(() => import("@/pages/user/DeleteAccount"));
 const ClientProfilePage = lazy(() => import("@/pages/client/ProfilePage"));
 
-const Loading = () => <div className="p-4 text-center">Cargando...</div>;
+
+const Loading = () => <div className="loading-logo-full"></div>;
 
 export const AppRouter = () => {
     return (

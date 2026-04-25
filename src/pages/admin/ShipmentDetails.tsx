@@ -1,4 +1,3 @@
-import { LoadingLogo } from "@/components/shared/LoadingLogo";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAdminShipmentStore } from "@/stores/adminShipmentStore";
@@ -643,7 +642,7 @@ export default function ShipmentDetails() {
                             <div className="flex gap-2">
                                 <Input value={senderCi} onChange={e => setSenderCi(e.target.value)} placeholder="Buscar por CI..." className={!senderCi.trim() ? "border-destructive/50" : ""} />
                                 <Button disabled={!isQuote || isSearchingSender || senderCi.length < 5} type="button" variant="outline" size="icon" className="shrink-0 h-10 w-10 text-primary hover:text-primary transition-colors hover:bg-primary/10" onClick={() => handleSearchClient('sender')}>
-                                    {isSearchingSender ? <LoadingLogo className="w-4 h-4 animate-pulse" /> : <Search className="w-4 h-4" />}
+                                    {isSearchingSender ? <div className={`loading-logo ${"w-4 h-4 animate-pulse"}`}></div> : <Search className="w-4 h-4" />}
                                 </Button>
                             </div>
                         </div>
@@ -673,7 +672,7 @@ export default function ShipmentDetails() {
                             <div className="flex gap-2">
                                 <Input value={receiverCi} onChange={e => setReceiverCi(e.target.value)} placeholder="Buscar por CI..." />
                                 <Button disabled={!isQuote || isSearchingReceiver || receiverCi.length < 5} type="button" variant="outline" size="icon" className="shrink-0 h-10 w-10 text-primary hover:text-primary transition-colors hover:bg-primary/10" onClick={() => handleSearchClient('recipient')}>
-                                    {isSearchingReceiver ? <LoadingLogo className="w-4 h-4 animate-pulse" /> : <Search className="w-4 h-4" />}
+                                    {isSearchingReceiver ? <div className={`loading-logo ${"w-4 h-4 animate-pulse"}`}></div> : <Search className="w-4 h-4" />}
                                 </Button>
                             </div>
                         </div>

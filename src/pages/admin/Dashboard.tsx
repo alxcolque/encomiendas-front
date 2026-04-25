@@ -1,7 +1,6 @@
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Package, Truck, CheckCircle2, TrendingUp, Users, Building2, Plus, FileText } from "lucide-react";
-import { LoadingLogo } from "@/components/shared/LoadingLogo";
 import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -38,7 +37,7 @@ export default function AdminDashboard() {
   if (isLoading || !data) {
     return (
       <div className="flex h-[400px] items-center justify-center">
-        <LoadingLogo className="w-8 h-8 animate-pulse text-primary" />
+        <div className={`loading-logo ${"w-8 h-8 animate-pulse text-primary"}`}></div>
       </div>
     );
   }

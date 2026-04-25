@@ -63,12 +63,10 @@ export default function TrackingPage() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px]" />
       </div>
 
-      <div className="relative z-10 max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 space-y-8">
+      <div className="relative z-10 max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 space-y-2">
         {/* Header */}
-        <div className="text-center pt-8 pb-4">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary shadow-lg shadow-primary/20 mb-6">
-            <Package size={32} className="text-primary-foreground" />
-          </div>
+        <div className="text-center py-4">
+          <img src="/logo.png" alt="Logo" className="w-20 h-20 object-contain mb-4 mx-auto rounded-full" />
           <h1 className="text-3xl md:text-5xl font-black text-foreground tracking-tight">Rastrear Envío</h1>
           <p className="text-muted-foreground text-base md:text-lg mt-2 max-w-md mx-auto">
             Ingresa tu código de seguimiento para conocer el estado de tu encomienda en tiempo real.

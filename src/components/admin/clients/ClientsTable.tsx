@@ -119,7 +119,7 @@ export function ClientsTable() {
                                     colSpan={6}
                                     className="h-24 text-center text-muted-foreground"
                                 >
-                                    Cargando clientes...
+                                    <div className={`loading-logo ${"mx-auto"}`}></div>
                                 </TableCell>
                             </TableRow>
                         ) : filtered.length === 0 ? (

@@ -6,7 +6,6 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { useAuthStore } from "@/stores/authStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { Package, UserPlus, LogIn } from "lucide-react";
-import { LoadingLogo } from "@/components/shared/LoadingLogo";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LoginModal from "@/components/landing/LoginModal";
@@ -51,22 +50,18 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
+    <div className="bg-background flex flex-col items-center justify-center p-2">
       {/* Background gradient effect */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px]" />
         <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-primary/10 rounded-full blur-[100px]" />
       </div>
 
-      <div className="relative z-10 w-full max-w-sm space-y-8">
+      <div className="relative z-10 w-full max-w-sm space-y-2">
         {/* Logo */}
         <div className="text-center space-y-4">
           <div className={`inline-flex items-center justify-center animate-float ${general?.logo ? '' : 'w-20 h-20 shadow-glow rounded-2xl gradient-primary'}`}>
-          {general?.logo ? (
-            <img src={general.logo} alt="Logo" className="h-28 w-auto object-contain drop-shadow-md" />
-          ) : (
-            <Package size={40} className="text-primary-foreground" />
-          )}
+            <img src="logo.png" alt="Logo" className="w-20 h-20 object-contain drop-shadow-md rounded-full" />
           </div>
           <div>
             <h1 className="text-3xl font-display font-bold text-gradient-primary">
@@ -120,7 +115,7 @@ export default function LoginPage() {
                   />
                 </div>
                 <Button type="submit" variant="hero" size="lg" className="w-full h-12 text-base mt-2" disabled={isLoading || !phone || !ciNit}>
-                  {isLoading ? <LoadingLogo className="w-5 h-5 animate-pulse" /> : "Ingresar"}
+                  {isLoading ? <div className={`loading-logo ${"w-5 h-5 animate-pulse"}`}></div> : "Ingresar"}
                 </Button>
               </form>
             </TabsContent>
@@ -166,7 +161,7 @@ export default function LoginPage() {
                   />
                 </div>
                 <Button type="submit" variant="hero" size="lg" className="w-full h-12 text-base mt-2" disabled={isLoading || !name || !phone || !ciNit}>
-                  {isLoading ? <LoadingLogo className="w-5 h-5 animate-pulse" /> : "Registrarse"}
+                  {isLoading ? <div className={`loading-logo ${"w-5 h-5 animate-pulse"}`}></div> : "Registrarse"}
                 </Button>
               </form>
             </TabsContent>

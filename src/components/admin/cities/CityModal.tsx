@@ -12,14 +12,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MapPin } from "lucide-react";
-import { LoadingLogo } from "@/components/shared/LoadingLogo";
 import { toast } from "sonner";
 import { useCityStore } from "@/stores/cityStore";
 import { City } from "@/interfaces/city.interface";
 
 const citySchema = z.object({
     name: z.string().min(2, "Nombre requerido (mín. 2 caracteres)"),
-    location: z.string().max(250).optional().or(z.literal("")),
+    location: z.string().min(1, "Ubicación requerida").regex(/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/, "Formato inválido. Ej: -16.5000, -68.1193"),
 });
 
 type CityFormValues = z.infer<typeof citySchema>;
@@ -38,6 +37,7 @@ export function CityModal({ cityToEdit, open, onOpenChange }: CityModalProps) {
     const form = useForm<CityFormValues>({
         resolver: zodResolver(citySchema),
         defaultValues: { name: "", location: "" },
+        mode: "onChange",
     });
 
     useEffect(() => {
@@ -104,17 +104,22 @@ export function CityModal({ cityToEdit, open, onOpenChange }: CityModalProps) {
 
                         <div className="space-y-2">
                             <Label htmlFor="location">
-                                Ubicación{" "}
-                                <span className="text-xs text-muted-foreground">(Opcional)</span>
+                                Ubicación <span className="text-destructive">*</span>
                             </Label>
                             <Input
                                 id="location"
                                 {...form.register("location")}
                                 placeholder="Ej: -16.5000, -68.1193"
                             />
-                            <p className="text-[10px] text-muted-foreground">
-                                Coordenadas o descripción de ubicación.
-                            </p>
+                            {form.formState.errors.location ? (
+                                <span className="text-xs text-destructive">
+                                    {form.formState.errors.location.message}
+                                </span>
+                            ) : (
+                                <p className="text-[10px] text-muted-foreground">
+                                    Coordenadas de latitud y longitud.
+                                </p>
+                            )}
                         </div>
                     </div>
 
@@ -122,8 +127,8 @@ export function CityModal({ cityToEdit, open, onOpenChange }: CityModalProps) {
                         <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
                             Cancelar
                         </Button>
-                        <Button type="submit" disabled={isSubmitting}>
-                            {isSubmitting && <LoadingLogo className="mr-2 h-4 w-4 animate-pulse" />}
+                        <Button type="submit" disabled={isSubmitting || !form.formState.isValid}>
+                            {isSubmitting && <div className={`loading-logo ${"mr-2 h-4 w-4 animate-pulse"}`}></div>}
                             {isEditing ? "Actualizar Ciudad" : "Guardar Ciudad"}
                         </Button>
                     </div>

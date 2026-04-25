@@ -187,7 +187,7 @@ export default function ContactSection() {
           <div className="glass-card p-2 h-64 overflow-hidden relative z-0">
             {mapLoading ? (
               <div className="w-full h-full rounded-xl bg-muted flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+                <div className="loading-logo-section"></div>
               </div>
             ) : (
               <div className="w-full h-full rounded-xl overflow-hidden relative z-0">

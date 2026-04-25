@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { InvoiceDocument } from "@/components/worker/shipment/InvoiceDocument";
 import { useAdminShipmentStore } from "@/stores/adminShipmentStore";
 import { AdminShipment } from "@/interfaces/shipment.interface";
-import { LoadingLogo } from "@/components/shared/LoadingLogo";
 
 export default function InvoicePage() {
     const { id } = useParams<{ id: string }>();
@@ -22,7 +21,7 @@ export default function InvoicePage() {
     if (isLoading) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center space-y-4 bg-slate-50">
-                <LoadingLogo className="h-8 w-8 animate-pulse text-primary" />
+                <div className={`loading-logo ${"h-8 w-8 animate-pulse text-primary"}`}></div>
                 <p className="text-muted-foreground animate-pulse">Generando factura...</p>
             </div>
         );

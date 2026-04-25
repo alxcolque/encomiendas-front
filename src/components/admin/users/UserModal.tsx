@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UserPlus, User as UserIcon } from "lucide-react";
-import { LoadingLogo } from "@/components/shared/LoadingLogo";
 import { toast } from "sonner";
 import { useUserStore } from "@/stores/userStore";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -227,7 +226,7 @@ export function UserModal({ userToEdit, open, onOpenChange }: UserModalProps) {
                     <div className="pt-4 flex justify-end gap-2">
                         <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Cancelar</Button>
                         <Button type="submit" disabled={isSubmitting}>
-                            {isSubmitting && <LoadingLogo className="mr-2 h-4 w-4 animate-pulse" />}
+                            {isSubmitting && <div className={`loading-logo ${"mr-2 h-4 w-4 animate-pulse"}`}></div>}
                             {isEditing ? "Actualizar Usuario" : "Guardar Usuario"}
                         </Button>
                     </div>

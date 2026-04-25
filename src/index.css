@@ -248,6 +248,31 @@
   .status-chip {
     @apply px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide;
   }
+
+  /* Animación de carga genérica usando el logo */
+  .loading-logo {
+    @apply flex items-center justify-center;
+  }
+  .loading-logo-section {
+    @apply flex items-center justify-center w-full h-full min-h-[200px];
+  }
+  .loading-logo-full {
+    @apply fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm;
+  }
+
+  .loading-logo::after,
+  .loading-logo-section::after,
+  .loading-logo-full::after {
+    content: "";
+    display: block;
+    width: 4rem;
+    height: 4rem;
+    background-image: url('/logo.png');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    @apply animate-pulse;
+  }
 }
 
 @layer utilities {

@@ -1,4 +1,3 @@
-import { LoadingLogo } from "@/components/shared/LoadingLogo";
 import { useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -101,10 +100,7 @@ export function RecentShipmentsTable({
     if (isLoading && displayedShipments.length === 0) {
         return (
             <Card className="shadow-sm border-border/50 bg-card/50 backdrop-blur-sm">
-                <CardContent className="p-12 flex flex-col items-center justify-center space-y-4">
-                    <LoadingLogo className="h-8 w-8 animate-pulse text-primary" />
-                    <p className="text-muted-foreground text-sm">Cargando encomiendas...</p>
-                </CardContent>
+                <div className="loading-logo-section"></div>
             </Card>
         );
     }

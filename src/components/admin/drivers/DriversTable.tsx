@@ -120,7 +120,7 @@ export function DriversTable() {
                         {isLoading ? (
                             <TableRow>
                                 <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
-                                    Cargando conductores...
+                                    <div className={`loading-logo ${"mx-auto"}`}></div>
                                 </TableCell>
                             </TableRow>
                         ) : filteredDrivers.length === 0 ? (

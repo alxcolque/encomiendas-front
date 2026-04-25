@@ -1,4 +1,3 @@
-import { LoadingLogo } from "@/components/shared/LoadingLogo";
 import { useState, forwardRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -408,7 +407,7 @@ export default function ShipmentPeopleForm({
                                     onClick={() => handleSearchClient('sender')}
                                 >
                                     {isSearchingSender ? (
-                                        <LoadingLogo className="h-4 w-4 animate-pulse" />
+                                        <div className={`loading-logo ${"h-4 w-4 animate-pulse"}`}></div>
                                     ) : (
                                         <Search className="h-4 w-4" />
                                     )}
@@ -442,7 +441,7 @@ export default function ShipmentPeopleForm({
                                         disabled={isUpdatingSender}
                                         className="w-full h-9 gap-1 bg-amber-500 hover:bg-amber-600 text-white font-bold transition-all animate-in fade-in zoom-in duration-300"
                                     >
-                                        {isUpdatingSender ? <LoadingLogo className="h-4 w-4 animate-pulse" /> : "Guardar nombre actualizado"}
+                                        {isUpdatingSender ? <div className={`loading-logo ${"h-4 w-4 animate-pulse"}`}></div> : "Guardar nombre actualizado"}
                                     </Button>
                                 )}
                             </div>
@@ -482,7 +481,7 @@ export default function ShipmentPeopleForm({
                                             disabled={isUpdatingSender}
                                             className="h-11 px-3 gap-1 bg-amber-500 hover:bg-amber-600 text-white font-bold transition-all animate-in fade-in zoom-in duration-300"
                                         >
-                                            {isUpdatingSender ? <LoadingLogo className="h-4 w-4 animate-pulse" /> : "Guardar"}
+                                            {isUpdatingSender ? <div className={`loading-logo ${"h-4 w-4 animate-pulse"}`}></div> : "Guardar"}
                                         </Button>
                                     )}
                                 </div>
@@ -558,7 +557,7 @@ export default function ShipmentPeopleForm({
                                     onClick={() => handleSearchClient('recipient')}
                                 >
                                     {isSearchingRecipient ? (
-                                        <LoadingLogo className="h-4 w-4 animate-pulse" />
+                                        <div className={`loading-logo ${"h-4 w-4 animate-pulse"}`}></div>
                                     ) : (
                                         <Search className="h-4 w-4" />
                                     )}
@@ -590,7 +589,7 @@ export default function ShipmentPeopleForm({
                                         disabled={isUpdatingRecipient}
                                         className="w-full h-9 gap-1 bg-amber-500 hover:bg-amber-600 text-white font-bold transition-all animate-in fade-in zoom-in duration-300"
                                     >
-                                        {isUpdatingRecipient ? <LoadingLogo className="h-4 w-4 animate-pulse" /> : "Guardar nombre actualizado"}
+                                        {isUpdatingRecipient ? <div className={`loading-logo ${"h-4 w-4 animate-pulse"}`}></div> : "Guardar nombre actualizado"}
                                     </Button>
                                 )}
                             </div>
@@ -628,7 +627,7 @@ export default function ShipmentPeopleForm({
                                             disabled={isUpdatingRecipient}
                                             className="h-11 px-3 gap-1 bg-amber-500 hover:bg-amber-600 text-white font-bold transition-all animate-in fade-in zoom-in duration-300"
                                         >
-                                            {isUpdatingRecipient ? <LoadingLogo className="h-4 w-4 animate-pulse" /> : "Guardar"}
+                                            {isUpdatingRecipient ? <div className={`loading-logo ${"h-4 w-4 animate-pulse"}`}></div> : "Guardar"}
                                         </Button>
                                     )}
                                 </div>
@@ -780,7 +779,7 @@ export default function ShipmentPeopleForm({
                 >
                     {isSubmitting ? (
                         <>
-                            <LoadingLogo className="h-5 w-5 animate-pulse" />
+                            <div className={`loading-logo ${"h-5 w-5 animate-pulse"}`}></div>
                             Registrando encomienda...
                         </>
                     ) : (

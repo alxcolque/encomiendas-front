@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useSettingsStore } from '@/stores/settingsStore';
-import defaultLogo from '@/assets/kolmox-logo.png';
+import defaultLogo from '/logo.png';
 
 type Theme = "light" | "dark" | "system";
 
@@ -72,7 +72,7 @@ export function TopNavbar({ className }: TopNavbarProps) {
           onClick={() => navigate("/driver")}
         >
           <img
-            src={general.logo ?? defaultLogo}
+            src={'logo.png'}
             alt={general.siteName ?? "Logo"}
             className="w-9 h-9 rounded-xl object-cover"
           />

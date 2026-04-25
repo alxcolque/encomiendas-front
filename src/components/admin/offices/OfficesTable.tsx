@@ -33,7 +33,7 @@ export function OfficesTable({ onEdit }: OfficesTableProps) {
     }, []);
 
     if (isLoading && offices.length === 0) {
-        return <div className="p-8 text-center text-muted-foreground">Cargando oficinas...</div>;
+        return <div className="loading-logo-section"></div>;
     }
 
     return (

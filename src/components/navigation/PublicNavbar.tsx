@@ -102,7 +102,7 @@ export default function PublicNavbar() {
                     <Link to="/" className="flex items-center gap-2 group">
                         <div className="relative w-10 h-10 overflow-hidden rounded-xl">
                             <img
-                                src={general.logo || kolmoxLogo}
+                                src={'logo.png'}
                                 alt={general.siteName || "KOLMOX"}
                                 className="w-full h-full object-cover"
                                 onError={(e) => {

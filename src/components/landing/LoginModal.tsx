@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Shield, Lock } from "lucide-react";
-import { LoadingLogo } from "@/components/shared/LoadingLogo";
 import { useAuthStore } from "@/stores/authStore";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -128,7 +127,7 @@ export default function LoginModal({ open, onOpenChange }: LoginModalProps) {
               disabled={phone.length < 8 || pin.length < 4 || loading}
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12"
             >
-              {loading ? <LoadingLogo className="w-5 h-5 animate-pulse" /> : "Ingresar"}
+              {loading ? <div className={`loading-logo ${"w-5 h-5 animate-pulse"}`}></div> : "Ingresar"}
             </Button>
           </form>
         </div>
