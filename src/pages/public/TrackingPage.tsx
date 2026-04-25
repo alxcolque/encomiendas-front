@@ -63,7 +63,7 @@ export default function TrackingPage() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px]" />
       </div>
 
-      <div className="relative z-10 max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 space-y-2">
+      <div className="relative z-10 max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-2 md:py-6 space-y-2">
         {/* Header */}
         <div className="text-center py-4">
           <img src="/logo.png" alt="Logo" className="w-20 h-20 object-contain mb-4 mx-auto rounded-full" />

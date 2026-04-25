@@ -2,7 +2,7 @@ import { LayoutDashboard, Package, Users, UserCheck, Truck, Building2, FileBarCh
 import { AdminSidebarItem } from "./AdminSidebarItem";
 import { ADMIN_ROUTES } from "@/constants/admin.routes";
 import { cn } from "@/lib/utils";
-import kolmoxLogo from "@/assets/kolmox-logo.png";
+import kolmoxLogo from "/logo.png";
 import { useAuthStore } from "@/stores/authStore";
 
 interface AdminSidebarProps {
