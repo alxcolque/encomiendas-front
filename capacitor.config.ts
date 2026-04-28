@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'Kolmox',
   webDir: 'dist',
   server: {
-    url: 'https://kolmox.com.bo',
+    url: 'https://encomiendas.culking.com',
     cleartext: true
   }
 };
