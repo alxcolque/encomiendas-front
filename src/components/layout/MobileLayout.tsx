@@ -3,6 +3,7 @@ import { useLocation, useNavigate, Outlet } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { TopNavbar } from "./TopNavbar";
 import { LucideIcon } from "lucide-react";
+import { PullToRefresh } from "../shared/PullToRefresh";
 
 export interface NavItem {
   icon: LucideIcon;
@@ -39,9 +40,9 @@ export function MobileLayout({
         "flex-1 overflow-x-hidden",
         showNav && navItems.length > 0 && "pb-24"
       )}>
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <PullToRefresh className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
           {children ? children : <Outlet />}
-        </div>
+        </PullToRefresh>
       </main>
 
       {/* Bottom navigation */}

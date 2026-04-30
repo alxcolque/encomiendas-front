@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { useReportStore } from "@/stores/reportStore";
 import { format, subDays, startOfWeek, startOfMonth, startOfYear, endOfMonth, endOfYear, endOfWeek } from "date-fns";
+import { useRegisterRefresh } from "@/stores/refreshStore";
 
 type DateFilter = 'today' | 'week' | 'month' | 'year' | 'custom';
 
@@ -19,6 +20,11 @@ export default function Reports() {
     // Default dates
     const [startDate, setStartDate] = useState<string>(format(startOfMonth(new Date()), 'yyyy-MM-dd'));
     const [endDate, setEndDate] = useState<string>(format(endOfMonth(new Date()), 'yyyy-MM-dd'));
+
+    // Register refresh
+    useRegisterRefresh(async () => {
+        await fetchReportData(startDate, endDate);
+    });
 
     useEffect(() => {
         const today = new Date();

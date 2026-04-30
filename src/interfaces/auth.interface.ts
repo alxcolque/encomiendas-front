@@ -12,6 +12,7 @@ export interface User {
     email_verified_at?: string;
     created_at?: string;
     updated_at?: string;
+    offices?: { id: string; name: string; city_id?: string }[];
 }
 
 export interface LoginCredentials {

@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useAdminShipmentStore } from "@/stores/adminShipmentStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { AdminShipment } from "@/interfaces/shipment.interface";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import {  Printer, X } from "lucide-react";
+import { Printer, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import defaultLogo from '/logo.png';
 
 export default function ShipmentTicket() {
     const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
     const { fetchShipmentById } = useAdminShipmentStore();
     const { general, fetchSettings } = useSettingsStore();
     const [shipment, setShipment] = useState<AdminShipment | null>(null);
@@ -26,18 +28,21 @@ export default function ShipmentTicket() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center space-y-4">
-                <div className={`loading-logo ${"h-8 w-8 animate-pulse text-primary"}`}></div>
-                <p>Generando ticket...</p>
+            <div className="min-h-screen flex flex-col items-center justify-center space-y-4 bg-background">
+                <div className="loading-logo"></div>
+                <p className="text-sm font-medium text-muted-foreground animate-pulse">Generando ticket...</p>
             </div>
         );
     }
 
     if (!shipment) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center p-8 border rounded-xl">
+            <div className="min-h-screen flex items-center justify-center bg-background">
+                <div className="text-center p-8 border border-border rounded-3xl bg-card shadow-xl max-w-sm mx-auto">
                     <h1 className="text-xl font-bold mb-2">Envío no encontrado</h1>
+                    <Button onClick={() => navigate(-1)} variant="outline" className="mt-4">
+                        Regresar
+                    </Button>
                 </div>
             </div>
         );
@@ -53,8 +58,6 @@ export default function ShipmentTicket() {
         : 'Sobre';
 
     // Payment status
-    // 1=sender, 2=receiver, 3=both (Assuming 1 means "Paid" by sender, 2 "To pay" by receiver)
-    // Based on the prompt: "Pago: Pagado" o "Pago: A pagar"
     const paymentStatus = shipment.tracking_pay === 1 ? 'Pagado' : 'A pagar';
 
     const roundedPrice = Math.ceil(Number(shipment.price) * 2) / 2;
@@ -63,14 +66,21 @@ export default function ShipmentTicket() {
     const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(trackingUrl)}`;
 
     return (
-        <div className="min-h-screen bg-white text-black p-4 font-sans print:p-0 print:m-0 print:min-h-0 print:h-auto overflow-x-hidden">
+        <div className="min-h-screen bg-muted/30 text-black p-4 font-sans print:p-0 print:m-0 print:min-h-0 print:h-auto overflow-x-hidden">
             {/* Controls - hidden when printing */}
-            <div className="max-w-md mx-auto mb-8 flex justify-between print:hidden">
-                <Button variant="outline" onClick={() => window.close()} className="gap-2">
-                    <X className="w-4 h-4" /> Cerrar
+            <div className="max-w-md mx-auto mb-8 flex justify-between print:hidden gap-4">
+                <Button
+                    variant="outline"
+                    onClick={() => navigate(-1)}
+                    className="gap-2 h-11 px-6 rounded-xl border-border bg-card shadow-sm hover:bg-muted transition-all"
+                >
+                    <ArrowLeft className="w-4 h-4" /> Regresar
                 </Button>
-                <Button onClick={handlePrint} className="gap-2">
-                    <Printer className="w-4 h-4" /> Imprimir
+                <Button
+                    onClick={handlePrint}
+                    className="gap-2 h-11 px-8 rounded-xl gradient-primary text-white shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all"
+                >
+                    <Printer className="w-4 h-4" /> Imprimir Etiqueta
                 </Button>
             </div>
 
@@ -83,7 +93,7 @@ export default function ShipmentTicket() {
                             {general.logo ? (
                                 <img src={general.logo} alt="Logo" className="max-w-full max-h-full object-contain" />
                             ) : (
-                                <span className="text-[8px] text-gray-400">LOGO</span>
+                                <img src={defaultLogo} alt="Logo" className="max-w-full max-h-full object-contain" />
                             )}
                         </div>
                         <h1 className="text-xl font-black tracking-widest">TICKET</h1>
@@ -104,33 +114,17 @@ export default function ShipmentTicket() {
                         </div>
                     </div>
 
-                    {/* Row 4-5 */}
-                    <div className="space-y-1.5 mb-4 text-[11px]">
-                        <div className="flex justify-between items-center border-b border-gray-100 pb-0.5">
+                    {/* Row 7-9 & QR Area */}
+                    <div className="flex justify-between items-center gap-4">
+                        <div className="space-y-3 flex-1">
                             <div className="flex gap-2 min-w-0 flex-1">
                                 <span className="font-black uppercase">Rem:</span>
                                 <span className="font-semibold truncate">{shipment.sender_name}</span>
                             </div>
-                            <div className="flex gap-1 ml-2">
-                                <span className="font-black">CEL:</span>
-                                <span>{shipment.sender_phone || '-'}</span>
-                            </div>
-                        </div>
-                        <div className="flex justify-between items-center border-b border-gray-100 pb-0.5">
                             <div className="flex gap-2 min-w-0 flex-1">
                                 <span className="font-black uppercase">Dest:</span>
                                 <span className="font-semibold truncate">{shipment.receiver_name}</span>
                             </div>
-                            <div className="flex gap-1 ml-2">
-                                <span className="font-black">CEL:</span>
-                                <span>{shipment.receiver_phone || '-'}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Row 7-9 & QR Area */}
-                    <div className="flex justify-between items-end">
-                        <div className="space-y-2 flex-1">
                             <div className="text-[11px] font-bold flex gap-2">
                                 <span className="font-black uppercase">Desc:</span> <span className="font-medium">{description}</span>
                             </div>
@@ -141,25 +135,27 @@ export default function ShipmentTicket() {
                             {/* Row 8 */}
                             <div className="text-sm font-black flex gap-1 items-baseline">
                                 <span className="font-black uppercase text-[10px]">Total:</span>
-                                <span className="text-lg">{roundedPrice.toFixed(2)} Bs.</span>
+                                <span className="text-xl">{roundedPrice.toFixed(2)} Bs.</span>
                             </div>
                             {/* Row 9 */}
-                            <div className="text-[10px] italic font-bold flex gap-1 border-t border-gray-100 pt-0.5 mt-1">
+                            <div className="text-[10px] italic font-bold flex gap-1 border-t border-gray-100 pt-1 mt-1">
                                 <span className="font-black uppercase text-[9px] not-italic">Ruta:</span>
                                 <span className="truncate">{shipment.origin_office?.city?.name} -&gt; {shipment.destination_office?.city?.name}</span>
                             </div>
                         </div>
 
                         {/* QR Code */}
-                        <div className="flex flex-col items-center ml-2 border-l border-gray-100 pl-2">
-                            <div className="w-20 h-20 border border-black p-0.5 bg-white">
+                        <div className="flex flex-col items-center border-l border-gray-200 pl-4 shrink-0">
+                            <div className="w-25 h-25 border-2 border-black p-1 bg-white">
                                 <img
                                     src={qrCodeUrl}
                                     alt="Tracking QR"
                                     className="w-full h-full object-contain"
                                 />
                             </div>
-                            <span className="text-[7px] mt-0.5 font-bold uppercase">Seguimiento</span>
+                            <span className="text-[10px] mt-1 font-black uppercase tracking-tight text-center w-full">
+                                Escanea para<br />seguimiento
+                            </span>
                         </div>
                     </div>
                 </div>

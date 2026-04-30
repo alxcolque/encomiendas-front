@@ -18,6 +18,7 @@ export interface AdminDashboardData {
     active_drivers: any[];
     active_drivers_count: number;
     total_offices_count: number;
+    city_name?: string;
 }
 
 export type ShipmentStatus = 'created' | 'in_transit' | 'at_office' | 'delivered';

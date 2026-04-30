@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Package } from "lucide-react";
 import { format } from "date-fns";
 import ShipmentRegisterWizard from "@/components/worker/shipment/ShipmentRegisterWizard";
+import { useBackToClose } from "@/hooks/useBackToClose";
 
 /* ─── Props ──────────────────────────────────────────────── */
 interface NewShipmentModalProps {
@@ -40,6 +41,9 @@ export function NewShipmentModal({
     const isControlled = typeof controlledOpen !== "undefined";
     const open = isControlled ? controlledOpen! : internalOpen;
     const setOpen = isControlled ? onOpenChange! : setInternalOpen;
+
+    // Intercept back button to close modal
+    useBackToClose(open, "new-shipment-modal", () => setOpen(false));
 
     const currentDate = new Date();
 

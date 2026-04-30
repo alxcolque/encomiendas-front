@@ -443,8 +443,8 @@ export default function ShipmentDetails() {
 
     if (isLoading || !shipment) {
         return (
-            <div className="flex items-center justify-center p-24">
-                <div className="animate-pulse rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            <div className="flex h-[400px] items-center justify-center">
+                <div className="loading-logo-section"></div>
             </div>
         );
     }
@@ -488,7 +488,7 @@ export default function ShipmentDetails() {
                         )
                     )}
 
-                    <Button variant="secondary" className="gap-2 h-11 sm:h-12" onClick={() => window.open(`/admin/ticket/${shipment.id}`, '_blank')}>
+                    <Button variant="secondary" className="gap-2 h-11 sm:h-12" onClick={() => navigate(`/admin/ticket/${shipment.id}`)}>
                         <FileText className="w-4 h-4" /> Etiqueta
                     </Button>
                 </div>

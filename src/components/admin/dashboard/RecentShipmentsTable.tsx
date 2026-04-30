@@ -226,7 +226,7 @@ export function RecentShipmentsTable({
                                                     {shipment.current_status === 'created' && (
                                                         <DropdownMenuItem
                                                             className="cursor-pointer"
-                                                            onClick={() => window.open(`/admin/ticket/${shipment.id}`, '_blank')}
+                                                            onClick={() => navigate(`/admin/ticket/${shipment.id}`)}
                                                         >
                                                             <Printer className="w-4 h-4 mr-2" />
                                                             Imprimir Etiqueta
