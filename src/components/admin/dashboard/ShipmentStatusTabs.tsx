@@ -31,7 +31,7 @@ export function ShipmentStatusTabs() {
         const handleGlobalKeyDown = (e: globalThis.KeyboardEvent) => {
             const activeTag = document.activeElement?.tagName.toLowerCase();
             const isInputTarget = activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select';
-            
+
             // If it's a normal character stroke and we aren't already in an input
             if (!isInputTarget && e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
                 const activeScannerInput = document.querySelector<HTMLInputElement>('[data-state="active"] .scanner-input-field');
@@ -54,19 +54,20 @@ export function ShipmentStatusTabs() {
 
     return (
         <div className="w-full">
-            <Tabs defaultValue="created" className="w-full">
-                <TabsList className="grid w-full grid-cols-5 h-auto p-1 bg-muted/50 mb-6">
+            <Tabs defaultValue="created" className="w-full" >
+                {/* Wrap Tabs List for Multi-row Support on Mobile */}
+                <TabsList className="flex flex-wrap w-full justify-start items-center bg-muted/30 p-1.5 mb-6 gap-2 border border-border/50 rounded-2xl h-auto">
                     {statuses.map((status) => {
                         const count = shipments.filter(s => s.current_status === status.id).length;
                         return (
-                            <TabsTrigger 
-                                key={status.id} 
+                            <TabsTrigger
+                                key={status.id}
                                 value={status.id}
-                                className="relative py-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
+                                className="flex-1 min-w-[120px] sm:min-w-[140px] md:min-w-[150px] relative py-2 md:py-3 px-3 md:px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all rounded-xl whitespace-nowrap font-medium text-[10px] sm:text-xs md:text-sm"
                             >
                                 <span className="font-semibold">{status.label}</span>
                                 {count > 0 && (
-                                    <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm ring-2 ring-background">
+                                    <span className="absolute -top-1 -right-1 flex h-4 w-4 md:h-5 md:w-5 items-center justify-center rounded-full bg-red-500 text-[8px] md:text-[10px] font-bold text-white shadow-lg ring-2 ring-background animate-in zoom-in duration-300">
                                         {count > 99 ? '99+' : count}
                                     </span>
                                 )}
@@ -77,7 +78,7 @@ export function ShipmentStatusTabs() {
 
                 {statuses.map((status) => {
                     const filteredShipments = shipments.filter(s => s.current_status === status.id);
-                    
+
                     return (
                         <TabsContent key={status.id} value={status.id} className="mt-2 space-y-6">
                             {/* Input for Scanner */}
@@ -85,8 +86,8 @@ export function ShipmentStatusTabs() {
                                 <div className="bg-primary/10 p-3 rounded-lg">
                                     <ScanLine className="text-primary w-6 h-6" />
                                 </div>
-                                <Input 
-                                    placeholder="Escanea el código de barras, código QR o escribe manualmente y presiona Enter..." 
+                                <Input
+                                    placeholder="Escanea el código de barras, código QR o escribe manualmente y presiona Enter..."
                                     value={inputValue}
                                     onChange={(e) => setInputValue(e.target.value)}
                                     onKeyDown={handleKeyDown}
@@ -97,8 +98,8 @@ export function ShipmentStatusTabs() {
                             </div>
 
                             {/* Table with filtered shipments */}
-                            <RecentShipmentsTable 
-                                shipments={filteredShipments} 
+                            <RecentShipmentsTable
+                                shipments={filteredShipments}
                                 title={`Encomiendas: ${status.label}`}
                                 showSearch={true}
                                 showViewAll={false}

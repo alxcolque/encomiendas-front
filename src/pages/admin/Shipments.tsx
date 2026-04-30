@@ -12,6 +12,7 @@ export default function Shipments() {
                 actions={<NewShipmentModal />}
             />
             <ShipmentStatusTabs />
+
             <RecentShipmentsTable
                 title="Todas las Encomiendas"
                 showSearch={true}

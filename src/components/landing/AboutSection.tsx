@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Package, Globe, Users } from "lucide-react";
-import aboutFleet from "/kolmox.jpeg";
+import aboutFleet from "/aboutus.jpeg";
 import { useSettingsStore } from "@/stores/settingsStore";
 
 const counters = [
