@@ -167,7 +167,7 @@ export default function ShipmentRegisterWizard({
 
             const result = await createShipment({
                 ...payload,
-                with_invoice: isClientFlow ? details.withIva : true,
+                with_invoice: details.withIva,
                 invoice_name: isClientFlow ? user?.name : people?.senderName,
                 invoice_nit: isClientFlow ? user?.ci_nit : people?.senderCI,
                 invoice_type: details.withIva ? 'con' : 'sin',

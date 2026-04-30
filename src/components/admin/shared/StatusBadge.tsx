@@ -3,6 +3,7 @@ import { ShipmentStatus } from "@/interfaces/admin/dashboard.interface";
 
 interface StatusBadgeProps {
     status: ShipmentStatus | string;
+    secondaryLabel?: string;
     className?: string;
 }
 
@@ -29,18 +30,32 @@ const statusLabels: Record<string, string> = {
     offline: "Desconectado",
 };
 
-export function StatusBadge({ status, className }: StatusBadgeProps) {
+export function StatusBadge({ status, secondaryLabel, className }: StatusBadgeProps) {
     const normalizedStatus = status.toLowerCase();
     const style = statusStyles[normalizedStatus] || "bg-gray-100 text-gray-700 border-gray-200";
     const label = statusLabels[normalizedStatus] || status;
 
     return (
-        <span className={cn(
-            "px-2.5 py-0.5 rounded-full text-xs font-medium border inline-flex items-center justify-center whitespace-nowrap",
-            style,
-            className
-        )}>
-            {label}
-        </span>
+        <div className="flex items-center gap-1.5 flex-wrap">
+            <span className={cn(
+                "px-2.5 py-0.5 rounded-full text-xs font-medium border inline-flex items-center justify-center whitespace-nowrap",
+                style,
+                className
+            )}>
+                {label}
+            </span>
+            {secondaryLabel && (
+                <span className={cn(
+                    "px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border inline-flex items-center justify-center whitespace-nowrap",
+                    secondaryLabel.toLowerCase() === 'pagado'
+                        ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                        : secondaryLabel.toLowerCase() === 'por pagar'
+                            ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                            : "bg-rose-500/10 text-rose-600 border-rose-500/20"
+                )}>
+                    {secondaryLabel}
+                </span>
+            )}
+        </div>
     );
 }

@@ -72,9 +72,9 @@ export function TopNavbar({ className }: TopNavbarProps) {
           onClick={() => navigate("/driver")}
         >
           <img
-            src={'logo.png'}
+            src={defaultLogo}
             alt={general.siteName ?? "Logo"}
-            className="w-9 h-9 rounded-xl object-cover"
+            className="w-7 h-7 rounded-2xl object-cover"
           />
           <span className="font-display font-bold text-lg">{general.siteName ?? "KOLMOX"}</span>
         </div>

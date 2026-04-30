@@ -193,39 +193,52 @@ export function RecentShipmentsTable({
                                         </TableCell>
                                         <TableCell className="font-medium text-foreground">Bs. {Number(shipment.price).toFixed(2)}</TableCell>
                                         <TableCell>
-                                            <StatusBadge status={shipment.current_status} />
+                                            <StatusBadge
+                                                status={shipment.current_status}
+                                                secondaryLabel={
+                                                    shipment.current_status === 'created'
+                                                        ? (shipment.tracking_pay === 2 ? "Por pagar" : shipment.invoice ? "Pagado" : "No pagado")
+                                                        : undefined
+                                                }
+                                            />
                                         </TableCell>
                                         <TableCell className="text-right">
-                                            {(shipment.current_status === 'quote' || role !== 'company') && (
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted">
-                                                            <MoreVertical className="w-4 h-4 text-muted-foreground" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end" className="w-56">
-                                                        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                                                        <DropdownMenuSeparator />
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted">
+                                                        <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end" className="w-56">
+                                                    <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                                                    <DropdownMenuSeparator />
 
-                                                        {role !== 'company' && (
-                                                            <>
-                                                                <DropdownMenuItem
-                                                                    className="cursor-pointer"
-                                                                    onClick={() => navigate(`/admin/shipments/${shipment.id}`)}
-                                                                >
-                                                                    <Eye className="w-4 h-4 mr-2" />
-                                                                    Ver detalles
-                                                                </DropdownMenuItem>
+                                                    {/* Opción común para todos: Ver detalles */}
+                                                    <DropdownMenuItem
+                                                        className="cursor-pointer"
+                                                        onClick={() => navigate(`/admin/shipments/${shipment.id}`)}
+                                                    >
+                                                        <Eye className="w-4 h-4 mr-2" />
+                                                        Ver detalles
+                                                    </DropdownMenuItem>
 
-                                                                <DropdownMenuItem
-                                                                    className="cursor-pointer"
-                                                                    onClick={() => window.open(`/admin/ticket/${shipment.id}`, '_blank')}
-                                                                >
-                                                                    <Printer className="w-4 h-4 mr-2" />
-                                                                    Imprimir Etiqueta
-                                                                </DropdownMenuItem>
+                                                    {/* Opción para estado Creado: Imprimir Etiqueta */}
+                                                    {shipment.current_status === 'created' && (
+                                                        <DropdownMenuItem
+                                                            className="cursor-pointer"
+                                                            onClick={() => window.open(`/admin/ticket/${shipment.id}`, '_blank')}
+                                                        >
+                                                            <Printer className="w-4 h-4 mr-2" />
+                                                            Imprimir Etiqueta
+                                                        </DropdownMenuItem>
+                                                    )}
 
-                                                                <DropdownMenuSeparator />
+                                                    {/* Opción Cambiar Estado: Todos menos Cotizado y Entregado */}
+                                                    {shipment.current_status !== 'quote' && shipment.current_status !== 'delivered' && (
+                                                        <>
+                                                            <DropdownMenuSeparator />
+                                                            {/* Validación de pago para habilitar cambio de estado */}
+                                                            {(shipment.invoice || shipment.tracking_pay === 2) ? (
                                                                 <DropdownMenuSub>
                                                                     <DropdownMenuSubTrigger className="cursor-pointer">
                                                                         <RotateCcw className="w-4 h-4 mr-2" />
@@ -264,24 +277,29 @@ export function RecentShipmentsTable({
                                                                         </DropdownMenuSubContent>
                                                                     </DropdownMenuPortal>
                                                                 </DropdownMenuSub>
-                                                            </>
-                                                        )}
-
-                                                        {shipment.current_status === 'quote' && (
-                                                            <>
-                                                                {role !== 'company' && <DropdownMenuSeparator />}
-                                                                <DropdownMenuItem
-                                                                    className="cursor-pointer text-red-600 hover:text-red-700 hover:bg-red-50 focus:text-red-700"
-                                                                    onClick={() => handleDelete(shipment.id)}
-                                                                >
-                                                                    <Trash2 className="w-4 h-4 mr-2" />
-                                                                    Eliminar
+                                                            ) : (
+                                                                <DropdownMenuItem disabled className="opacity-50 text-xs italic">
+                                                                    Requiere pago para cambiar estado
                                                                 </DropdownMenuItem>
-                                                            </>
-                                                        )}
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            )}
+                                                            )}
+                                                        </>
+                                                    )}
+
+                                                    {/* Opción Eliminar: Solo en estado Creado */}
+                                                    {shipment.current_status === 'created' && (
+                                                        <>
+                                                            <DropdownMenuSeparator />
+                                                            <DropdownMenuItem
+                                                                className="cursor-pointer text-red-600 hover:text-red-700 hover:bg-red-50 focus:text-red-700"
+                                                                onClick={() => handleDelete(shipment.id)}
+                                                            >
+                                                                <Trash2 className="w-4 h-4 mr-2" />
+                                                                Eliminar
+                                                            </DropdownMenuItem>
+                                                        </>
+                                                    )}
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
                                         </TableCell>
                                     </TableRow>
                                 ))
