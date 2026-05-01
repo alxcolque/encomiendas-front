@@ -744,7 +744,7 @@ export default function ShipmentDetails() {
                                     <Button disabled={!isFullEditable} type="button" variant="outline" size="sm" onClick={() => { setIsNewReceiver(false); setReceiverName(""); setReceiverPhone(""); setReceiverCi(""); }} >
                                         Cancelar
                                     </Button>
-                                    <Button disabled={!isFullEditable} type="button" size="sm" className="bg-primary text-white" disabled={!isFullEditable || !receiverName.trim() || !receiverPhone.trim()} onClick={() => setIsNewReceiver(false)}>
+                                    <Button type="button" size="sm" className="bg-primary text-white" disabled={!isFullEditable || !receiverName.trim() || !receiverPhone.trim()} onClick={() => setIsNewReceiver(false)}>
                                         Aceptar Datos
                                     </Button>
                                 </div>
