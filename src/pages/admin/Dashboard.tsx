@@ -111,8 +111,8 @@ export default function AdminDashboard() {
         }
       />
 
-      {/* KPI Stats Grid - Only for Admin */}
-      {!isWorker && <StatsCards stats={kpiStats} />}
+      {/* KPI Stats Grid - Shown for all roles */}
+      <StatsCards stats={kpiStats} />
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

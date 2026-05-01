@@ -8,6 +8,7 @@ import { useWalletStore } from "@/stores/walletStore";
 import { useNavigate } from "react-router-dom";
 import { MapPin, Package, Coins, Star, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useRegisterRefresh } from "@/stores/refreshStore";
 
 function ChallengeCard({ challenge }: { challenge: Challenge }) {
   const { acceptChallenge } = useChallengeStore();
@@ -80,6 +81,12 @@ function ChallengeCard({ challenge }: { challenge: Challenge }) {
 
 export default function DriverHomePage() {
   const { availableChallenges, activeChallenge } = useChallengeStore();
+  
+  // Register refresh (gesture only for now, would link to a fetch if store had it)
+  useRegisterRefresh(async () => {
+    console.log("Refreshing driver challenges...");
+    // If challengeStore has a fetch method, call it here
+  });
 
   return (
 
