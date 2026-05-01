@@ -316,4 +316,20 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  /* Barcode Scanner Styles */
+  body.scanner-active {
+    background: transparent !important;
+    --background: transparent !important;
+  }
+
+  body.scanner-active * {
+    background: transparent !important;
+  }
+
+  /* Make sure critical UI elements stay visible if needed, 
+     but usually we hide everything and show a custom UI overlay or just the camera */
+  body.scanner-active #root {
+    display: none !important;
+  }
 }

@@ -6,6 +6,7 @@ import { RecentShipmentsTable } from "./RecentShipmentsTable";
 import { Input } from "@/components/ui/input";
 import { ScanLine } from "lucide-react";
 import { ShipmentStatus } from "@/interfaces/shipment.interface";
+import { useDeviceScanner } from "@/hooks/useDeviceScanner";
 
 const statuses: { id: ShipmentStatus; label: string }[] = [
     { id: 'quote', label: 'Cotizado' },
@@ -19,6 +20,7 @@ export function ShipmentStatusTabs() {
     const { shipments, fetchShipments } = useAdminShipmentStore();
     const { scanAndUpdateShipment, scanning } = useShipmentScannerStore();
     const [inputValue, setInputValue] = useState("");
+    const { startScan } = useDeviceScanner();
 
     useEffect(() => {
         // Fetch shipments when the component mounts to get the latest status
@@ -44,6 +46,17 @@ export function ShipmentStatusTabs() {
         window.addEventListener('keydown', handleGlobalKeyDown);
         return () => window.removeEventListener('keydown', handleGlobalKeyDown);
     }, []);
+
+    const handleCameraScan = () => {
+        startScan(async (content) => {
+            // Process scanned content
+            let code = content;
+            if (content.includes('CODE_TRACKING=')) {
+                code = content.split('CODE_TRACKING=')[1];
+            }
+            await scanAndUpdateShipment(code);
+        });
+    };
 
     const handleKeyDown = async (e: KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && inputValue.trim()) {
@@ -83,9 +96,13 @@ export function ShipmentStatusTabs() {
                         <TabsContent key={status.id} value={status.id} className="mt-2 space-y-6">
                             {/* Input for Scanner */}
                             <div className="flex items-center space-x-3 bg-card p-4 rounded-xl border border-border/50 shadow-sm">
-                                <div className="bg-primary/10 p-3 rounded-lg">
+                                <button 
+                                    onClick={handleCameraScan}
+                                    className="bg-primary/10 p-3 rounded-lg hover:bg-primary/20 transition-colors active:scale-95 touch-target flex items-center justify-center"
+                                    title="Escanear con cámara"
+                                >
                                     <ScanLine className="text-primary w-6 h-6" />
-                                </div>
+                                </button>
                                 <Input
                                     placeholder="Escanea el código de barras, código QR o escribe manualmente y presiona Enter..."
                                     value={inputValue}
