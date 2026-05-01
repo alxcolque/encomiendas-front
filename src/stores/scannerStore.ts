@@ -43,6 +43,14 @@ const normalizeTrackingCode = (rawValue: string) => {
     }
 };
 
+const STATUS_LABELS: Record<string, string> = {
+    'quote': 'Cotización',
+    'created': 'Registrado',
+    'in_transit': 'En Tránsito',
+    'at_office': 'En Agencia de Destino',
+    'delivered': 'Entregado'
+};
+
 export const useShipmentScannerStore = create<ScannerState>((set) => ({
     scanning: false,
     lastCode: null,
@@ -64,7 +72,8 @@ export const useShipmentScannerStore = create<ScannerState>((set) => ({
 
             set({ lastCode: trackingCode });
 
-            toast.success(`Estado cambiado a: ${data.new_status || 'Siguiente'}`);
+            const statusLabel = STATUS_LABELS[data.new_status] || data.new_status || 'Siguiente';
+            toast.success(`Estado cambiado a: ${statusLabel}`);
 
             new Audio('/sounds/ok.mp3').play().catch(() => { });
 

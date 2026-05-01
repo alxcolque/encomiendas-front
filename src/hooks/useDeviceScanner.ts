@@ -37,8 +37,8 @@ export const useDeviceScanner = () => {
                     <div class="web-scanner-line"></div>
                 </div>
                 <div class="pb-20">
-                    <button class="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-8 py-3 rounded-full font-bold transition-all border border-white/20">
-                        Cancelar
+                    <button id="web-scanner-close" class="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-10 py-3 rounded-full font-bold transition-all border border-white/20">
+                        Cerrar
                     </button>
                 </div>
             `;
@@ -50,18 +50,20 @@ export const useDeviceScanner = () => {
             
             const cleanup = () => {
                 codeReader.reset();
+                // Explicitly stop all tracks to release camera
+                if (video.srcObject instanceof MediaStream) {
+                    video.srcObject.getTracks().forEach(track => track.stop());
+                }
                 if (document.body.contains(overlay)) {
                     document.body.removeChild(overlay);
                 }
                 resolve();
             };
             
-            const cancelButton = ui.querySelector('button');
-            cancelButton?.addEventListener('click', cleanup);
+            const closeButton = ui.querySelector('#web-scanner-close');
+            closeButton?.addEventListener('click', cleanup);
             
             try {
-                // 2. Request Camera Permission & Start Decoding
-                // This triggers the browser permission dialog
                 await codeReader.decodeFromVideoDevice(undefined, video, (result, error) => {
                     if (result) {
                         onScan(result.getText());
@@ -70,7 +72,7 @@ export const useDeviceScanner = () => {
                 });
             } catch (err) {
                 console.error('ZXing error:', err);
-                toast.error("No se pudo acceder a la cámara o ocurrió un error.");
+                toast.error("Error al acceder a la cámara");
                 cleanup();
             }
         });
