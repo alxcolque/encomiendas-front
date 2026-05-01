@@ -43,7 +43,7 @@ export function NewShipmentModal({
     const setOpen = isControlled ? onOpenChange! : setInternalOpen;
 
     // Intercept back button to close modal
-    useBackToClose(open, "new-shipment-modal", () => setOpen(false));
+    useBackToClose(open, () => setOpen(false));
 
     const currentDate = new Date();
 

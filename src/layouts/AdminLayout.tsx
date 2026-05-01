@@ -7,7 +7,6 @@ import { NewShipmentModal } from "@/components/shared/NewShipmentModal";
 import { ADMIN_ROUTES } from "@/constants/admin.routes";
 import { useAuthStore } from "@/stores/authStore";
 import { PullToRefresh } from "@/components/shared/PullToRefresh";
-import { HistoryBackHandler } from "@/components/shared/HistoryBackHandler";
 
 const mobileNavItems: NavItem[] = [
     { icon: LayoutDashboard, label: "Panel", path: ADMIN_ROUTES.DASHBOARD },
@@ -37,7 +36,6 @@ export default function AdminLayout() {
 
     return (
         <>
-            <HistoryBackHandler />
             {/* DESKTOP LAYOUT (lg+) */}
             <div className="hidden lg:flex min-h-screen bg-background">
                 {/* Fixed Sidebar */}

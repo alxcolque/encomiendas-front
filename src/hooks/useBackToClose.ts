@@ -1,34 +1,42 @@
-import { useEffect } from 'react';
-import { useUIStore } from '@/stores/uiStore';
+import { useEffect, useRef } from 'react';
 
 /**
- * Senior Hook to link a component's open state to the global back button handler.
+ * Senior Hook to handle "Back to Close" behavior for modals and overlays.
+ * It uses a dummy history state to intercept the browser's back button.
  * 
- * @param isOpen Current open state of the modal/overlay
- * @param id Unique ID for this overlay
- * @param onClose Function to call when back is pressed
+ * @param isOpen Current open state
+ * @param onClose Function to call when the user hits back
  */
-export const useBackToClose = (isOpen: boolean, id: string, onClose: () => void) => {
-    const { addBlocker, removeBlocker, blockers } = useUIStore();
+export const useBackToClose = (isOpen: boolean, onClose: () => void) => {
+    const isManuallyClosing = useRef(false);
 
     useEffect(() => {
-        if (isOpen) {
-            addBlocker(id);
-        } else {
-            removeBlocker(id);
+        if (!isOpen) {
+            // If we were open and now we are closed, and it wasn't via the back button,
+            // we need to remove our dummy state from the history.
+            if (isManuallyClosing.current) {
+                isManuallyClosing.current = false;
+                if (window.history.state?.isBackToClose) {
+                    window.history.back();
+                }
+            }
+            return;
         }
+
+        // Push a dummy state to history to intercept the back button
+        window.history.pushState({ isBackToClose: true }, "");
+
+        const handlePopState = (event: PopStateEvent) => {
+            // If the back button was pressed, we close the modal
+            // We check if the state we are entering has isBackToClose (should be false/undefined now)
+            onClose();
+        };
+
+        window.addEventListener('popstate', handlePopState);
 
         return () => {
-            removeBlocker(id);
+            window.removeEventListener('popstate', handlePopState);
+            isManuallyClosing.current = true;
         };
-    }, [isOpen, id, addBlocker, removeBlocker]);
-
-    // Handle external close (popstate)
-    useEffect(() => {
-        // If this blocker was removed from the store but the local state is still open,
-        // it means it was closed via the back button (popstate handler in HistoryBackHandler)
-        if (isOpen && !blockers.has(id)) {
-            onClose();
-        }
-    }, [blockers, id, isOpen, onClose]);
+    }, [isOpen, onClose]);
 };

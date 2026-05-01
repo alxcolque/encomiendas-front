@@ -7,11 +7,13 @@ import ServicesGrid from "@/components/landing/ServicesGrid";
 import FloatingWhatsApp from "@/components/landing/FloatingWhatsApp";
 import ClientOrderHistory from "@/components/landing/ClientOrderHistory";
 import { useAuthStore } from "@/stores/authStore";
-import { useState } from "react";
+import { useRegisterRefresh } from "@/stores/refreshStore";
 
 export default function LandingPage() {
-  const { general } = useSettingsStore();
+  const { general, fetchSettings } = useSettingsStore();
   const { user, authStatus } = useAuthStore();
+
+  useRegisterRefresh(fetchSettings);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
