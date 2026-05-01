@@ -85,10 +85,10 @@ export default function ShipmentTicket() {
             </div>
 
             {/* Ticket Content */}
-            <div className="max-w-[105mm] mx-auto border-2 border-dashed border-gray-300 p-4 print:p-0 print:border-none print:max-w-none print:w-[105mm] print:h-[135mm] print:overflow-hidden flex flex-col justify-between overflow-hidden print:m-0">
-                <div className="print:p-2">
+            <div className="bg-white max-w-[105mm] mx-auto border-2 border-dashed border-gray-300 p-4 print:p-0 print:border-none print:max-w-none print:w-[105mm] print:h-[135mm] print:overflow-hidden flex flex-col justify-between overflow-hidden print:m-0">
+                <div className="print:p-2 bg-white">
                     {/* Row 1 */}
-                    <div className="flex justify-between items-center mb-2">
+                    <div className="flex justify-between items-center">
                         <div className="w-12 h-12 bg-gray-100 flex items-center justify-center overflow-hidden">
                             {general.logo ? (
                                 <img src={general.logo} alt="Logo" className="max-w-full max-h-full object-contain" />
@@ -103,27 +103,28 @@ export default function ShipmentTicket() {
                     </div>
 
                     {/* Row 2 */}
-                    <div className="text-center mb-2">
+                    <div className="text-center">
                         <h2 className="text-3xl font-black leading-tight">{general.siteName || 'KOLMOX'}</h2>
                     </div>
 
                     {/* Row 3 */}
-                    <div className="flex justify-center mb-4">
+                    <div className="flex justify-center mb-2">
                         <div className="border-2 border-black rounded-lg px-4 py-1">
                             <span className="text-xl font-mono font-bold">{shipment.tracking_code}</span>
                         </div>
                     </div>
 
                     {/* Row 7-9 & QR Area */}
-                    <div className="flex justify-between items-center gap-4">
-                        <div className="space-y-3 flex-1">
-                            <div className="flex gap-2 min-w-0 flex-1">
+                    <div className="flex columns-2 justify-between items-center gap-4">
+                        {/* Data column 1*/}
+                        <div className="space-y-2 flex flex-col w-1/2">
+                            <div className="text-[11px] font-bold flex gap-2">
                                 <span className="font-black uppercase">Rem:</span>
-                                <span className="font-semibold truncate">{shipment.sender_name}</span>
+                                <span className="font-medium">{shipment.sender_name}</span>
                             </div>
-                            <div className="flex gap-2 min-w-0 flex-1">
+                            <div className="text-[11px] font-bold flex gap-2">
                                 <span className="font-black uppercase">Dest:</span>
-                                <span className="font-semibold truncate">{shipment.receiver_name}</span>
+                                <span className="font-medium">{shipment.receiver_name}</span>
                             </div>
                             <div className="text-[11px] font-bold flex gap-2">
                                 <span className="font-black uppercase">Desc:</span> <span className="font-medium">{description}</span>
@@ -144,9 +145,10 @@ export default function ShipmentTicket() {
                             </div>
                         </div>
 
-                        {/* QR Code */}
+                        {/* QR Code column 2*/}
                         <div className="flex flex-col items-center border-l border-gray-200 pl-4 shrink-0">
-                            <div className="w-25 h-25 border-2 border-black p-1 bg-white">
+                            {/* QR small mode mobile */}
+                            <div className="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36  border-2 border-black p-1 bg-white">
                                 <img
                                     src={qrCodeUrl}
                                     alt="Tracking QR"

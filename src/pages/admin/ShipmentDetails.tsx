@@ -366,6 +366,16 @@ export default function ShipmentDetails() {
             return;
         }
 
+        // Recipient mandatory if not a quote
+        if (status !== "quote") {
+            if (!receiverName.trim() || !receiverCi.trim() || !receiverPhone.trim()) {
+                toast.error("Datos del destinatario incompletos", {
+                    description: "Para registrar o cambiar el estado de la encomienda, los datos del destinatario son obligatorios."
+                });
+                return;
+            }
+        }
+
         setIsSaving(true);
         try {
             const payload: Partial<CreateShipmentPayload> = {
@@ -703,9 +713,9 @@ export default function ShipmentDetails() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label>CI / NIT</Label>
+                            <Label>CI / NIT {status !== "quote" && <span className="text-destructive">*</span>}</Label>
                             <div className="flex gap-2">
-                                <Input disabled={!isFullEditable} value={receiverCi} onChange={e => setReceiverCi(e.target.value)} placeholder="Buscar por CI..." />
+                                <Input disabled={!isFullEditable} value={receiverCi} onChange={e => setReceiverCi(e.target.value)} placeholder="Buscar por CI..." className={status !== "quote" && !receiverCi.trim() ? "border-destructive/50" : ""} />
                                 <Button disabled={!isFullEditable || isSearchingReceiver || receiverCi.length < 5} type="button" variant="outline" size="icon" className="shrink-0 h-10 w-10 text-primary hover:text-primary transition-colors hover:bg-primary/10" onClick={() => handleSearchClient('recipient')}>
                                     {isSearchingReceiver ? <div className={`loading-logo ${"w-4 h-4 animate-pulse"}`}></div> : <Search className="w-4 h-4" />}
                                 </Button>
@@ -716,12 +726,12 @@ export default function ShipmentDetails() {
                         {!isNewReceiver ? (
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="space-y-2">
-                                    <Label>Nombre Completo</Label>
-                                    <Input disabled={!isFullEditable || !receiverName} value={receiverName} onChange={e => setReceiverName(e.target.value)} placeholder={!receiverName ? "Busque un cliente primero" : ""} />
+                                    <Label>Nombre Completo {status !== "quote" && <span className="text-destructive">*</span>}</Label>
+                                    <Input disabled={!isFullEditable || !receiverName} value={receiverName} onChange={e => setReceiverName(e.target.value)} placeholder={!receiverName ? "Busque un cliente primero" : ""} className={status !== "quote" && !receiverName.trim() ? "border-destructive/50" : ""} />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Teléfono</Label>
-                                    <Input disabled={!isFullEditable || !receiverPhone} value={receiverPhone} onChange={e => setReceiverPhone(e.target.value)} placeholder={!receiverPhone ? "Busque un cliente primero" : ""} />
+                                    <Label>Teléfono {status !== "quote" && <span className="text-destructive">*</span>}</Label>
+                                    <Input disabled={!isFullEditable || !receiverPhone} value={receiverPhone} onChange={e => setReceiverPhone(e.target.value)} placeholder={!receiverPhone ? "Busque un cliente primero" : ""} className={status !== "quote" && !receiverPhone.trim() ? "border-destructive/50" : ""} />
                                 </div>
                             </div>
                         ) : (
