@@ -61,7 +61,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center space-y-4">
           <div className={`inline-flex items-center justify-center animate-float ${general?.logo ? '' : 'w-20 h-20 shadow-glow rounded-2xl gradient-primary'}`}>
-            <img src="logo.png" alt="Logo" className="w-20 h-20 object-contain drop-shadow-md rounded-full" />
+            <img src="logo.png" alt="Logo" className="w-14 h-14 object-contain drop-shadow-md rounded-full" />
           </div>
           <div>
             <h1 className="text-3xl font-display font-bold text-gradient-primary">
@@ -76,7 +76,7 @@ export default function LoginPage() {
         {/* Login/Register Tabs */}
         <GlassCard className="p-2">
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-4">
+            <TabsList className="grid w-full grid-cols-2 mb-2">
               <TabsTrigger value="login" className="flex items-center gap-2">
                 <LogIn className="w-4 h-4" /> Ingresar
               </TabsTrigger>

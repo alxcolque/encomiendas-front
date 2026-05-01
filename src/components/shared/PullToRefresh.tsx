@@ -32,7 +32,7 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({ children, classNam
     // Get the scroll container (either window or the closest scrollable parent)
     const scrollContainer = containerRef.current?.closest('.overflow-y-auto') || document.documentElement;
     const scrollTop = scrollContainer === document.documentElement ? window.scrollY : (scrollContainer as HTMLElement).scrollTop;
-    
+
     if (scrollTop > 5) return; // Add a small buffer
 
     const y = Math.max(0, info.offset.y);
@@ -59,7 +59,7 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({ children, classNam
   const pullProgress = Math.min(pullDistance / PULL_THRESHOLD, 1);
 
   return (
-    <div className={cn("relative overflow-hidden", className)} ref={containerRef}>
+    <div className={cn("relative", className)} ref={containerRef}>
       {/* Pull Indicator */}
       <motion.div
         className="absolute top-0 left-0 right-0 flex items-center justify-center pointer-events-none z-50"
@@ -76,11 +76,11 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({ children, classNam
             <motion.div
               style={{ rotate: pullProgress * 180 }}
             >
-              <ArrowDown 
+              <ArrowDown
                 className={cn(
-                  "w-5 h-5 transition-colors",
+                  "w-5 h-5 transition-colors opacity-40 transition-opacity",
                   pullProgress >= 1 ? "text-primary" : "text-muted-foreground"
-                )} 
+                )}
               />
             </motion.div>
           )}
@@ -89,9 +89,6 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({ children, classNam
 
       {/* Content Wrapper */}
       <motion.div
-        drag="y"
-        dragConstraints={{ top: 0, bottom: 0 }}
-        dragElastic={0.8}
         onPan={handlePan}
         onPanEnd={handlePanEnd}
         animate={controls}

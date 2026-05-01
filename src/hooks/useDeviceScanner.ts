@@ -28,6 +28,17 @@ export const useDeviceScanner = () => {
             }
 
             if (camera !== 'granted') {
+                // For browser environments, explicitly trigger the native prompt
+                try {
+                    if (typeof navigator !== 'undefined' && navigator.mediaDevices?.getUserMedia) {
+                        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                        // Stop the stream immediately, we only wanted the permission
+                        stream.getTracks().forEach(track => track.stop());
+                    }
+                } catch (err) {
+                    console.warn("Browser media request failed or was dismissed:", err);
+                }
+
                 const { camera: newStatus } = await BarcodeScanner.requestPermissions();
                 if (newStatus !== 'granted') {
                     toast.error("No se otorgaron permisos para usar la cámara.");
