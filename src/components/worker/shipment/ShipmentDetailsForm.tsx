@@ -708,7 +708,7 @@ export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = fal
                             </div>
                         </div>
                         <div className="flex flex-col items-end gap-3 shrink-0">
-                            {role === 'admin' && role === 'worker' && (
+                            {(role === 'admin' || role === 'worker') && (
                                 <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-primary/20 hover:border-primary/40 transition-colors cursor-pointer" onClick={() => setWithIva(!withIva)}>
                                     <Checkbox
                                         id="iva-checkbox"

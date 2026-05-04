@@ -73,8 +73,9 @@ export function RecentShipmentsTable({
         try {
             await updateStatus(id, status);
             toast.success(`Estado actualizado a ${status}`);
-        } catch (error) {
-            toast.error("Error al actualizar el estado");
+        } catch (error: any) {
+            const message = error.response?.data?.message || "Error al actualizar el estado";
+            toast.error(message);
         }
     };
 
@@ -83,7 +84,7 @@ export function RecentShipmentsTable({
         try {
             await deleteShipment(id);
             toast.success("Encomienda eliminada");
-        } catch (error) {
+        } catch (error: any) {
             toast.error("Error al eliminar la encomienda");
         }
     };
@@ -289,7 +290,7 @@ export function RecentShipmentsTable({
                                                             ) : (
                                                                 <DropdownMenuItem disabled className="opacity-50 text-xs italic">
                                                                     Requiere pago para cambiar estado
-                                                                </DropdownMenuItem>
+                                                                  </DropdownMenuItem>
                                                             )}
                                                         </>
                                                     )}

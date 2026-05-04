@@ -438,9 +438,11 @@ export default function ShipmentDetails() {
         setIsGeneratingInvoice(true);
         try {
             await ENV.post(`/shipments/${shipment.id}/invoice`, {
-                invoice_type: "con",
+                // invoice_type: "sin",
                 invoice_name: senderName,
                 invoice_nit: senderCi || "0",
+                business_name: import.meta.env.VITE_COMPANY_NAME,
+                nit_ci_emisor: import.meta.env.VITE_COMPANY_NIT,
             });
             toast.success("Factura generada exitosamente");
             loadShipment(shipment.id);
