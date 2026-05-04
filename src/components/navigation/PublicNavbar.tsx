@@ -99,7 +99,7 @@ export default function PublicNavbar() {
                 {/* FIRST ROW: Logo and Auth (Mobile/Tablet/Desktop) */}
                 <div className="flex items-center justify-between h-16">
                     {/* Logo Section */}
-                    <Link to="/" className="flex items-center gap-2 group">
+                    <a href="/" className="flex items-center gap-2 group">
                         <div className="relative w-10 h-10 overflow-hidden rounded-xl">
                             <img
                                 src={'logo.png'}
@@ -115,11 +115,12 @@ export default function PublicNavbar() {
                         <span className="text-xl font-bold font-display tracking-tight text-foreground">
                             {general.siteName || "KOLMOX"}
                         </span>
-                    </Link>
+                    </a>
 
                     {/* Desktop Navigation (Hidden on Mobile/Tablet) */}
                     <div className="hidden md:flex items-center gap-1 mx-4">
                         {navLinks.map((link) => (
+
                             <Link
                                 key={link.name}
                                 to={link.href}

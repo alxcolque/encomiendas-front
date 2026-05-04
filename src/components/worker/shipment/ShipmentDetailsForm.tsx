@@ -708,33 +708,37 @@ export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = fal
                             </div>
                         </div>
                         <div className="flex flex-col items-end gap-3 shrink-0">
-                            <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-primary/20 hover:border-primary/40 transition-colors cursor-pointer" onClick={() => setWithIva(!withIva)}>
-                                <Checkbox
-                                    id="iva-checkbox"
-                                    checked={withIva}
-                                    onCheckedChange={(checked) => setWithIva(!!checked)}
-                                    className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                                />
-                                <Label htmlFor="iva-checkbox" className="text-sm font-bold text-foreground cursor-pointer select-none">
-                                    Con Factura
-                                </Label>
-                            </div>
+                            {role === 'admin' && role === 'worker' && (
+                                <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-primary/20 hover:border-primary/40 transition-colors cursor-pointer" onClick={() => setWithIva(!withIva)}>
+                                    <Checkbox
+                                        id="iva-checkbox"
+                                        checked={withIva}
+                                        onCheckedChange={(checked) => setWithIva(!!checked)}
+                                        className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                                    />
+                                    <Label htmlFor="iva-checkbox" className="text-sm font-bold text-foreground cursor-pointer select-none">
+                                        Con Factura
+                                    </Label>
+                                </div>
+                            )}
 
                             {/* Discount Input */}
-                            <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-border/60 hover:border-primary/40 transition-colors">
-                                <Label htmlFor="discount-input" className="text-sm font-bold text-muted-foreground whitespace-nowrap">
-                                    Descuento (Bs.)
-                                </Label>
-                                <Input
-                                    id="discount-input"
-                                    type="number"
-                                    min="0"
-                                    step="0.5"
-                                    value={discount}
-                                    onChange={(e) => setDiscount(e.target.value)}
-                                    className="h-8 w-24 text-right font-bold border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 p-0"
-                                />
-                            </div>
+                            {role === 'admin' && role === 'worker' && (
+                                <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-border/60 hover:border-primary/40 transition-colors">
+                                    <Label htmlFor="discount-input" className="text-sm font-bold text-muted-foreground whitespace-nowrap">
+                                        Descuento (Bs.)
+                                    </Label>
+                                    <Input
+                                        id="discount-input"
+                                        type="number"
+                                        min="0"
+                                        step="0.5"
+                                        value={discount}
+                                        onChange={(e) => setDiscount(e.target.value)}
+                                        className="h-8 w-24 text-right font-bold border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 p-0"
+                                    />
+                                </div>
+                            )}
 
                             <div className="text-right">
                                 <p className="text-5xl sm:text-6xl font-black text-primary tabular-nums tracking-tight leading-none">

@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { ArrowRight, Route, Trash2, RefreshCw } from "lucide-react";
+import { ArrowLeftRight, Route, Trash2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
 export function RoutesTab() {
@@ -144,7 +144,7 @@ export function RoutesTab() {
                                         {rv.city_a?.name ?? "—"}
                                     </TableCell>
                                     <TableCell className="text-muted-foreground px-0">
-                                        <ArrowRight className="h-4 w-4" />
+                                        <ArrowLeftRight className="h-4 w-4" />
                                     </TableCell>
                                     <TableCell className="font-medium">
                                         {rv.city_b?.name ?? "—"}
@@ -185,7 +185,7 @@ export function RoutesTab() {
                                                 onClick={() =>
                                                     handleDelete(
                                                         rv.id,
-                                                        `${rv.city_a?.name} → ${rv.city_b?.name}`
+                                                        `${rv.city_a?.name} ↔ ${rv.city_b?.name}`
                                                     )
                                                 }
                                             >

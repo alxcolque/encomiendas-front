@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ENV } from "@/config/env";
 import { useAuthStore } from "@/stores/authStore";
-import { Package, MapPin, Calendar, ArrowRight, AlertCircle, Plus, X } from "lucide-react";
+import { Package, MapPin, Calendar, ArrowRight, AlertCircle, Plus, X, RefreshCcw } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
@@ -85,23 +85,34 @@ export default function ClientOrderHistory() {
                         </p>
                     </div>
                     {user && (
-                        <NewShipmentModal
-                            defaultSender={{
-                                id: user.id || "",
-                                name: user.name || "",
-                                ci: user.ci_nit || "",
-                                phone: user.phone || ""
-                            }}
-                            trigger={
-                                <Button
-                                    size="lg"
-                                    className="gradient-primary glow-primary text-white shadow-lg shadow-primary/20 font-semibold gap-2 hover:opacity-90 hover:scale-[1.01] transition-all duration-200"
-                                >
-                                    <Plus className="h-5 w-5" />
-                                    Nueva Encomienda
-                                </Button>
-                            }
-                        />
+                        <div className="flex items-center gap-4">
+                            {/* Button refresh */}
+                            <Button
+                                size="sm"
+                                className="font-semibold gap-2 hover:opacity-90 hover:scale-[1.01] transition-all duration-200"
+                                onClick={fetchShipments}
+                            >
+                                <RefreshCcw className="h-5 w-5" />
+                                Actualizar
+                            </Button>
+                            <NewShipmentModal
+                                defaultSender={{
+                                    id: user.id || "",
+                                    name: user.name || "",
+                                    ci: user.ci_nit || "",
+                                    phone: user.phone || ""
+                                }}
+                                trigger={
+                                    <Button
+                                        size="lg"
+                                        className="gradient-primary glow-primary text-white shadow-lg shadow-primary/20 font-semibold gap-2 hover:opacity-90 hover:scale-[1.01] transition-all duration-200"
+                                    >
+                                        <Plus className="h-5 w-5" />
+                                        Nueva Encomienda
+                                    </Button>
+                                }
+                            />
+                        </div>
                     )}
                 </div>
 

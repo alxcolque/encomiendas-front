@@ -5,16 +5,11 @@ import { Button } from "@/components/ui/button";
 import { StatusBadge } from "../shared/StatusBadge";
 import {
     Eye,
-
-    FileText,
     MoreVertical,
     CheckCircle2,
     Truck,
     Package,
     RotateCcw,
-    XCircle,
-    Send,
-    ExternalLink,
     Printer,
     Search,
     Trash2
@@ -116,9 +111,13 @@ export function RecentShipmentsTable({
         return dateB - dateA;
     });
 
-    // Filter by Tracking Code
+    // Filter by Tracking Code, sender name, receiver name, sender CI/NIT, receiver CI/NIT
     const filteredShipments = sortedShipments.filter(s =>
-        !searchQuery || s.tracking_code?.toLowerCase().includes(searchQuery.toLowerCase())
+        !searchQuery || s.tracking_code?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        s.sender_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        s.receiver_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        s.sender_ci?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        s.receiver_ci?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     // Apply limit if provided
@@ -178,8 +177,18 @@ export function RecentShipmentsTable({
                                 finalShipments.map((shipment) => (
                                     <TableRow key={shipment.id} className="hover:bg-muted/50 border-border/50 transition-colors">
                                         <TableCell className="font-mono font-bold text-primary">{shipment.tracking_code}</TableCell>
-                                        <TableCell className="text-muted-foreground">{shipment.sender_name}</TableCell>
-                                        <TableCell className="text-muted-foreground">{shipment.receiver_name}</TableCell>
+                                        <TableCell className="text-muted-foreground">
+                                            {shipment.sender_name}
+                                            <div className="text-xs text-muted-foreground/70">
+                                                {shipment.sender_ci}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-muted-foreground">
+                                            {shipment.receiver_name}
+                                            <div className="text-xs text-muted-foreground/70">
+                                                {shipment.receiver_ci}
+                                            </div>
+                                        </TableCell>
                                         <TableCell>
                                             <div className="flex flex-col text-xs">
                                                 <span className="font-medium text-foreground">
