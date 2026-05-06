@@ -126,6 +126,21 @@ export function TopNavbar({ className }: TopNavbarProps) {
                   <div className="px-4 py-3 border-b border-border/50">
                     <p className="font-bold text-sm text-foreground">{user.name}</p>
                     <p className="text-[10px] uppercase tracking-wider font-extrabold text-primary">{user.role}</p>
+                    {user.role === 'worker' && (
+                      user.offices && user.offices.length > 0 ? (
+                        <div className="flex items-center gap-1 mt-1.5">
+                          <Building2 size={11} className="text-muted-foreground shrink-0" />
+                          <p className="text-[11px] text-muted-foreground font-medium truncate">
+                            {user.offices[0].name}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1 mt-1.5">
+                          <Building2 size={11} className="text-amber-500 shrink-0" />
+                          <p className="text-[11px] text-amber-500 font-medium">Sin agencia asignada</p>
+                        </div>
+                      )
+                    )}
                   </div>
                   <div className="p-1">
                     {user.role === 'admin' && (

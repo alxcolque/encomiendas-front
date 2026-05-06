@@ -289,9 +289,15 @@ function TransportCard({
 export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = false, isAdminMode = false }: Props) {
     const { user } = useAuthStore();
     const role = user?.role;
+    const isWorker = role === 'worker';
+    // For workers: use the first assigned office as origin (if any)
+    const workerOfficeId = isWorker && user?.offices && user.offices.length > 0
+        ? String(user.offices[0].id)
+        : null;
+
     const { offices, fetchOffices } = useOfficeStore();
     const [type, setType] = useState<ShipmentType>("paquete");
-    const [originId, setOriginId] = useState("");
+    const [originId, setOriginId] = useState(workerOfficeId ?? "");
     const [destinationId, setDestinationId] = useState("");
     const [width, setWidth] = useState<string>("");
     const [lengthVal, setLengthVal] = useState<string>("");
@@ -412,9 +418,23 @@ export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = fal
                             </div>
                             Agencia de Origen
                             <span className="text-destructive">*</span>
+                            {isWorker && workerOfficeId && (
+                                <span className="ml-1 text-[10px] font-semibold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                                    Asignada
+                                </span>
+                            )}
                         </Label>
-                        <Select value={originId} onValueChange={setOriginId}>
-                            <SelectTrigger className="h-11 border-border/80 focus:border-primary">
+                        <Select
+                            value={originId}
+                            onValueChange={setOriginId}
+                            disabled={isWorker && !!workerOfficeId}
+                        >
+                            <SelectTrigger
+                                className={cn(
+                                    "h-11 border-border/80 focus:border-primary",
+                                    isWorker && workerOfficeId && "opacity-80 cursor-not-allowed bg-muted/50"
+                                )}
+                            >
                                 <SelectValue placeholder="Seleccionar origen..." />
                             </SelectTrigger>
                             <SelectContent>
@@ -425,6 +445,11 @@ export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = fal
                                 ))}
                             </SelectContent>
                         </Select>
+                        {isWorker && !workerOfficeId && (
+                            <p className="text-[11px] text-amber-600 dark:text-amber-400 font-medium mt-1">
+                                ⚠️ No tienes una agencia asignada. Contacta al administrador.
+                            </p>
+                        )}
                     </div>
                     <div className="space-y-2">
                         <Label className="flex items-center gap-1.5 text-sm font-semibold">
@@ -785,11 +810,13 @@ export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = fal
 
                 {!isValid && (
                     <p className="text-center text-xs text-muted-foreground">
-                        {!originId || !destinationId
-                            ? "📍 Selecciona ciudad de origen y destino para continuar"
-                            : originId === destinationId
-                                ? "⚠️ El origen y destino deben ser ciudades diferentes"
-                                : "📐 Completa las dimensiones y peso del paquete para continuar"}
+                        {isWorker && !workerOfficeId
+                            ? "⚠️ No tienes una agencia de origen asignada. Contacta al administrador."
+                            : !originId || !destinationId
+                                ? "📍 Selecciona ciudad de origen y destino para continuar"
+                                : originId === destinationId
+                                    ? "⚠️ El origen y destino deben ser ciudades diferentes"
+                                    : "📐 Completa las dimensiones y peso del paquete para continuar"}
                     </p>
                 )}
             </div>
