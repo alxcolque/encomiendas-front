@@ -27,6 +27,8 @@ interface NewShipmentModalProps {
         ci: string;
         phone: string;
     };
+    /** Called after a shipment is successfully registered (before closing the modal). */
+    onSuccess?: () => void;
 }
 
 /* ─── Component ──────────────────────────────────────────── */
@@ -35,6 +37,7 @@ export function NewShipmentModal({
     open: controlledOpen,
     onOpenChange,
     defaultSender,
+    onSuccess,
 }: NewShipmentModalProps) {
     const [internalOpen, setInternalOpen] = useState(false);
 
@@ -78,7 +81,10 @@ export function NewShipmentModal({
                 {/* Wizard content */}
                 <div className="p-0">
                     <ShipmentRegisterWizard
-                        onSuccess={() => setOpen(false)}
+                        onSuccess={() => {
+                            onSuccess?.();
+                            setOpen(false);
+                        }}
                         hideHeader
                         defaultSender={defaultSender}
                     />

@@ -96,6 +96,7 @@ export default function ClientOrderHistory() {
                                 Actualizar
                             </Button>
                             <NewShipmentModal
+                                onSuccess={fetchShipments}
                                 defaultSender={{
                                     id: user.id || "",
                                     name: user.name || "",

@@ -290,14 +290,16 @@ export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = fal
     const { user } = useAuthStore();
     const role = user?.role;
     const isWorker = role === 'worker';
-    // For workers: use the first assigned office as origin (if any)
-    const workerOfficeId = isWorker && user?.offices && user.offices.length > 0
+
+    // Raw ID of the worker's assigned office from the auth token
+    // (comes as number from the backend, normalize to string for comparison)
+    const workerRawOfficeId = isWorker && user?.offices && user.offices.length > 0
         ? String(user.offices[0].id)
         : null;
 
     const { offices, fetchOffices } = useOfficeStore();
     const [type, setType] = useState<ShipmentType>("paquete");
-    const [originId, setOriginId] = useState(workerOfficeId ?? "");
+    const [originId, setOriginId] = useState("");   // always starts empty; set after offices load
     const [destinationId, setDestinationId] = useState("");
     const [width, setWidth] = useState<string>("");
     const [lengthVal, setLengthVal] = useState<string>("");
@@ -317,6 +319,17 @@ export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = fal
             fetchOffices();
         }
     }, []);
+
+    // Once offices are loaded, find the exact store ID that matches the worker's assigned office.
+    // This avoids mismatches between the number the backend returns in user.offices[x].id
+    // and the string id stored in officeStore, which would cause the Select to show blank.
+    useEffect(() => {
+        if (!isWorker || !workerRawOfficeId || offices.length === 0) return;
+        const matched = offices.find(o => String(o.id) === workerRawOfficeId);
+        if (matched) {
+            setOriginId(matched.id); // use the exact id from the store
+        }
+    }, [isWorker, workerRawOfficeId, offices]);
 
     /* Fetch Route Value when offices change */
     useEffect(() => {
@@ -418,7 +431,7 @@ export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = fal
                             </div>
                             Agencia de Origen
                             <span className="text-destructive">*</span>
-                            {isWorker && workerOfficeId && (
+                            {isWorker && workerRawOfficeId && (
                                 <span className="ml-1 text-[10px] font-semibold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30">
                                     Asignada
                                 </span>
@@ -427,12 +440,12 @@ export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = fal
                         <Select
                             value={originId}
                             onValueChange={setOriginId}
-                            disabled={isWorker && !!workerOfficeId}
+                            disabled={isWorker && !!workerRawOfficeId}
                         >
                             <SelectTrigger
                                 className={cn(
                                     "h-11 border-border/80 focus:border-primary",
-                                    isWorker && workerOfficeId && "opacity-80 cursor-not-allowed bg-muted/50"
+                                    isWorker && workerRawOfficeId && "opacity-80 cursor-not-allowed bg-muted/50"
                                 )}
                             >
                                 <SelectValue placeholder="Seleccionar origen..." />
@@ -445,7 +458,7 @@ export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = fal
                                 ))}
                             </SelectContent>
                         </Select>
-                        {isWorker && !workerOfficeId && (
+                        {isWorker && !workerRawOfficeId && (
                             <p className="text-[11px] text-amber-600 dark:text-amber-400 font-medium mt-1">
                                 ⚠️ No tienes una agencia asignada. Contacta al administrador.
                             </p>
@@ -810,7 +823,7 @@ export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = fal
 
                 {!isValid && (
                     <p className="text-center text-xs text-muted-foreground">
-                        {isWorker && !workerOfficeId
+                        {isWorker && !workerRawOfficeId
                             ? "⚠️ No tienes una agencia de origen asignada. Contacta al administrador."
                             : !originId || !destinationId
                                 ? "📍 Selecciona ciudad de origen y destino para continuar"

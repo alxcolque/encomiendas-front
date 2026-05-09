@@ -193,9 +193,9 @@ export function RecentShipmentsTable({
                                         <TableCell>
                                             <div className="flex flex-col text-xs">
                                                 <span className="font-medium text-foreground">
-                                                    {shipment.origin_office?.city?.name || "N/A"}
+                                                    {shipment.origin_office?.name || "N/A"}
                                                 </span>
-                                                <span className="text-muted-foreground">→ {shipment.destination_office?.city?.name || "N/A"}</span>
+                                                <span className="text-muted-foreground">→ {shipment.destination_office?.name || "N/A"}</span>
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-muted-foreground text-sm">

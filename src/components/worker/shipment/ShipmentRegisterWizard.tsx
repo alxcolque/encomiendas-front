@@ -140,8 +140,13 @@ export default function ShipmentRegisterWizard({
                 origin_office_id: details.origin_office_id,
                 destination_office_id: details.destination_office_id,
 
-                sender_id: isClientFlow ? user?.id : (people?.senderId || undefined),
-                receiver_id: isClientFlow ? undefined : (people?.recipientId || undefined),
+                // Convert empty string IDs to undefined so the backend gets null
+                sender_id: isClientFlow
+                    ? (user?.id ? String(user.id) : undefined)
+                    : (people?.senderId || undefined),
+                receiver_id: isClientFlow
+                    ? undefined
+                    : (people?.recipientId || undefined),
 
                 // If IDs are missing, the backend will use these
                 sender_name: isClientFlow ? user?.name : people?.senderName,
@@ -188,9 +193,18 @@ export default function ShipmentRegisterWizard({
             // Notify parent (e.g. close modal)
             onSuccess?.();
             window.scrollTo({ top: 0, behavior: "smooth" });
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error creating shipment:", error);
-            toast.error("Error al registrar la encomienda. Por favor intente de nuevo.");
+            // Try to extract the real backend message for easier diagnosis
+            const backendMessage =
+                error?.response?.data?.message ||
+                error?.response?.data?.errors
+                    ? Object.values(error?.response?.data?.errors ?? {}).flat().join(' · ')
+                    : null;
+            toast.error(
+                backendMessage || "Error al registrar la encomienda. Por favor intente de nuevo.",
+                { description: backendMessage ? undefined : "Revise la consola para más detalles." }
+            );
         }
     };
 
