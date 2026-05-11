@@ -84,113 +84,98 @@ export default function ShipmentTicket() {
                 </Button>
             </div>
 
-            {/* Ticket Content */}
-            <div className="bg-white max-w-[105mm] mx-auto border-2 border-dashed border-gray-300 p-4 print:p-0 print:border-none print:max-w-none print:w-[105mm] print:h-[135mm] print:overflow-hidden flex flex-col justify-between overflow-hidden print:m-0">
-                <div className="print:p-2 bg-white">
-                    {/* Row 1 */}
-                    <div className="flex justify-between items-center">
-                        <div className="w-12 h-12 bg-gray-100 flex items-center justify-center overflow-hidden">
-                            {general.logo ? (
-                                <img src={general.logo} alt="Logo" className="max-w-full max-h-full object-contain" />
-                            ) : (
-                                <img src={defaultLogo} alt="Logo" className="max-w-full max-h-full object-contain" />
-                            )}
-                        </div>
-                        <h1 className="text-xl font-black tracking-widest">TICKET</h1>
-                        <div className="text-xs font-bold">
-                            {format(new Date(), "dd-MM-yyyy")}
-                        </div>
+            {/* Ticket Content - Thermal 58mm Optimized */}
+            <div className="bg-white mx-auto p-4 print:p-0 w-full max-w-[280px] print:w-[58mm] print:max-w-[58mm] flex flex-col items-center overflow-hidden font-mono text-black">
+                
+                {/* Header: Logo and Site Name */}
+                <div className="w-16 h-16 mb-2 flex items-center justify-center">
+                    {general.logo ? (
+                        <img src={general.logo} alt="Logo" className="max-w-full max-h-full object-contain filter grayscale" />
+                    ) : (
+                        <img src={defaultLogo} alt="Logo" className="max-w-full max-h-full object-contain filter grayscale" />
+                    )}
+                </div>
+                <h2 className="text-xl font-black text-center leading-tight mb-1 uppercase">{general.siteName || 'KOLMOX'}</h2>
+                <div className="text-[10px] font-bold mb-2">
+                    {format(new Date(), "dd-MM-yyyy HH:mm")}
+                </div>
+                
+                <div className="w-full border-b-[2px] border-black border-dashed my-2"></div>
+                
+                {/* Tracking Code */}
+                <div className="text-center mb-1 w-full">
+                    <h1 className="text-sm font-black tracking-widest uppercase">TICKET</h1>
+                    <div className="text-xl font-black tracking-tight">{shipment.tracking_code}</div>
+                </div>
+                
+                <div className="w-full border-b-[2px] border-black border-dashed my-2"></div>
+                
+                {/* Information */}
+                <div className="w-full space-y-1.5 text-[11px] leading-tight">
+                    <div><span className="font-black uppercase">Rem:</span> <span className="font-semibold">{shipment.sender_name}</span></div>
+                    <div><span className="font-black uppercase">Dest:</span> <span className="font-semibold">{shipment.receiver_name}</span></div>
+                    <div><span className="font-black uppercase">Ruta:</span> <span className="font-semibold">{shipment.origin_office?.city?.name} - {shipment.destination_office?.city?.name}</span></div>
+                    <div><span className="font-black uppercase">Desc:</span> <span className="font-semibold">{description}</span></div>
+                </div>
+                
+                {/* Plan Favorcito Indicator */}
+                {shipment.is_favorite && (
+                    <div className="w-full mt-3 text-center border-y-2 border-black py-1.5">
+                        <span className="font-black text-[11px] uppercase tracking-wide">★ SEGURO: PLAN FAVORCITO ★</span>
                     </div>
+                )}
 
-                    {/* Row 2 */}
-                    <div className="text-center">
-                        <h2 className="text-3xl font-black leading-tight">{general.siteName || 'KOLMOX'}</h2>
+                <div className="w-full border-b-[2px] border-black border-dashed my-2 mt-3"></div>
+
+                {/* Total and Payment */}
+                <div className="w-full flex justify-between items-center text-sm font-black mt-1">
+                    <span>TOTAL:</span>
+                    <span className="text-lg">{roundedPrice.toFixed(2)} Bs.</span>
+                </div>
+                <div className="w-full text-xs font-black mt-1 text-center border border-black py-0.5 rounded-sm">
+                    PAGO: {paymentStatus.toUpperCase()}
+                </div>
+
+                <div className="w-full border-b-[2px] border-black border-dashed my-3"></div>
+
+                {/* QR Code */}
+                <div className="flex flex-col items-center justify-center w-full">
+                    <div className="p-1 bg-white">
+                        <img src={qrCodeUrl} alt="QR" className="w-32 h-32 object-contain" />
                     </div>
-
-                    {/* Row 3 */}
-                    <div className="flex justify-center mb-2">
-                        <div className="border-2 border-black rounded-lg px-4 py-1">
-                            <span className="text-xl font-mono font-bold">{shipment.tracking_code}</span>
-                        </div>
-                    </div>
-
-                    {/* Row 7-9 & QR Area */}
-                    <div className="flex columns-2 justify-between items-center gap-4">
-                        {/* Data column 1*/}
-                        <div className="space-y-2 flex flex-col w-1/2">
-                            <div className="text-[11px] font-bold flex gap-2">
-                                <span className="font-black uppercase">Rem:</span>
-                                <span className="font-medium">{shipment.sender_name}</span>
-                            </div>
-                            <div className="text-[11px] font-bold flex gap-2">
-                                <span className="font-black uppercase">Dest:</span>
-                                <span className="font-medium">{shipment.receiver_name}</span>
-                            </div>
-                            <div className="text-[11px] font-bold flex gap-2">
-                                <span className="font-black uppercase">Desc:</span> <span className="font-medium">{description}</span>
-                            </div>
-                            {/* Row 7 */}
-                            <div className="text-[11px] font-bold flex gap-2">
-                                <span className="font-black uppercase">Pago:</span> <span className="font-medium">{paymentStatus}</span>
-                            </div>
-                            {/* Row 8 */}
-                            <div className="text-sm font-black flex gap-1 items-baseline">
-                                <span className="font-black uppercase text-[10px]">Total:</span>
-                                <span className="text-xl">{roundedPrice.toFixed(2)} Bs.</span>
-                            </div>
-                            {/* Row 9 */}
-                            <div className="text-[10px] italic font-bold flex gap-1 border-t border-gray-100 pt-1 mt-1">
-                                <span className="font-black uppercase text-[9px] not-italic">Ruta:</span>
-                                <span className="truncate">{shipment.origin_office?.city?.name} -&gt; {shipment.destination_office?.city?.name}</span>
-                            </div>
-                        </div>
-
-                        {/* QR Code column 2*/}
-                        <div className="flex flex-col items-center border-l border-gray-200 pl-4 shrink-0">
-                            {/* QR small mode mobile */}
-                            <div className="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36  border-2 border-black p-1 bg-white">
-                                <img
-                                    src={qrCodeUrl}
-                                    alt="Tracking QR"
-                                    className="w-full h-full object-contain"
-                                />
-                            </div>
-                            <span className="text-[10px] mt-1 font-black uppercase tracking-tight text-center w-full">
-                                Escanea para<br />seguimiento
-                            </span>
-                        </div>
-                    </div>
+                    <span className="text-[10px] font-bold mt-1 text-center uppercase tracking-tighter">Escanea para<br/>seguimiento</span>
                 </div>
 
                 {/* Footer note */}
-                <div className="mt-2 pt-2 border-t border-black text-center text-[9px] uppercase font-bold print:mb-4">
+                <div className="mt-4 text-center text-[10px] font-bold pb-4 uppercase">
                     * Gracias por su preferencia *
                 </div>
             </div>
 
-            {/* Custom styles for printing */}
+            {/* Custom styles for 58mm thermal printing */}
             <style dangerouslySetInnerHTML={{
                 __html: `
                 @media print {
                     @page { 
-                        size: letter portrait; 
-                        margin: 5mm !important; 
+                        margin: 0; 
+                        size: 58mm auto;
                     }
                     html, body { 
-                        width: 100% !important; 
                         margin: 0 !important; 
                         padding: 0 !important; 
+                        width: 58mm !important;
                         background: white !important; 
                         -webkit-print-color-adjust: exact !important; 
+                        color-adjust: exact !important;
+                    }
+                    /* Forzar que todos los textos sean negro puro para térmicas */
+                    * {
+                        color: #000 !important;
                     }
                     .print\\:hidden { display: none !important; }
                     .print\\:p-0 { padding: 0 !important; }
-                    .print\\:border-none { border: none !important; }
-                    .print\\:overflow-hidden { overflow: hidden !important; }
-                    .print\\:max-w-none { max-width: none !important; }
-                    .print\\:h-\\[135mm\\] { height: 135mm !important; }
-                    .print\\:w-\\[105mm\\] { width: 105mm !important; }
-                    .print\\:m-0 { margin: 0 !important; }
+                    .print\\:w-\\[58mm\\] { width: 58mm !important; }
+                    .print\\:max-w-\\[58mm\\] { max-width: 58mm !important; }
                 }
             `}} />
         </div>
