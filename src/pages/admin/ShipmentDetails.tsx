@@ -169,6 +169,12 @@ export default function ShipmentDetails() {
     const [withInvoice, setWithInvoice] = useState(false);
     const [paymentBy, setPaymentBy] = useState<"remitente" | "destinatario">("remitente");
 
+    // Favorite Plan states
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [amountFav, setAmountFav] = useState<string>("");
+    const [productContentFav, setProductContentFav] = useState<string>("");
+    const [percentFav, setPercentFav] = useState<number>(0);
+
     // Sender states
     const [senderName, setSenderName] = useState("");
     const [senderCi, setSenderCi] = useState("");
@@ -269,6 +275,11 @@ export default function ShipmentDetails() {
             setIsFragile(data.is_fragile || false);
             setWithInvoice(data.with_invoice || false);
             setPaymentBy(data.tracking_pay === 2 ? "destinatario" : "remitente");
+            
+            setIsFavorite(data.is_favorite || false);
+            setAmountFav(data.amount_fav?.toString() || "");
+            setProductContentFav(data.product_content_fav || "");
+            setPercentFav(Number(data.percent_fav) || 0);
 
             setSenderName(data.sender_name || "");
             setSenderCi(data.sender_ci || data.invoice?.doc_num || "");
@@ -301,7 +312,7 @@ export default function ShipmentDetails() {
 
         const timeout = setTimeout(async () => {
             const routeVal = await findRouteValue(origin.city_id, dest.city_id);
-            const calculated = calculateTotal(
+            let calculated = calculateTotal(
                 type,
                 service,
                 Number(width) || 0,
@@ -312,11 +323,22 @@ export default function ShipmentDetails() {
                 Number(discount) || 0,
                 withInvoice
             );
+            
+            if (isFavorite) {
+                const amount = parseFloat(amountFav) || 0;
+                const calculatedFee = amount * 0.03;
+                const finalFee = Math.max(calculatedFee, 2);
+                setPercentFav(finalFee);
+                calculated += finalFee;
+            } else {
+                setPercentFav(0);
+            }
+            
             setPrice(calculated.toString());
         }, 300);
 
         return () => clearTimeout(timeout);
-    }, [type, service, width, length, height, weight, discount, withInvoice, transport, originId, destinationId, isReadyForAutoCalc]);
+    }, [type, service, width, length, height, weight, discount, withInvoice, transport, originId, destinationId, isReadyForAutoCalc, isFavorite, amountFav]);
 
     const handleCalculatePrice = async () => {
         if (!originId || !destinationId) {
@@ -339,7 +361,7 @@ export default function ShipmentDetails() {
             return;
         }
 
-        const calculated = calculateTotal(
+        let calculated = calculateTotal(
             type,
             service,
             Number(width) || 0,
@@ -350,6 +372,16 @@ export default function ShipmentDetails() {
             Number(discount) || 0,
             withInvoice
         );
+        
+        if (isFavorite) {
+            const amount = parseFloat(amountFav) || 0;
+            const calculatedFee = amount * 0.03;
+            const finalFee = Math.max(calculatedFee, 2);
+            setPercentFav(finalFee);
+            calculated += finalFee;
+        } else {
+            setPercentFav(0);
+        }
 
         setPrice(calculated.toString());
         toast.success("Precio calculado", { description: `${calculated} Bs.` });
@@ -404,6 +436,10 @@ export default function ShipmentDetails() {
                 receiver_name: receiverName,
                 receiver_ci: receiverCi,
                 receiver_phone: receiverPhone,
+                is_favorite: isFavorite,
+                amount_fav: isFavorite ? parseFloat(amountFav) : undefined,
+                product_content_fav: isFavorite ? productContentFav : undefined,
+                percent_fav: isFavorite ? percentFav : undefined,
             };
 
             await updateShipment(shipment.id, payload);
@@ -641,6 +677,93 @@ export default function ShipmentDetails() {
                             </div>
                         </div>
                     </div>
+                    
+                    {/* ── Plan Favorcito ── */}
+                    <div className="border border-amber-500/30 bg-amber-500/5 rounded-2xl p-4 sm:p-5 shadow-sm">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center shadow-md">
+                                <Star className="h-4 w-4 text-white" />
+                            </div>
+                            <h3 className="font-bold text-sm text-foreground">Plan Favorcito (Seguro)</h3>
+                        </div>
+
+                        <div className="flex items-center gap-3 bg-background/50 px-4 py-3 rounded-xl border border-amber-500/30 cursor-pointer hover:border-amber-500/60 transition-colors mb-4" onClick={() => {
+                            if (!isFullEditable) return;
+                            const nextIsFav = !isFavorite;
+                            setIsFavorite(nextIsFav);
+                            if (!nextIsFav) {
+                                setAmountFav("");
+                                setProductContentFav("");
+                                setPercentFav(0);
+                            }
+                        }}>
+                            <Checkbox
+                                disabled={!isFullEditable}
+                                id="fav-checkbox-admin"
+                                checked={isFavorite}
+                                onCheckedChange={(checked) => {
+                                    const nextIsFav = !!checked;
+                                    setIsFavorite(nextIsFav);
+                                    if (!nextIsFav) {
+                                        setAmountFav("");
+                                        setProductContentFav("");
+                                        setPercentFav(0);
+                                    }
+                                }}
+                                className="data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500"
+                            />
+                            <Label htmlFor="fav-checkbox-admin" className="text-sm font-bold text-foreground cursor-pointer select-none flex-1">
+                                Encomienda con Seguro "Plan Favorcito"
+                            </Label>
+                        </div>
+
+                        {/* Mostrar los campos si esta activo el plan favorcito */}
+                        <div className={cn(
+                            "grid grid-cols-1 md:grid-cols-2 gap-4 transition-all duration-300 ease-in-out overflow-hidden",
+                            isFavorite ? "opacity-100 max-h-[500px]" : "opacity-0 max-h-0 pointer-events-none"
+                        )}>
+                            <div className="space-y-1.5 md:col-span-2">
+                                <Label className="text-sm font-semibold">
+                                    Descripción del Producto <span className="text-destructive">*</span>
+                                </Label>
+                                <Input
+                                    disabled={!isFullEditable}
+                                    placeholder="Ej: Laptop Dell Inspiron, Ropa deportiva..."
+                                    value={productContentFav}
+                                    onChange={(e) => setProductContentFav(e.target.value)}
+                                    className="h-11 focus:border-amber-500"
+                                />
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <Label className="text-sm font-semibold">
+                                    Monto a Asegurar (Bs.) <span className="text-destructive">*</span>
+                                </Label>
+                                <Input
+                                    disabled={!isFullEditable}
+                                    type="number"
+                                    min="0"
+                                    placeholder="Ej: 1500"
+                                    value={amountFav}
+                                    onChange={(e) => setAmountFav(e.target.value)}
+                                    className="h-11 focus:border-amber-500 font-semibold"
+                                />
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <Label className="text-sm font-semibold text-muted-foreground">
+                                    Comisión de Seguro (Bs.)
+                                </Label>
+                                <Input
+                                    type="text"
+                                    readOnly
+                                    value={Number(percentFav) > 0 ? Number(percentFav).toFixed(2) : "2.00"}
+                                    className="h-11 bg-muted/50 border-border font-bold text-amber-600 dark:text-amber-400 cursor-not-allowed"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
                 {/* ── Right Column: People & Options ── */}

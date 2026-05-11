@@ -46,6 +46,11 @@ export interface ShipmentDetailsData {
     service: ServiceTier;
     total: number;
     withIva: boolean;
+    // Favorites
+    is_favorite?: boolean;
+    amount_fav?: number;
+    product_content_fav?: string;
+    percent_fav?: number;
 }
 
 interface Props {
@@ -312,6 +317,12 @@ export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = fal
     const [routeValue, setRouteValue] = useState(0);
     const [routeValueNotFound, setRouteValueNotFound] = useState(false);
     const [discount, setDiscount] = useState<string>("0");
+    
+    // Plan Favorcito state
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [amountFav, setAmountFav] = useState<string>("");
+    const [productContentFav, setProductContentFav] = useState<string>("");
+    const [percentFav, setPercentFav] = useState<number>(0);
     const { findRouteValue } = useRouteValueStore();
 
     useEffect(() => {
@@ -362,8 +373,22 @@ export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = fal
         const h = parseFloat(height) || 0;
         const wt = parseFloat(weight) || 0;
         const d = parseFloat(discount) || 0;
-        setTotal(calculateTotal(type, transport, service, w, l, h, wt, withIva, routeValue, d));
-    }, [type, transport, service, width, lengthVal, height, weight, withIva, routeValue, discount]);
+        
+        let subtotal = calculateTotal(type, transport, service, w, l, h, wt, withIva, routeValue, d);
+        
+        // Calculate Favorite Plan fee if active
+        if (isClientMode && isFavorite) {
+            const amount = parseFloat(amountFav) || 0;
+            const calculatedFee = amount * 0.03;
+            const finalFee = Math.max(calculatedFee, 2); // Minimum 2 Bs
+            setPercentFav(finalFee);
+            subtotal += finalFee;
+        } else {
+            setPercentFav(0);
+        }
+        
+        setTotal(subtotal);
+    }, [type, transport, service, width, lengthVal, height, weight, withIva, routeValue, discount, isClientMode, isFavorite, amountFav]);
 
     /* Validation */
     const isPackageDimensionsValid =
@@ -373,7 +398,9 @@ export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = fal
             parseFloat(height) > 0 &&
             parseFloat(weight) > 0);
 
-    const isValid = originId && destinationId && originId !== destinationId && isPackageDimensionsValid;
+    const isFavoriteValid = !isFavorite || (parseFloat(amountFav) > 0 && productContentFav.trim().length > 0);
+
+    const isValid = originId && destinationId && originId !== destinationId && isPackageDimensionsValid && isFavoriteValid;
 
     const handleNext = () => {
         if (!isValid) return;
@@ -389,6 +416,10 @@ export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = fal
             service,
             total,
             withIva,
+            is_favorite: isFavorite,
+            amount_fav: isFavorite ? parseFloat(amountFav) : undefined,
+            product_content_fav: isFavorite ? productContentFav : undefined,
+            percent_fav: isFavorite ? percentFav : undefined,
         });
     };
 
@@ -788,6 +819,93 @@ export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = fal
                     </div>
                 </div>
             </div>
+
+            {/* ── Plan Favorcito (Solo Cliente) ────────────────────────── */}
+            {isClientMode && (
+                <div className="border border-amber-500/30 bg-amber-500/5 rounded-2xl p-5 shadow-sm">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center shadow-md">
+                            <Star className="h-4 w-4 text-white" />
+                        </div>
+                        <h3 className="font-bold text-base text-foreground">Plan Favorcito (Opcional)</h3>
+                    </div>
+
+                    <div className="flex items-center gap-3 bg-background/50 px-4 py-3 rounded-xl border border-amber-500/30 cursor-pointer hover:border-amber-500/60 transition-colors mb-4" onClick={() => {
+                        const nextIsFav = !isFavorite;
+                        setIsFavorite(nextIsFav);
+                        if (!nextIsFav) {
+                            setAmountFav("");
+                            setProductContentFav("");
+                            setPercentFav(0);
+                        }
+                    }}>
+                        <Checkbox
+                            id="fav-checkbox"
+                            checked={isFavorite}
+                            onCheckedChange={(checked) => {
+                                const nextIsFav = !!checked;
+                                setIsFavorite(nextIsFav);
+                                if (!nextIsFav) {
+                                    setAmountFav("");
+                                    setProductContentFav("");
+                                    setPercentFav(0);
+                                }
+                            }}
+                            className="data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500"
+                        />
+                        <Label htmlFor="fav-checkbox" className="text-sm font-bold text-foreground cursor-pointer select-none flex-1">
+                            Añadir Seguro "Plan Favorcito"
+                        </Label>
+                    </div>
+
+                    {/* Mostrar los campos si esta activo el plan favorcito */}
+                    <div className={cn(
+                        "grid grid-cols-1 md:grid-cols-2 gap-4 transition-all duration-300 ease-in-out overflow-hidden",
+                        isFavorite ? "opacity-100 max-h-[500px]" : "opacity-0 max-h-0 pointer-events-none"
+                    )}>
+                        <div className="space-y-1.5 md:col-span-2">
+                            <Label className="text-sm font-semibold">
+                                Descripción del Producto <span className="text-destructive">*</span>
+                            </Label>
+                            <Input
+                                placeholder="Ej: Laptop Dell Inspiron, Ropa deportiva..."
+                                value={productContentFav}
+                                onChange={(e) => setProductContentFav(e.target.value)}
+                                className="h-11 focus:border-amber-500"
+                            />
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <Label className="text-sm font-semibold">
+                                Monto a Asegurar (Bs.) <span className="text-destructive">*</span>
+                            </Label>
+                            <Input
+                                type="number"
+                                min="0"
+                                placeholder="Ej: 1500"
+                                value={amountFav}
+                                onChange={(e) => setAmountFav(e.target.value)}
+                                className="h-11 focus:border-amber-500 font-semibold"
+                            />
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <Label className="text-sm font-semibold text-muted-foreground">
+                                Comisión de Seguro (Bs.)
+                            </Label>
+                            <Input
+                                type="text"
+                                readOnly
+                                value={percentFav > 0 ? percentFav.toFixed(2) : "2.00"}
+                                className="h-11 bg-muted/50 border-border font-bold text-amber-600 dark:text-amber-400 cursor-not-allowed"
+                            />
+                            <p className="text-[10px] text-muted-foreground mt-1">
+                                3% del monto declarado (Mínimo 2 Bs.)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* ── Next Button ──────────────────────────────────── */}
             <div className="space-y-2">

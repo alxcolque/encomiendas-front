@@ -167,7 +167,13 @@ export default function ShipmentRegisterWizard({
                 width: details.width,
                 length: details.length,
                 height: details.height,
-                current_status: isClientFlow ? 'quote' : 'created'
+                current_status: isClientFlow ? 'quote' : 'created',
+
+                // Favorites (from details)
+                is_favorite: details.is_favorite,
+                amount_fav: details.amount_fav,
+                product_content_fav: details.product_content_fav,
+                percent_fav: details.percent_fav,
             };
 
             const result = await createShipment({

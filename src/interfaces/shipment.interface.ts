@@ -55,6 +55,11 @@ export interface AdminShipment {
     invoice?: Invoice;
     created_at?: string;
     updated_at?: string;
+    // Favorites
+    is_favorite?: boolean;
+    amount_fav?: number | null;
+    product_content_fav?: string | null;
+    percent_fav?: number | null;
 }
 
 export interface CreateShipmentPayload {
@@ -90,4 +95,9 @@ export interface CreateShipmentPayload {
     with_invoice?: boolean;
     invoice_nit?: string;
     invoice_name?: string;
+    // Favorites
+    is_favorite?: boolean;
+    amount_fav?: number;
+    product_content_fav?: string;
+    percent_fav?: number;
 }
