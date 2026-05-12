@@ -275,7 +275,7 @@ export default function ShipmentDetails() {
             setIsFragile(data.is_fragile || false);
             setWithInvoice(data.with_invoice || false);
             setPaymentBy(data.tracking_pay === 2 ? "destinatario" : "remitente");
-            
+
             setIsFavorite(data.is_favorite || false);
             setAmountFav(data.amount_fav?.toString() || "");
             setProductContentFav(data.product_content_fav || "");
@@ -323,7 +323,7 @@ export default function ShipmentDetails() {
                 Number(discount) || 0,
                 withInvoice
             );
-            
+
             if (isFavorite) {
                 const amount = parseFloat(amountFav) || 0;
                 const calculatedFee = amount * 0.03;
@@ -333,7 +333,7 @@ export default function ShipmentDetails() {
             } else {
                 setPercentFav(0);
             }
-            
+
             setPrice(calculated.toString());
         }, 300);
 
@@ -372,7 +372,7 @@ export default function ShipmentDetails() {
             Number(discount) || 0,
             withInvoice
         );
-        
+
         if (isFavorite) {
             const amount = parseFloat(amountFav) || 0;
             const calculatedFee = amount * 0.03;
@@ -409,47 +409,47 @@ export default function ShipmentDetails() {
         }
 
         setIsSaving(true);
-        try {
-            const payload: Partial<CreateShipmentPayload> = {
-                origin_office_id: originId,
-                destination_office_id: destinationId,
-                current_status: status,
-                observation,
-                is_pack: type === "paquete",
-                track_type: transport === "aereo" ? 2 : 1,
-                type_service: service,
-                weight: weight ? parseFloat(weight) : 0,
-                width: width ? parseFloat(width) : 0,
-                length: length ? parseFloat(length) : 0,
-                height: height ? parseFloat(height) : 0,
-                price: price ? parseFloat(price) : 0,
-                is_fragile: isFragile,
-                with_invoice: withInvoice,
-                ...(withInvoice ? {
-                    invoice_nit: senderCi || "0",
-                    invoice_name: senderName || "S/N"
-                } : {}),
-                tracking_pay: paymentBy === "destinatario" ? 2 : 1,
-                sender_name: senderName,
-                sender_ci: senderCi,
-                sender_phone: senderPhone,
-                receiver_name: receiverName,
-                receiver_ci: receiverCi,
-                receiver_phone: receiverPhone,
-                is_favorite: isFavorite,
-                amount_fav: isFavorite ? parseFloat(amountFav) : undefined,
-                product_content_fav: isFavorite ? productContentFav : undefined,
-                percent_fav: isFavorite ? percentFav : undefined,
-            };
+        /* try { */
+        const payload: Partial<CreateShipmentPayload> = {
+            origin_office_id: originId,
+            destination_office_id: destinationId,
+            current_status: status,
+            observation,
+            is_pack: type === "paquete",
+            track_type: transport === "aereo" ? 2 : 1,
+            type_service: service,
+            weight: weight ? parseFloat(weight) : 0,
+            width: width ? parseFloat(width) : 0,
+            length: length ? parseFloat(length) : 0,
+            height: height ? parseFloat(height) : 0,
+            price: price ? parseFloat(price) : 0,
+            is_fragile: isFragile,
+            with_invoice: withInvoice,
+            ...(withInvoice ? {
+                invoice_nit: senderCi || "0",
+                invoice_name: senderName || "S/N"
+            } : {}),
+            tracking_pay: paymentBy === "destinatario" ? 2 : 1,
+            sender_name: senderName,
+            sender_ci: senderCi,
+            sender_phone: senderPhone,
+            receiver_name: receiverName,
+            receiver_ci: receiverCi,
+            receiver_phone: receiverPhone,
+            is_favorite: isFavorite,
+            amount_fav: isFavorite ? parseFloat(amountFav) : undefined,
+            product_content_fav: isFavorite ? productContentFav : undefined,
+            percent_fav: isFavorite ? percentFav : undefined,
+        };
 
-            await updateShipment(shipment.id, payload);
-            toast.success("Encomienda actualizada correctamente");
-            loadShipment(shipment.id);
-        } catch (error) {
+        await updateShipment(shipment.id, payload);
+        toast.success("Encomienda actualizada correctamente");
+        loadShipment(shipment.id);
+        /* } catch (error) {
             toast.error("Error al actualizar la encomienda");
         } finally {
             setIsSaving(false);
-        }
+        } */
     };
 
     const handleDeleteShipment = async () => {
@@ -677,7 +677,7 @@ export default function ShipmentDetails() {
                             </div>
                         </div>
                     </div>
-                    
+
                     {/* ── Plan Favorcito ── */}
                     <div className="border border-amber-500/30 bg-amber-500/5 rounded-2xl p-4 sm:p-5 shadow-sm">
                         <div className="flex items-center gap-3 mb-4">
