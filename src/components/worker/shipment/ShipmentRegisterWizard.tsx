@@ -103,7 +103,7 @@ export default function ShipmentRegisterWizard({
     const [step, setStep] = useState(1);
     const [termsAccepted, setTermsAccepted] = useState(false);
     const [detailsData, setDetailsData] = useState<ShipmentDetailsData | null>(null);
-    const [withIva, setWithIva] = useState(false);
+    const [withIva, setWithIva] = useState(true);
     const [showInvoice, setShowInvoice] = useState(false);
     const [createdInvoice, setCreatedInvoice] = useState<Invoice | null>(null);
     const { createShipment } = useAdminShipmentStore();

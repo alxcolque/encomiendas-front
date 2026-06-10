@@ -312,12 +312,12 @@ export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = fal
     const [weight, setWeight] = useState<string>("");
     const [transport, setTransport] = useState<TransportMode>("terrestre");
     const [service, setService] = useState<ServiceTier>("standard");
-    const [withIva, setWithIva] = useState(false);
+    const [withIva, setWithIva] = useState(true);
     const [total, setTotal] = useState(0);
     const [routeValue, setRouteValue] = useState(0);
     const [routeValueNotFound, setRouteValueNotFound] = useState(false);
     const [discount, setDiscount] = useState<string>("0");
-    
+
     // Plan Favorcito state
     const [isFavorite, setIsFavorite] = useState(false);
     const [amountFav, setAmountFav] = useState<string>("");
@@ -373,9 +373,9 @@ export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = fal
         const h = parseFloat(height) || 0;
         const wt = parseFloat(weight) || 0;
         const d = parseFloat(discount) || 0;
-        
+
         let subtotal = calculateTotal(type, transport, service, w, l, h, wt, withIva, routeValue, d);
-        
+
         // Calculate Favorite Plan fee if active
         if (isClientMode && isFavorite) {
             const amount = parseFloat(amountFav) || 0;
@@ -386,7 +386,7 @@ export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = fal
         } else {
             setPercentFav(0);
         }
-        
+
         setTotal(subtotal);
     }, [type, transport, service, width, lengthVal, height, weight, withIva, routeValue, discount, isClientMode, isFavorite, amountFav]);
 
@@ -777,19 +777,7 @@ export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = fal
                             </div>
                         </div>
                         <div className="flex flex-col items-end gap-3 shrink-0">
-                            {(role === 'admin' || role === 'worker') && (
-                                <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-primary/20 hover:border-primary/40 transition-colors cursor-pointer" onClick={() => setWithIva(!withIva)}>
-                                    <Checkbox
-                                        id="iva-checkbox"
-                                        checked={withIva}
-                                        onCheckedChange={(checked) => setWithIva(!!checked)}
-                                        className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                                    />
-                                    <Label htmlFor="iva-checkbox" className="text-sm font-bold text-foreground cursor-pointer select-none">
-                                        Con Factura
-                                    </Label>
-                                </div>
-                            )}
+
 
                             {/* Discount Input */}
                             {role === 'admin' && role === 'worker' && (
@@ -899,9 +887,9 @@ export default function ShipmentDetailsForm({ onNext, onBack, isClientMode = fal
                                 value={percentFav > 0 ? percentFav.toFixed(2) : "2.00"}
                                 className="h-11 bg-muted/50 border-border font-bold text-amber-600 dark:text-amber-400 cursor-not-allowed"
                             />
-                            <p className="text-[10px] text-muted-foreground mt-1">
+                            {/* <p className="text-[10px] text-muted-foreground mt-1">
                                 3% del monto declarado (Mínimo 2 Bs.)
-                            </p>
+                            </p> */}
                         </div>
                     </div>
                 </div>
