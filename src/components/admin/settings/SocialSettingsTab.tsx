@@ -3,13 +3,17 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { useSettingsStore } from "@/stores/settingsStore";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Save, Facebook, Instagram, Video, MessageCircle } from "lucide-react";
+import { Save, Facebook, Instagram, Video, MessageCircle, Youtube } from "lucide-react";
 
 export function SocialSettingsTab() {
     const { socials, updateSocials, isLoading } = useSettingsStore();
     const [localSocials, setLocalSocials] = useState(socials);
+
+    useEffect(() => {
+        setLocalSocials(socials);
+    }, [socials]);
 
     const handleUpdate = (index: number, field: string, value: any) => {
         const newSocials = [...localSocials];
@@ -27,6 +31,7 @@ export function SocialSettingsTab() {
             case 'instagram': return <Instagram className="h-5 w-5 text-pink-600" />;
             case 'tiktok': return <Video className="h-5 w-5 text-black" />; // generic video for tiktok
             case 'whatsapp': return <MessageCircle className="h-5 w-5 text-green-500" />;
+            case 'youtube': return <Youtube className="h-5 w-5 text-red-600" />;
             default: return null;
         }
     };

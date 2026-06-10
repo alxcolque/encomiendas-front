@@ -1,7 +1,7 @@
-import { Textarea } from "@/components/ui/textarea";
+import { TiptapEditor } from "./TiptapEditor";
 import { Button } from "@/components/ui/button";
 import { useSettingsStore } from "@/stores/settingsStore";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Save } from "lucide-react";
 
@@ -9,6 +9,14 @@ export function LegalSettingsTab() {
     const { termsAndConditions, privacyPolicy, updateLegal, isLoading } = useSettingsStore();
     const [terms, setTerms] = useState(termsAndConditions);
     const [privacy, setPrivacy] = useState(privacyPolicy);
+
+    useEffect(() => {
+        setTerms(termsAndConditions);
+    }, [termsAndConditions]);
+
+    useEffect(() => {
+        setPrivacy(privacyPolicy);
+    }, [privacyPolicy]);
 
     const handleSave = () => {
         Promise.all([
@@ -21,19 +29,17 @@ export function LegalSettingsTab() {
         <div className="space-y-8 max-w-3xl">
             <div className="space-y-3">
                 <h3 className="text-lg font-semibold">Términos y Condiciones</h3>
-                <Textarea
+                <TiptapEditor
                     value={terms}
-                    onChange={(e) => setTerms(e.target.value)}
-                    className="min-h-[200px]"
+                    onChange={setTerms}
                     placeholder="Escriba los términos y condiciones aquí..."
                 />
             </div>
             <div className="space-y-3">
                 <h3 className="text-lg font-semibold">Política de Privacidad</h3>
-                <Textarea
+                <TiptapEditor
                     value={privacy}
-                    onChange={(e) => setPrivacy(e.target.value)}
-                    className="min-h-[200px]"
+                    onChange={setPrivacy}
                     placeholder="Escriba la política de privacidad aquí..."
                 />
             </div>

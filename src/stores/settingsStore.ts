@@ -113,6 +113,8 @@ export const useSettingsStore = create<SettingsState>((set) => ({
                 socials: response.socials,
                 faqs: response.faqs,
                 footerLinks: response.footerLinks,
+                termsAndConditions: response.termsAndConditions,
+                privacyPolicy: response.privacyPolicy,
                 isLoading: false,
             });
         } catch (error) {
