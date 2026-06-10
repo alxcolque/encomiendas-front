@@ -1,6 +1,6 @@
 import { useSettingsStore } from "@/stores/settingsStore";
 import { Link } from "react-router-dom";
-import { Package, Facebook, Instagram, Twitter, Linkedin, CreditCard, Wallet, Banknote, Mail, Phone, MapPin, Video, MessageCircle } from "lucide-react";
+import { Package, Facebook, Instagram, Twitter, Linkedin, Youtube, CreditCard, Wallet, Banknote, Mail, Phone, MapPin, Video, MessageCircle } from "lucide-react";
 
 export default function PublicFooter() {
     const currentYear = new Date().getFullYear();
@@ -14,6 +14,7 @@ export default function PublicFooter() {
             case 'linkedin': return Linkedin;
             case 'tiktok': return Video;
             case 'whatsapp': return MessageCircle;
+            case 'youtube': return Youtube;
             default: return Package;
         }
     };
@@ -40,7 +41,7 @@ export default function PublicFooter() {
                             <span className="text-xl font-bold font-display text-foreground">{general.siteName}</span>
                         </Link>
                         <p className="text-muted-foreground leading-relaxed max-w-sm">
-                            {general.siteDescription}
+                            Servicio de transporte de encomiendas rápido y seguro a nivel nacional.
                         </p>
                         <div className="space-y-3 pt-2">
                             <div className="flex items-center gap-3 text-sm text-muted-foreground">

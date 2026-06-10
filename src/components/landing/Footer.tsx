@@ -1,4 +1,4 @@
-import { Package, Facebook, Instagram, Twitter, Linkedin, CreditCard, Wallet, Banknote } from "lucide-react";
+import { Package, Facebook, Instagram, Twitter, Linkedin, Youtube, CreditCard, Wallet, Banknote } from "lucide-react";
 
 const footerLinks = {
   servicios: [
@@ -26,6 +26,8 @@ const socialLinks = [
   { icon: Instagram, href: "#", label: "Instagram" },
   { icon: Twitter, href: "#", label: "Twitter" },
   { icon: Linkedin, href: "#", label: "LinkedIn" },
+  //{ icon: Tiktok, href: "#", label: "TikTok" },
+  { icon: Youtube, href: "#", label: "YouTube" },
 ];
 
 

@@ -102,20 +102,15 @@ export default function AboutSection() {
                 ¿Quiénes Somos?
               </h2>
               <div className="text-muted-foreground text-base md:text-xl leading-relaxed space-y-4">
-                {general.siteDescription ? (
-                  <p>{general.siteDescription}</p>
-                ) : (
-                  <>
-                    <p>
-                      En <span className="text-primary font-bold">{general.siteName || 'KOLMOX'}</span>, somos más que una empresa de logística.
-                      Somos tu socio estratégico en el mundo de las entregas.
-                    </p>
-                    <p className="text-sm md:text-lg opacity-80">
-                      Con más de una década de experiencia, hemos revolucionado la forma en que Bolivia envía y recibe paquetes.
-                      Nuestra flota moderna y tecnología de punta garantizan entregas seguras y rápidas.
-                    </p>
-                  </>
-                )}
+
+                <p>
+                  En <span className="text-primary font-bold">{general.siteName || 'KOLMOX'}</span>, somos más que una empresa de logística.
+                  Somos tu socio estratégico en el mundo de las entregas.
+                </p>
+                <p className="text-sm md:text-lg opacity-80">
+                  Con más de una década de experiencia, hemos revolucionado la forma en que Bolivia envía y recibe paquetes.
+                  Nuestra flota moderna y tecnología de punta garantizan entregas seguras y rápidas.
+                </p>
               </div>
             </div>
 
