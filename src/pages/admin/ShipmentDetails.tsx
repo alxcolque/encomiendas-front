@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAdminShipmentStore } from "@/stores/adminShipmentStore";
 import { AdminShipment, ShipmentStatus, CreateShipmentPayload } from "@/interfaces/shipment.interface";
@@ -191,6 +191,64 @@ export default function ShipmentDetails() {
     const [isSearchingSender, setIsSearchingSender] = useState(false);
     const [isSearchingReceiver, setIsSearchingReceiver] = useState(false);
     const [isNewReceiver, setIsNewReceiver] = useState(false);
+
+    // WhatsApp Message States
+    const [senderMessage, setSenderMessage] = useState("");
+    const [receiverMessage, setReceiverMessage] = useState("");
+    const [isSenderMessageEdited, setIsSenderMessageEdited] = useState(false);
+    const [isReceiverMessageEdited, setIsReceiverMessageEdited] = useState(false);
+
+    const generateInvoiceMessage = useCallback((name: string) => {
+        if (!shipment) return "";
+        const originOffice = offices.find(o => o.id === originId);
+        const destOffice = offices.find(o => o.id === destinationId);
+        const originCityName = originOffice?.city?.name || "Origen";
+        const destCityName = destOffice?.city?.name || "Destino";
+
+        const statusText = {
+            quote: "COTIZACIÓN",
+            created: "REGISTRADO",
+            in_transit: "EN TRÁNSITO 🚚",
+            at_office: "LISTO EN AGENCIA 🏢",
+            delivered: "ENTREGADO ✅"
+        }[status] || status.toUpperCase();
+
+        const isPaid = !!shipment.invoice;
+        const payStatus = isPaid ? "PAGADO" : (paymentBy === "destinatario" ? "POR PAGAR EN DESTINO" : "PENDIENTE DE PAGO");
+
+        const line = "----------------------------------------";
+        return `Hola, ${name}:
+${line}
+📄 DETALLE DE ENCOMIENDA (TICKET)
+${line}
+Código: ${shipment.tracking_code}
+Estado: ${statusText}
+Pago: ${payStatus}
+${line}
+Remitente: ${senderName} (${senderPhone})
+Destinatario: ${receiverName} (${receiverPhone})
+${line}
+Detalle: ${type === 'paquete' ? 'Paquete 📦' : 'Sobre ✉️'} de ${weight || 0} kg
+Ruta: ${originCityName} -> ${destCityName}
+Monto: ${price || 0} Bs.
+${line}
+Seguimiento en línea:
+http://localhost:5173/tracking?code=${shipment.tracking_code}
+${line}
+¡Gracias por su preferencia!`;
+    }, [shipment, offices, originId, destinationId, status, paymentBy, senderName, senderPhone, receiverName, receiverPhone, type, weight, price]);
+
+    useEffect(() => {
+        if (!isSenderMessageEdited) {
+            setSenderMessage(generateInvoiceMessage(senderName));
+        }
+    }, [senderName, generateInvoiceMessage, isSenderMessageEdited]);
+
+    useEffect(() => {
+        if (!isReceiverMessageEdited) {
+            setReceiverMessage(generateInvoiceMessage(receiverName));
+        }
+    }, [receiverName, generateInvoiceMessage, isReceiverMessageEdited]);
 
     // Business Logic Flags
     const isPaid = !!shipment?.invoice;
@@ -936,35 +994,62 @@ export default function ShipmentDetails() {
             {/* Campos preparados para enviar al WhatsApp al remitente y destinatario */}
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {/* Remitente */}
-                <div className="border border-emerald-500/30 rounded-2xl p-5 bg-emerald-500/5 shadow-sm space-y-4">
-                    <div className="flex items-center gap-2 border-b border-emerald-500/10 pb-2">
-                        <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs font-black shadow-md shadow-emerald-500/20">
-                            R
+                <div className="border border-emerald-500/30 rounded-2xl p-5 bg-emerald-500/5 shadow-sm space-y-4 flex flex-col justify-between">
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-2 border-b border-emerald-500/10 pb-2">
+                            <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs font-black shadow-md shadow-emerald-500/20">
+                                R
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-sm text-emerald-700 dark:text-emerald-400">Notificación al Remitente</h4>
+                                <p className="text-[10px] text-emerald-600 dark:text-emerald-500">Enviar detalles por WhatsApp</p>
+                            </div>
                         </div>
-                        <div>
-                            <h4 className="font-bold text-sm text-emerald-700 dark:text-emerald-400">Notificación al Remitente</h4>
-                            <p className="text-[10px] text-emerald-600 dark:text-emerald-500">Enviar detalles por WhatsApp</p>
+                        <div className="space-y-3">
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-emerald-800 dark:text-emerald-300">Nombre del Remitente</Label>
+                                <Input
+                                    value={senderName}
+                                    onChange={(e) => setSenderName(e.target.value)}
+                                    className="h-10 bg-background/50 border-emerald-500/20 focus:border-emerald-500 dark:bg-card/50"
+                                    placeholder="Nombre completo"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-emerald-800 dark:text-emerald-300">Teléfono del Remitente</Label>
+                                <Input
+                                    value={senderPhone}
+                                    onChange={(e) => setSenderPhone(e.target.value)}
+                                    className="h-10 bg-background/50 border-emerald-500/20 focus:border-emerald-500 dark:bg-card/50"
+                                    placeholder="Ej: 71234567"
+                                />
+                            </div>
+                            <div className="space-y-1 flex flex-col">
+                                <div className="flex items-center justify-between mb-1">
+                                    <Label className="text-xs font-bold text-emerald-800 dark:text-emerald-300">Mensaje de Notificación (Editable)</Label>
+                                    {isSenderMessageEdited && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsSenderMessageEdited(false)}
+                                            className="text-emerald-600 hover:text-emerald-700 text-[10px] font-bold underline"
+                                        >
+                                            Restablecer original
+                                        </button>
+                                    )}
+                                </div>
+                                <Textarea
+                                    value={senderMessage}
+                                    onChange={(e) => {
+                                        setSenderMessage(e.target.value);
+                                        setIsSenderMessageEdited(true);
+                                    }}
+                                    className="min-h-[160px] text-xs font-mono bg-background/50 border-emerald-500/20 focus:border-emerald-500 dark:bg-card/50 p-3 leading-relaxed"
+                                    placeholder="Redacte el mensaje aquí..."
+                                />
+                            </div>
                         </div>
                     </div>
-                    <div className="space-y-3">
-                        <div className="space-y-1">
-                            <Label className="text-xs font-bold text-emerald-800 dark:text-emerald-300">Nombre del Remitente</Label>
-                            <Input
-                                value={senderName}
-                                onChange={(e) => setSenderName(e.target.value)}
-                                className="h-10 bg-background/50 border-emerald-500/20 focus:border-emerald-500 dark:bg-card/50"
-                                placeholder="Nombre completo"
-                            />
-                        </div>
-                        <div className="space-y-1">
-                            <Label className="text-xs font-bold text-emerald-800 dark:text-emerald-300">Teléfono del Remitente</Label>
-                            <Input
-                                value={senderPhone}
-                                onChange={(e) => setSenderPhone(e.target.value)}
-                                className="h-10 bg-background/50 border-emerald-500/20 focus:border-emerald-500 dark:bg-card/50"
-                                placeholder="Ej: 71234567"
-                            />
-                        </div>
+                    <div className="pt-2">
                         <Button
                             type="button"
                             onClick={() => {
@@ -972,18 +1057,10 @@ export default function ShipmentDetails() {
                                     toast.error("Número de teléfono inválido");
                                     return;
                                 }
-                                const originOffice = offices.find(o => o.id === originId);
-                                const destOffice = offices.find(o => o.id === destinationId);
-                                const originCityName = originOffice?.city?.name || "";
-                                const destCityName = destOffice?.city?.name || "";
-                                const detailText = `Envío de ${type === 'paquete' ? 'Paquete 📦' : 'Sobre ✉️'} (${weight || 0} kg) desde ${originCityName} (${originOffice?.name || ''}) hasta ${destCityName} (${destOffice?.name || ''}). Costo: ${price || 0} Bs.`;
-                                const trackingUrl = `http://localhost:5173/tracking?code=${shipment?.tracking_code || ""}`;
-                                const message = `Hola, ${senderName}:\n${detailText}\nlink de código de seguimiento: ${trackingUrl}`;
-
-                                window.open(`https://wa.me/591${senderPhone}?text=${encodeURIComponent(message)}`, '_blank');
+                                window.open(`https://wa.me/591${senderPhone}?text=${encodeURIComponent(senderMessage)}`, '_blank');
                             }}
                             disabled={!senderPhone || senderPhone.length < 7}
-                            className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2 mt-2 shadow-md shadow-emerald-600/10 border-0"
+                            className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2 shadow-md shadow-emerald-600/10 border-0"
                         >
                             <FaWhatsapp className="w-5 h-5" /> Enviar notificación
                         </Button>
@@ -991,35 +1068,62 @@ export default function ShipmentDetails() {
                 </div>
 
                 {/* Destinatario */}
-                <div className="border border-blue-500/30 rounded-2xl p-5 bg-blue-500/5 shadow-sm space-y-4">
-                    <div className="flex items-center gap-2 border-b border-blue-500/10 pb-2">
-                        <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-black shadow-md shadow-blue-500/20">
-                            D
+                <div className="border border-blue-500/30 rounded-2xl p-5 bg-blue-500/5 shadow-sm space-y-4 flex flex-col justify-between">
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-2 border-b border-blue-500/10 pb-2">
+                            <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-black shadow-md shadow-blue-500/20">
+                                D
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-sm text-blue-700 dark:text-blue-400">Notificación al Destinatario</h4>
+                                <p className="text-[10px] text-blue-600 dark:text-blue-500">Enviar detalles por WhatsApp</p>
+                            </div>
                         </div>
-                        <div>
-                            <h4 className="font-bold text-sm text-blue-700 dark:text-blue-400">Notificación al Destinatario</h4>
-                            <p className="text-[10px] text-blue-600 dark:text-blue-500">Enviar detalles por WhatsApp</p>
+                        <div className="space-y-3">
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-blue-800 dark:text-blue-300">Nombre del Destinatario</Label>
+                                <Input
+                                    value={receiverName}
+                                    onChange={(e) => setReceiverName(e.target.value)}
+                                    className="h-10 bg-background/50 border-blue-500/20 focus:border-blue-500 dark:bg-card/50"
+                                    placeholder="Nombre completo"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-blue-800 dark:text-blue-300">Teléfono del Destinatario</Label>
+                                <Input
+                                    value={receiverPhone}
+                                    onChange={(e) => setReceiverPhone(e.target.value)}
+                                    className="h-10 bg-background/50 border-blue-500/20 focus:border-blue-500 dark:bg-card/50"
+                                    placeholder="Ej: 71234567"
+                                />
+                            </div>
+                            <div className="space-y-1 flex flex-col">
+                                <div className="flex items-center justify-between mb-1">
+                                    <Label className="text-xs font-bold text-blue-800 dark:text-blue-300">Mensaje de Notificación (Editable)</Label>
+                                    {isReceiverMessageEdited && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsReceiverMessageEdited(false)}
+                                            className="text-blue-600 hover:text-blue-700 text-[10px] font-bold underline"
+                                        >
+                                            Restablecer original
+                                        </button>
+                                    )}
+                                </div>
+                                <Textarea
+                                    value={receiverMessage}
+                                    onChange={(e) => {
+                                        setReceiverMessage(e.target.value);
+                                        setIsReceiverMessageEdited(true);
+                                    }}
+                                    className="min-h-[160px] text-xs font-mono bg-background/50 border-blue-500/20 focus:border-blue-500 dark:bg-card/50 p-3 leading-relaxed"
+                                    placeholder="Redacte el mensaje aquí..."
+                                />
+                            </div>
                         </div>
                     </div>
-                    <div className="space-y-3">
-                        <div className="space-y-1">
-                            <Label className="text-xs font-bold text-blue-800 dark:text-blue-300">Nombre del Destinatario</Label>
-                            <Input
-                                value={receiverName}
-                                onChange={(e) => setReceiverName(e.target.value)}
-                                className="h-10 bg-background/50 border-blue-500/20 focus:border-blue-500 dark:bg-card/50"
-                                placeholder="Nombre completo"
-                            />
-                        </div>
-                        <div className="space-y-1">
-                            <Label className="text-xs font-bold text-blue-800 dark:text-blue-300">Teléfono del Destinatario</Label>
-                            <Input
-                                value={receiverPhone}
-                                onChange={(e) => setReceiverPhone(e.target.value)}
-                                className="h-10 bg-background/50 border-blue-500/20 focus:border-blue-500 dark:bg-card/50"
-                                placeholder="Ej: 71234567"
-                            />
-                        </div>
+                    <div className="pt-2">
                         <Button
                             type="button"
                             onClick={() => {
@@ -1027,18 +1131,10 @@ export default function ShipmentDetails() {
                                     toast.error("Número de teléfono inválido");
                                     return;
                                 }
-                                const originOffice = offices.find(o => o.id === originId);
-                                const destOffice = offices.find(o => o.id === destinationId);
-                                const originCityName = originOffice?.city?.name || "";
-                                const destCityName = destOffice?.city?.name || "";
-                                const detailText = `Envío de ${type === 'paquete' ? 'Paquete 📦' : 'Sobre ✉️'} (${weight || 0} kg) desde ${originCityName} (${originOffice?.name || ''}) hasta ${destCityName} (${destOffice?.name || ''}). Costo: ${price || 0} Bs.`;
-                                const trackingUrl = `http://localhost:5173/tracking?code=${shipment?.tracking_code || ""}`;
-                                const message = `Hola, ${receiverName}:\n${detailText}\nlink de código de seguimiento: ${trackingUrl}`;
-
-                                window.open(`https://wa.me/591${receiverPhone}?text=${encodeURIComponent(message)}`, '_blank');
+                                window.open(`https://wa.me/591${receiverPhone}?text=${encodeURIComponent(receiverMessage)}`, '_blank');
                             }}
                             disabled={!receiverPhone || receiverPhone.length < 7}
-                            className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-bold gap-2 mt-2 shadow-md shadow-blue-600/10 border-0"
+                            className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-bold gap-2 shadow-md shadow-blue-600/10 border-0"
                         >
                             <FaWhatsapp className="w-5 h-5" /> Enviar notificación
                         </Button>
