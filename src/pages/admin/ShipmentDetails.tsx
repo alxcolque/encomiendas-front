@@ -44,6 +44,8 @@ import { useClientStore } from "@/stores/clientStore";
 import { useRouteValueStore } from "@/stores/routeValueStore";
 import { ENV } from "@/config/env";
 import { cn } from "@/lib/utils";
+import { Switch } from "@radix-ui/react-switch";
+import { FaWhatsapp } from "react-icons/fa6";
 
 /* ─── Price Calculation ─── */
 function calculateTotal(
@@ -910,14 +912,14 @@ export default function ShipmentDetails() {
                             </Label>
                         </div>
 
-                        <div className={cn("flex items-center space-x-2 pt-2 border-t border-border", isFullEditable ? "cursor-pointer" : "opacity-50 pointer-events-none")} onClick={() => isFullEditable && setWithInvoice(!withInvoice)}>
+                        {/* <div className={cn("flex items-center space-x-2 pt-2 border-t border-border", isFullEditable ? "cursor-pointer" : "opacity-50 pointer-events-none")} onClick={() => isFullEditable && setWithInvoice(!withInvoice)}>
                             <div className={cn("w-6 h-6 rounded border-2 flex items-center justify-center transition-all", withInvoice ? "bg-blue-500 border-blue-500" : "border-border bg-muted")}>
                                 {withInvoice && <CheckCircle2 className="h-4 w-4 text-white" />}
                             </div>
                             <Label className="text-sm font-bold text-foreground cursor-pointer flex items-center gap-2">
                                 <FileText className={cn("h-4 w-4", withInvoice ? "text-blue-500" : "text-muted-foreground")} /> Con Factura
                             </Label>
-                        </div>
+                        </div> */}
                     </div>
 
                 </div>
@@ -931,6 +933,119 @@ export default function ShipmentDetails() {
                     </Button>
                 )}
             </div>
+            {/* Campos preparados para enviar al WhatsApp al remitente y destinatario */}
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {/* Remitente */}
+                <div className="border border-emerald-500/30 rounded-2xl p-5 bg-emerald-500/5 shadow-sm space-y-4">
+                    <div className="flex items-center gap-2 border-b border-emerald-500/10 pb-2">
+                        <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs font-black shadow-md shadow-emerald-500/20">
+                            R
+                        </div>
+                        <div>
+                            <h4 className="font-bold text-sm text-emerald-700 dark:text-emerald-400">Notificación al Remitente</h4>
+                            <p className="text-[10px] text-emerald-600 dark:text-emerald-500">Enviar detalles por WhatsApp</p>
+                        </div>
+                    </div>
+                    <div className="space-y-3">
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-emerald-800 dark:text-emerald-300">Nombre del Remitente</Label>
+                            <Input
+                                value={senderName}
+                                onChange={(e) => setSenderName(e.target.value)}
+                                className="h-10 bg-background/50 border-emerald-500/20 focus:border-emerald-500 dark:bg-card/50"
+                                placeholder="Nombre completo"
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-emerald-800 dark:text-emerald-300">Teléfono del Remitente</Label>
+                            <Input
+                                value={senderPhone}
+                                onChange={(e) => setSenderPhone(e.target.value)}
+                                className="h-10 bg-background/50 border-emerald-500/20 focus:border-emerald-500 dark:bg-card/50"
+                                placeholder="Ej: 71234567"
+                            />
+                        </div>
+                        <Button
+                            type="button"
+                            onClick={() => {
+                                if (!senderPhone || senderPhone.length < 7) {
+                                    toast.error("Número de teléfono inválido");
+                                    return;
+                                }
+                                const originOffice = offices.find(o => o.id === originId);
+                                const destOffice = offices.find(o => o.id === destinationId);
+                                const originCityName = originOffice?.city?.name || "";
+                                const destCityName = destOffice?.city?.name || "";
+                                const detailText = `Envío de ${type === 'paquete' ? 'Paquete 📦' : 'Sobre ✉️'} (${weight || 0} kg) desde ${originCityName} (${originOffice?.name || ''}) hasta ${destCityName} (${destOffice?.name || ''}). Costo: ${price || 0} Bs.`;
+                                const trackingUrl = `http://localhost:5173/tracking?code=${shipment?.tracking_code || ""}`;
+                                const message = `Hola, ${senderName}:\n${detailText}\nlink de código de seguimiento: ${trackingUrl}`;
+
+                                window.open(`https://wa.me/591${senderPhone}?text=${encodeURIComponent(message)}`, '_blank');
+                            }}
+                            disabled={!senderPhone || senderPhone.length < 7}
+                            className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2 mt-2 shadow-md shadow-emerald-600/10 border-0"
+                        >
+                            <FaWhatsapp className="w-5 h-5" /> Enviar notificación
+                        </Button>
+                    </div>
+                </div>
+
+                {/* Destinatario */}
+                <div className="border border-blue-500/30 rounded-2xl p-5 bg-blue-500/5 shadow-sm space-y-4">
+                    <div className="flex items-center gap-2 border-b border-blue-500/10 pb-2">
+                        <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-black shadow-md shadow-blue-500/20">
+                            D
+                        </div>
+                        <div>
+                            <h4 className="font-bold text-sm text-blue-700 dark:text-blue-400">Notificación al Destinatario</h4>
+                            <p className="text-[10px] text-blue-600 dark:text-blue-500">Enviar detalles por WhatsApp</p>
+                        </div>
+                    </div>
+                    <div className="space-y-3">
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-blue-800 dark:text-blue-300">Nombre del Destinatario</Label>
+                            <Input
+                                value={receiverName}
+                                onChange={(e) => setReceiverName(e.target.value)}
+                                className="h-10 bg-background/50 border-blue-500/20 focus:border-blue-500 dark:bg-card/50"
+                                placeholder="Nombre completo"
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-blue-800 dark:text-blue-300">Teléfono del Destinatario</Label>
+                            <Input
+                                value={receiverPhone}
+                                onChange={(e) => setReceiverPhone(e.target.value)}
+                                className="h-10 bg-background/50 border-blue-500/20 focus:border-blue-500 dark:bg-card/50"
+                                placeholder="Ej: 71234567"
+                            />
+                        </div>
+                        <Button
+                            type="button"
+                            onClick={() => {
+                                if (!receiverPhone || receiverPhone.length < 7) {
+                                    toast.error("Número de teléfono inválido");
+                                    return;
+                                }
+                                const originOffice = offices.find(o => o.id === originId);
+                                const destOffice = offices.find(o => o.id === destinationId);
+                                const originCityName = originOffice?.city?.name || "";
+                                const destCityName = destOffice?.city?.name || "";
+                                const detailText = `Envío de ${type === 'paquete' ? 'Paquete 📦' : 'Sobre ✉️'} (${weight || 0} kg) desde ${originCityName} (${originOffice?.name || ''}) hasta ${destCityName} (${destOffice?.name || ''}). Costo: ${price || 0} Bs.`;
+                                const trackingUrl = `http://localhost:5173/tracking?code=${shipment?.tracking_code || ""}`;
+                                const message = `Hola, ${receiverName}:\n${detailText}\nlink de código de seguimiento: ${trackingUrl}`;
+
+                                window.open(`https://wa.me/591${receiverPhone}?text=${encodeURIComponent(message)}`, '_blank');
+                            }}
+                            disabled={!receiverPhone || receiverPhone.length < 7}
+                            className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-bold gap-2 mt-2 shadow-md shadow-blue-600/10 border-0"
+                        >
+                            <FaWhatsapp className="w-5 h-5" /> Enviar notificación
+                        </Button>
+                    </div>
+                </div>
+            </div>
+
         </div>
     );
 }

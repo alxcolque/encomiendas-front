@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,13 +24,14 @@ const statusLabels: Record<ShipmentStatus, string> = {
 };
 
 export default function TrackingPage() {
+  const { code: pathCode } = useParams<{ code?: string }>();
   const [code, setCode] = useState("");
   const [searched, setSearched] = useState(false);
   const { currentShipment, trackShipment, isLoading } = useShipmentStore();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    let queryCode = params.get("CODE_TRACKING") || params.get("code");
+    let queryCode = pathCode || params.get("CODE_TRACKING") || params.get("code");
 
     // Fallback para atrapar formatos como ?=CODE_TRACKING=KOL-... 
     if (!queryCode) {
@@ -45,7 +47,7 @@ export default function TrackingPage() {
       trackShipment(formattedCode);
       setSearched(true);
     }
-  }, [trackShipment]);
+  }, [trackShipment, pathCode]);
 
   const handleSearch = () => {
     trackShipment(code);
