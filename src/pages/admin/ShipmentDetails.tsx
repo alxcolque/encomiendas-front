@@ -83,7 +83,7 @@ function calculateTotal(
     if (total < 0) total = 0;
 
     if (withInvoice) {
-        total = total * 1.16;
+        total = total / 0.84;
     }
 
     return Math.ceil(total * 2) / 2;

@@ -156,7 +156,7 @@ function calculateTotal(
     if (total < 0) total = 0;
 
     if (withIva) {
-        total = total * 1.16;
+        total = total / 0.84; // 16% de IVA
     }
 
     return Math.ceil(total * 2) / 2;

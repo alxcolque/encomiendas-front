@@ -1,4 +1,4 @@
-import { useState, forwardRef } from "react";
+import { useState, forwardRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -6,7 +6,7 @@ import {
     ArrowLeft,
     CheckCircle2,
     CreditCard,
-    
+
     MapPin,
     MapPinOff,
     MessageCircle,
@@ -18,6 +18,7 @@ import {
     User,
     Wallet,
 } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa6";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,6 +46,19 @@ const schema = z.object({
 
     paymentBy: z.enum(["remitente", "destinatario"]),
     isFragile: z.boolean().default(false),
+}).superRefine((data, ctx) => {
+    if (data.senderCI && data.recipientCI && data.senderCI.trim().toLowerCase() === data.recipientCI.trim().toLowerCase()) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "El carnet del remitente y del destinatario no pueden ser iguales",
+            path: ["senderCI"],
+        });
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "El carnet del destinatario y del remitente no pueden ser iguales",
+            path: ["recipientCI"],
+        });
+    }
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -152,6 +166,7 @@ export default function ShipmentPeopleForm({
         handleSubmit,
         watch,
         setValue,
+        getValues,
         formState: { errors },
     } = useForm<FormValues>({
         resolver: zodResolver(schema),
@@ -181,6 +196,22 @@ export default function ShipmentPeopleForm({
 
     const senderCI = watch("senderCI");
     const recipientCI = watch("recipientCI");
+
+    useEffect(() => {
+        if (getValues("senderId")) {
+            setValue("senderId", "");
+            setValue("senderName", "");
+            setValue("senderPhone", "");
+        }
+    }, [senderCI, setValue, getValues]);
+
+    useEffect(() => {
+        if (getValues("recipientId")) {
+            setValue("recipientId", "");
+            setValue("recipientName", "");
+            setValue("recipientPhone", "");
+        }
+    }, [recipientCI, setValue, getValues]);
 
     const handleSearchClient = async (type: 'sender' | 'recipient') => {
         const ci = type === 'sender' ? senderCI : recipientCI;
@@ -291,7 +322,7 @@ export default function ShipmentPeopleForm({
 
     const onError = (errors: any) => {
         console.log("Validation Errors:", errors);
-        toast.error("Por favor revise los datos del formulario. Faltan campos obligatorios.");
+        toast.error("Por favor revise los datos del formulario. Revise los campos obligatorios o de identificación.");
     };
 
     return (
@@ -360,7 +391,12 @@ export default function ShipmentPeopleForm({
                                 type="button"
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => setIsNewSender(true)}
+                                onClick={() => {
+                                    setIsNewSender(true);
+                                    setValue("senderId", "");
+                                    setValue("senderName", "");
+                                    setValue("senderPhone", "");
+                                }}
                                 className="h-8 text-xs gap-1 text-primary hover:text-primary hover:bg-primary/10"
                             >
                                 <Plus className="h-3 w-3" />
@@ -372,8 +408,14 @@ export default function ShipmentPeopleForm({
                                 type="button"
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => setIsNewSender(false)}
-                                className="h-8 text-xs gap-1 text-muted-foreground hover:bg-muted"
+                                onClick={() => {
+                                    setIsNewSender(false);
+                                    setValue("senderId", "");
+                                    setValue("senderName", "");
+                                    setValue("senderPhone", "");
+                                    setValue("senderCI", "");
+                                }}
+                                className="h-8 text-xs gap-1 text-white bg-success hover:bg-success/70"
                             >
                                 Buscar existente
                             </Button>
@@ -465,13 +507,15 @@ export default function ShipmentPeopleForm({
                                         {...register("senderPhone")}
                                     />
                                     <Button
+                                        title="Verificar el whatsapp"
                                         type="button"
                                         variant="outline"
                                         size="icon"
                                         className="h-11 w-11 shrink-0 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50"
                                         onClick={() => handleWhatsApp(watch("senderPhone"), watch("senderName"))}
+                                        disabled={!watch("senderPhone") || watch("senderPhone").length < 7}
                                     >
-                                        <MessageCircle className="h-5 w-5" />
+                                        <FaWhatsapp className="h-5 w-5" />
                                     </Button>
                                     {!defaultSender && !isNewSender && watch("senderId") && (watch("senderPhone") !== origSenderPhone || watch("senderName") !== origSenderName) && (
                                         <Button
@@ -512,7 +556,12 @@ export default function ShipmentPeopleForm({
                                 type="button"
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => setIsNewRecipient(true)}
+                                onClick={() => {
+                                    setIsNewRecipient(true);
+                                    setValue("recipientId", "");
+                                    setValue("recipientName", "");
+                                    setValue("recipientPhone", "");
+                                }}
                                 className="h-8 text-xs gap-1 text-primary hover:text-primary hover:bg-primary/10"
                             >
                                 <Plus className="h-3 w-3" />
@@ -524,8 +573,14 @@ export default function ShipmentPeopleForm({
                                 type="button"
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => setIsNewRecipient(false)}
-                                className="h-8 text-xs gap-1 text-muted-foreground hover:bg-muted"
+                                onClick={() => {
+                                    setIsNewRecipient(false);
+                                    setValue("recipientId", "");
+                                    setValue("recipientName", "");
+                                    setValue("recipientPhone", "");
+                                    setValue("recipientCI", "");
+                                }}
+                                className="h-8 text-xs gap-1 text-white bg-success hover:bg-success/70"
                             >
                                 Buscar existente
                             </Button>
@@ -612,12 +667,14 @@ export default function ShipmentPeopleForm({
                                     />
                                     <Button
                                         type="button"
+                                        title="Verificar el whatsapp"
                                         variant="outline"
                                         size="icon"
                                         className="h-11 w-11 shrink-0 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50"
                                         onClick={() => handleWhatsApp(watch("recipientPhone"), watch("recipientName"))}
+                                        disabled={!watch("recipientPhone") || watch("recipientPhone").length < 7}
                                     >
-                                        <MessageCircle className="h-5 w-5" />
+                                        <FaWhatsapp className="h-5 w-5" />
                                     </Button>
                                     {!isNewRecipient && watch("recipientId") && (watch("recipientPhone") !== origRecipientPhone || watch("recipientName") !== origRecipientName) && (
                                         <Button
