@@ -15,6 +15,13 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from "@/components/ui/dialog";
+import {
     ArrowLeft,
     Package,
     MapPin,
@@ -186,6 +193,9 @@ export default function ShipmentDetails() {
     const [receiverName, setReceiverName] = useState("");
     const [receiverCi, setReceiverCi] = useState("");
     const [receiverPhone, setReceiverPhone] = useState("");
+
+    const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<number>(1);
 
     const { searchClients } = useClientStore();
     const [isSearchingSender, setIsSearchingSender] = useState(false);
@@ -526,21 +536,20 @@ ${line}
         }
     };
 
-    const handleGenerateInvoice = async () => {
+    const handleGenerateInvoiceConfirm = async () => {
         if (!shipment) return;
-        const confirm = window.confirm("¿Estás seguro de generar la factura para esta encomienda?");
-        if (!confirm) return;
 
         setIsGeneratingInvoice(true);
         try {
             await ENV.post(`/shipments/${shipment.id}/invoice`, {
-                // invoice_type: "sin",
+                payment_method: selectedPaymentMethod,
                 invoice_name: senderName,
                 invoice_nit: senderCi || "0",
                 business_name: import.meta.env.VITE_COMPANY_NAME,
                 nit_ci_emisor: import.meta.env.VITE_COMPANY_NIT,
             });
             toast.success("Factura generada exitosamente");
+            setIsPaymentDialogOpen(false);
             loadShipment(shipment.id);
         } catch (error) {
             toast.error("Error al generar factura. Revisa si ya fue generada.");
@@ -589,7 +598,7 @@ ${line}
                         </Button>
                     ) : (
                         canCollect && (
-                            <Button variant="default" className="gap-2 h-11 sm:h-12 bg-amber-500 hover:bg-amber-600 text-white" onClick={handleGenerateInvoice} disabled={isGeneratingInvoice}>
+                            <Button variant="default" className="gap-2 h-11 sm:h-12 bg-amber-500 hover:bg-amber-600 text-white" onClick={() => setIsPaymentDialogOpen(true)} disabled={isGeneratingInvoice}>
                                 <CreditCard className="w-4 h-4" />
                                 {isGeneratingInvoice ? "Proc..." : "Cobrar"}
                             </Button>
@@ -1141,6 +1150,72 @@ ${line}
                     </div>
                 </div>
             </div>
+
+            <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
+                <DialogContent className="sm:max-w-md bg-background/95 backdrop-blur-xl border-border">
+                    <DialogHeader>
+                        <DialogTitle className="text-xl font-bold flex items-center gap-2">
+                            <CreditCard className="w-5 h-5 text-amber-500" />
+                            Seleccionar Método de Pago
+                        </DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <p className="text-sm text-muted-foreground">
+                            Elija el método de pago para registrar el cobro de esta encomienda:
+                        </p>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            {/* Option 1: Cash */}
+                            <button
+                                type="button"
+                                onClick={() => setSelectedPaymentMethod(1)}
+                                className={cn(
+                                    "flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all gap-2 cursor-pointer focus:outline-none",
+                                    selectedPaymentMethod === 1
+                                        ? "border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                                        : "border-border hover:border-emerald-500/50 hover:bg-emerald-500/5"
+                                )}
+                            >
+                                <Wallet className="w-8 h-8" />
+                                <span className="font-bold text-sm">En efectivo</span>
+                            </button>
+
+                            {/* Option 2: QR */}
+                            <button
+                                type="button"
+                                onClick={() => setSelectedPaymentMethod(2)}
+                                className={cn(
+                                    "flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all gap-2 cursor-pointer focus:outline-none",
+                                    selectedPaymentMethod === 2
+                                        ? "border-blue-500 bg-blue-500/10 text-blue-700 dark:text-blue-400"
+                                        : "border-border hover:border-blue-500/50 hover:bg-blue-500/5"
+                                )}
+                            >
+                                <Zap className="w-8 h-8" />
+                                <span className="font-bold text-sm">Por QR</span>
+                            </button>
+                        </div>
+                    </div>
+                    <DialogFooter className="flex sm:justify-end gap-2">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setIsPaymentDialogOpen(false)}
+                            disabled={isGeneratingInvoice}
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            type="button"
+                            onClick={handleGenerateInvoiceConfirm}
+                            disabled={isGeneratingInvoice || !selectedPaymentMethod}
+                            className="bg-amber-500 hover:bg-amber-600 text-white font-bold"
+                        >
+                            {isGeneratingInvoice ? "Procesando..." : "Confirmar Cobro"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
         </div>
     );
