@@ -12,7 +12,22 @@ export interface ReportData {
         revenue: { label: string; revenue: number }[];
         volume: { label: string; packages: number }[];
         status: { browser: string; visitors: number; fill: string }[];
-    }
+    };
+    invoices: {
+        id: number;
+        invoice_number: string | null;
+        emit_date: string | null;
+        receipt_name: string;
+        doc_num: string;
+        payment_method: number;
+        total: string | number;
+        status: string;
+        created_at: string;
+        shipment?: {
+            id: number;
+            tracking_code: string;
+        } | null;
+    }[];
 }
 
 interface ReportState {

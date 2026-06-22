@@ -218,9 +218,9 @@ export default function ShipmentDetails() {
         const statusText = {
             quote: "COTIZACIÓN",
             created: "REGISTRADO",
-            in_transit: "EN TRÁNSITO 🚚",
-            at_office: "LISTO EN AGENCIA 🏢",
-            delivered: "ENTREGADO ✅"
+            in_transit: "EN TRÁNSITO",
+            at_office: "LISTO EN AGENCIA",
+            delivered: "ENTREGADO"
         }[status] || status.toUpperCase();
 
         const isPaid = !!shipment.invoice;
@@ -229,7 +229,7 @@ export default function ShipmentDetails() {
         const line = "----------------------------------------";
         return `Hola, ${name}:
 ${line}
-📄 DETALLE DE ENCOMIENDA (TICKET)
+DETALLE DE ENCOMIENDA (TICKET)
 ${line}
 Código: ${shipment.tracking_code}
 Estado: ${statusText}
@@ -238,12 +238,12 @@ ${line}
 Remitente: ${senderName} (${senderPhone})
 Destinatario: ${receiverName} (${receiverPhone})
 ${line}
-Detalle: ${type === 'paquete' ? 'Paquete 📦' : 'Sobre ✉️'} de ${weight || 0} kg
+Detalle: ${type === 'paquete' ? 'Paquete' : 'Sobre'} de ${weight || 0} kg
 Ruta: ${originCityName} -> ${destCityName}
 Monto: ${price || 0} Bs.
 ${line}
 Seguimiento en línea:
-http://localhost:5173/tracking?code=${shipment.tracking_code}
+${window.location.protocol}//${window.location.host}/tracking?code=${shipment.tracking_code}
 ${line}
 ¡Gracias por su preferencia!`;
     }, [shipment, offices, originId, destinationId, status, paymentBy, senderName, senderPhone, receiverName, receiverPhone, type, weight, price]);
