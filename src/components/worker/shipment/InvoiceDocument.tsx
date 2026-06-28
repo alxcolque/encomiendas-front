@@ -286,39 +286,34 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, onClo
                 __html: `
                 @media print {
                     @page { 
-                        size: 80mm auto;
+                        size: 58mm auto;
                         margin: 0; 
                     }
                     html, body { 
                         margin: 0 !important; 
                         padding: 0 !important; 
+                        width: 58mm !important;
                         background: white !important; 
                         color: black !important;
+                        -webkit-print-color-adjust: exact !important; 
+                        color-adjust: exact !important;
+                    }
+                    /* Force black text for thermal printing */
+                    * {
+                        color: #000 !important;
                     }
                     .print\\:hidden { 
                         display: none !important; 
                     }
-                }
-                
-                @media print {
                     .ticket-container {
-                        width: 80mm !important;
-                        max-width: 80mm !important;
-                        padding: 2mm !important;
+                        width: 58mm !important;
+                        max-width: 58mm !important;
+                        padding: 1mm !important;
                         margin: 0 auto !important;
                         background: white !important;
                         font-family: monospace !important;
                         border: none !important;
                         box-shadow: none !important;
-                    }
-                }
-                
-                /* Auto adjustment for 58mm printers */
-                @media print and (max-width: 60mm) {
-                    .ticket-container {
-                        width: 58mm !important;
-                        max-width: 58mm !important;
-                        padding: 1mm !important;
                         font-size: 10px !important;
                     }
                     .ticket-divider {

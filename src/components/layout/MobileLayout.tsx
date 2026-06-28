@@ -32,22 +32,22 @@ export function MobileLayout({
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col print:min-h-0 print:bg-white">
       {/* Top Navbar */}
-      {showHeader && <TopNavbar />}
+      {showHeader && <TopNavbar className="print:hidden" />}
 
       <main className={cn(
-        "flex-1 overflow-x-hidden",
+        "flex-1 overflow-x-hidden print:overflow-visible print:pb-0",
         showNav && navItems.length > 0 && "pb-24"
       )}>
-        <PullToRefresh className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <PullToRefresh className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 print:max-w-full print:p-0">
           {children ? children : <Outlet />}
         </PullToRefresh>
       </main>
 
       {/* Bottom navigation */}
       {showNav && navItems.length > 0 && (
-        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-xl border-t border-border">
+        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-xl border-t border-border print:hidden">
           <div className="flex justify-around items-center max-w-lg mx-auto py-2">
             {navItems.map((item, index) => {
               const Icon = item.icon;

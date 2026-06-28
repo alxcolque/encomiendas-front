@@ -365,3 +365,14 @@
     animation: scan 2.5s ease-in-out infinite;
   }
 }
+
+@media print {
+  header,
+  nav,
+  footer,
+  aside,
+  .print-hidden,
+  .print\:hidden {
+    display: none !important;
+  }
+}
