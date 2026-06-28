@@ -286,13 +286,13 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, onClo
                 __html: `
                 @media print {
                     @page { 
-                        size: 80mm auto;
+                        size: 100mm auto;
                         margin: 0; 
                     }
                     html, body { 
                         margin: 0 !important; 
                         padding: 0 !important; 
-                        width: 80mm !important;
+                        width: 100mm !important;
                         background: white !important; 
                         color: black !important;
                         -webkit-print-color-adjust: exact !important; 
@@ -306,8 +306,8 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, onClo
                         display: none !important; 
                     }
                     .ticket-container {
-                        width: 80mm !important;
-                        max-width: 80mm !important;
+                        width: 100mm !important;
+                        max-width: 100mm !important;
                         padding: 1mm !important;
                         margin: 0 auto !important;
                         background: white !important;
