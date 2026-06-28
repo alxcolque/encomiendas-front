@@ -13,7 +13,7 @@ interface InvoiceDocumentProps {
 
 export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, onClose }) => {
     const { user } = useAuthStore();
-    
+
     const handlePrint = () => {
         window.print();
     };
@@ -21,7 +21,7 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, onClo
     // Cast shipment properties if available from API response
     const shipment = (invoice as any).shipment;
     const trackingCode = shipment?.tracking_code || invoice.invoice_number || 'KOLMOX';
-    
+
     // Generate QR code URL
     const trackingUrl = `${window.location.protocol}//${window.location.host}/tracking?code=${trackingCode}`;
     const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(trackingUrl)}`;
@@ -122,7 +122,7 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, onClo
 
             {/* Thermal Ticket Container */}
             <div className="w-full max-w-[80mm] bg-white text-black p-4 font-mono text-xs shadow-md border border-gray-200 print:shadow-none print:border-none print:p-2 ticket-container select-text leading-tight tracking-wide">
-                
+
                 {/* 1. Logo / Name & Matriz Info */}
                 <div className="text-center mb-2">
                     <h2 className="text-lg font-black tracking-widest">{import.meta.env.VITE_COMPANY_NAME || 'KOLMOX'}</h2>
@@ -133,7 +133,7 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, onClo
                     <p className="text-[9px]">La Paz - Bolivia</p>
                     <p className="text-[9px]">NIT: {import.meta.env.VITE_COMPANY_NIT || '12345678'}</p>
                 </div>
-                
+
                 <div className="text-center font-bold text-[10px] ticket-divider my-1 text-black opacity-80">
                     --------------------------------
                 </div>
@@ -286,13 +286,13 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, onClo
                 __html: `
                 @media print {
                     @page { 
-                        size: 58mm auto;
+                        size: 80mm auto;
                         margin: 0; 
                     }
                     html, body { 
                         margin: 0 !important; 
                         padding: 0 !important; 
-                        width: 58mm !important;
+                        width: 80mm !important;
                         background: white !important; 
                         color: black !important;
                         -webkit-print-color-adjust: exact !important; 
@@ -306,8 +306,8 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, onClo
                         display: none !important; 
                     }
                     .ticket-container {
-                        width: 58mm !important;
-                        max-width: 58mm !important;
+                        width: 80mm !important;
+                        max-width: 80mm !important;
                         padding: 1mm !important;
                         margin: 0 auto !important;
                         background: white !important;
