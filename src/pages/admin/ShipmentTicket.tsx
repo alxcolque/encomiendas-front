@@ -66,7 +66,7 @@ export default function ShipmentTicket() {
     const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(trackingUrl)}`;
 
     return (
-        <div className="min-h-screen bg-muted/30 text-black p-4 font-sans print:p-0 print:m-0 print:min-h-0 print:h-auto overflow-x-hidden">
+        <div className="min-h-screen bg-muted/30 text-black p-4 font-sans print:bg-white print:p-0 print:py-0 print:min-h-0 overflow-x-hidden">
             {/* Controls - hidden when printing */}
             <div className="max-w-md mx-auto mb-8 flex justify-between print:hidden gap-4">
                 <Button
@@ -147,7 +147,7 @@ export default function ShipmentTicket() {
                         font-family: monospace !important;
                         border: none !important;
                         box-shadow: none !important;
-                        font-size: 25px !important;
+                        font-size: 30px !important;
                     }
                     .ticket-divider {
                         letter-spacing: -1.5px !important;

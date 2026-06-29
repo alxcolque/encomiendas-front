@@ -23,8 +23,7 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, onClo
     const trackingCode = shipment?.tracking_code || invoice.invoice_number || 'KOLMOX';
 
     // Generate QR code URL
-    const trackingUrl = `${window.location.protocol}//${window.location.host}/tracking?code=${trackingCode}`;
-    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(trackingUrl)}`;
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(trackingCode)}`;
 
     // Operator and box details
     const operatorName = user?.name || "Cajero";
@@ -314,7 +313,7 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, onClo
                         font-family: monospace !important;
                         border: none !important;
                         box-shadow: none !important;
-                        font-size: 25px !important;
+                        font-size: 30px !important;
                     }
                     .ticket-divider {
                         letter-spacing: -1.5px !important;
