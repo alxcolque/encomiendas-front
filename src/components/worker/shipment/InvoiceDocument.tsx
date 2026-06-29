@@ -313,7 +313,7 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, onClo
                         font-family: monospace !important;
                         border: none !important;
                         box-shadow: none !important;
-                        font-size: 30px !important;
+                        font-size: 20px !important;
                     }
                     .ticket-divider {
                         letter-spacing: -1.5px !important;
