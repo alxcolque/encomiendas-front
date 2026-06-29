@@ -140,8 +140,8 @@ export default function ShipmentTicket() {
                     }
                     .ticket-container {
                         width: 58mm !important;
-                        max-width: 58mm !important;
-                        padding: 2mm !important;
+                        max-width: 90mm !important;
+                        padding: 1mm !important;
                         margin: 0 auto !important;
                         background: white !important;
                         font-family: monospace !important;
@@ -151,8 +151,8 @@ export default function ShipmentTicket() {
                         line-height: 1.2 !important;
                     }
                     .ticket-container img {
-                        width: 40mm !important;
-                        height: 40mm !important;
+                        width: 70mm !important;
+                        height: 70mm !important;
                         margin: 0 auto !important;
                     }
                     .ticket-container h1 {
