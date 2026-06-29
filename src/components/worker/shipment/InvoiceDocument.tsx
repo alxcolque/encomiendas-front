@@ -133,19 +133,15 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, onClo
                     <p className="text-[9px]">NIT: {import.meta.env.VITE_COMPANY_NIT || '12345678'}</p>
                 </div>
 
-                <div className="text-center font-bold text-[10px] ticket-divider my-1 text-black opacity-80">
-                    --------------------------------
-                </div>
-
                 {/* 2. Título */}
                 <div className="text-center my-1">
                     <h1 className="text-sm font-black tracking-widest">FACTURA</h1>
                     <p className="text-[9px] font-bold uppercase">(Con Derecho a Crédito Fiscal)</p>
                 </div>
 
-                <div className="text-center font-bold text-[10px] ticket-divider my-1 text-black opacity-80">
+                {/* <div className="text-center font-bold text-[10px] ticket-divider my-1 text-black opacity-80">
                     --------------------------------
-                </div>
+                </div> */}
 
                 {/* 3. Información Fiscal */}
                 <div className="space-y-0.5 text-[10px]">
@@ -155,19 +151,11 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, onClo
                     <p><span className="font-bold">Fecha/Hora:</span> {invoice.emit_date ? format(new Date(invoice.emit_date), "dd/MM/yyyy HH:mm aa", { locale: es }) : 'N/A'}</p>
                 </div>
 
-                <div className="text-center font-bold text-[10px] ticket-divider my-1 text-black opacity-80">
-                    --------------------------------
-                </div>
-
                 {/* 4. Datos del Cliente */}
                 <div className="space-y-0.5 text-[10px]">
                     <p className="font-bold uppercase tracking-wider text-[11px] mb-0.5">Cliente:</p>
                     <p><span className="font-bold">Nombre:</span> {invoice.receipt_name}</p>
                     <p><span className="font-bold">NIT/CI:</span> {invoice.doc_num}{invoice.complement ? `-${invoice.complement}` : ''}</p>
-                </div>
-
-                <div className="text-center font-bold text-[10px] ticket-divider my-1 text-black opacity-80">
-                    --------------------------------
                 </div>
 
                 {/* 5. Información del Envío */}
@@ -183,10 +171,6 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, onClo
                     <p><span className="font-bold">Caja:</span> {boxNumber}</p>
                 </div>
 
-                <div className="text-center font-bold text-[10px] ticket-divider my-1 text-black opacity-80">
-                    --------------------------------
-                </div>
-
                 {/* 6. Detalle */}
                 <div className="text-[10px] space-y-2">
                     <p className="font-bold uppercase tracking-wider text-[11px] mb-1">Detalle:</p>
@@ -199,10 +183,6 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, onClo
                             )}
                         </div>
                     ))}
-                </div>
-
-                <div className="text-center font-bold text-[10px] ticket-divider my-1 text-black opacity-80">
-                    --------------------------------
                 </div>
 
                 {/* 7. Totales */}
@@ -225,18 +205,13 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, onClo
                     </div>
                 </div>
 
-                <div className="text-center font-bold text-[10px] ticket-divider my-1 text-black opacity-80">
-                    --------------------------------
-                </div>
 
                 {/* 8. Monto Literal */}
                 <div className="text-center text-[10px] uppercase font-bold px-1 my-1 leading-tight">
                     {formatLiteral(Number(invoice.total))}
                 </div>
 
-                <div className="text-center font-bold text-[10px] ticket-divider my-1 text-black opacity-80">
-                    --------------------------------
-                </div>
+
 
                 {/* 9. Código QR */}
                 <div className="flex flex-col items-center justify-center my-3 bg-white p-1">
@@ -254,15 +229,11 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, onClo
                     </svg>
                 </div>
 
-                <div className="text-center font-bold text-[10px] ticket-divider my-1 text-black opacity-80">
-                    --------------------------------
-                </div>
-
                 {/* 11. Pie Legal SIN y Agradecimiento */}
                 <div className="text-center text-[8px] uppercase font-semibold space-y-2 mt-1 leading-normal">
-                    <p className="px-1">
+                    {/* <p className="px-1">
                         "ESTA FACTURA CONTRIBUYE AL DESARROLLO DE NUESTRO PAIS, EL USO ILÍCITO DE ÉSTA SERÁ SANCIONADO DE ACUERDO A LEY"
-                    </p>
+                    </p> */}
                     <p className="italic opacity-85 px-1">
                         Ley N° 453: Tienes derecho a recibir información sobre las características y contenidos de los servicios que utilices.
                     </p>
@@ -272,10 +243,6 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, onClo
                     <p className="text-[9px] font-bold mt-1 lowercase opacity-75">
                         www.kolmox.com
                     </p>
-                </div>
-
-                <div className="text-center font-bold text-[10px] ticket-divider mt-2 mb-1 text-black opacity-80">
-                    ================================
                 </div>
 
             </div>

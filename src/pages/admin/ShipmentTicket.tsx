@@ -84,17 +84,17 @@ export default function ShipmentTicket() {
                 </Button>
             </div>
 
-            {/* Ticket Content - Thermal 90mm Optimized */}
+            {/* Ticket Content - Thermal 58mm Optimized */}
             <div className="bg-white mx-auto p-4 print:p-0 w-full max-w-[280px] ticket-container flex flex-col items-center overflow-hidden font-mono text-black">
                 {/* Tracking Code */}
                 <div className="text-center w-full">
                     <h1 className="text-sm font-black tracking-widest uppercase">TICKET</h1>
-                    <div className="text-xl font-black tracking-tight">{shipment.tracking_code}</div>
+                    <div className="text-xl font-black tracking-tight tracking-code-display">{shipment.tracking_code}</div>
                 </div>
                 {/* Information */}
-                <div className="w-full text-[11px] leading-tight">
-                    <div><span className="font-black uppercase">Rem:</span> <span className="font-semibold">{shipment.sender_name}</span></div>
-                    <div><span className="font-black uppercase">Dest:</span> <span className="font-semibold">{shipment.receiver_name}</span></div>
+                <div className="w-full text-[11px] text-center">
+                    {/* <div><span className="font-black uppercase">Rem:</span> <span className="font-semibold">{shipment.sender_name}</span></div>
+                    <div><span className="font-black uppercase">Dest:</span> <span className="font-semibold">{shipment.receiver_name}</span></div> */}
                     <div><span className="font-black uppercase">Ruta:</span> <span className="font-semibold">{shipment.origin_office?.city?.name} - {shipment.destination_office?.city?.name}</span></div>
                 </div>
 
@@ -114,24 +114,24 @@ export default function ShipmentTicket() {
 
             </div>
 
-            {/* Custom styles for 90mm thermal printing */}
+            {/* Custom styles for 58mm thermal printing (Knup KP-1025) */}
             <style dangerouslySetInnerHTML={{
                 __html: `
                 @media print {
                     @page { 
-                        size: 90mm auto;
+                        size: 58mm auto;
                         margin: 0; 
                     }
                     html, body { 
                         margin: 0 !important; 
                         padding: 0 !important; 
-                        width: 90mm !important;
+                        width: 58mm !important;
                         background: white !important; 
                         color: black !important;
                         -webkit-print-color-adjust: exact !important; 
                         color-adjust: exact !important;
                     }
-                    /* Force black text for thermal printing */
+                    /* Force black text for high contrast on thermal paper */
                     * {
                         color: #000 !important;
                     }
@@ -139,18 +139,30 @@ export default function ShipmentTicket() {
                         display: none !important; 
                     }
                     .ticket-container {
-                        width: 90mm !important;
-                        max-width: 90mm !important;
-                        padding: 1mm !important;
+                        width: 58mm !important;
+                        max-width: 58mm !important;
+                        padding: 2mm !important;
                         margin: 0 auto !important;
                         background: white !important;
                         font-family: monospace !important;
                         border: none !important;
                         box-shadow: none !important;
-                        font-size: 20px !important;
+                        font-size: 11px !important;
+                        line-height: 1.2 !important;
+                    }
+                    .ticket-container img {
+                        width: 40mm !important;
+                        height: 40mm !important;
+                        margin: 0 auto !important;
+                    }
+                    .ticket-container h1 {
+                        font-size: 13px !important;
+                    }
+                    .ticket-container .tracking-code-display {
+                        font-size: 18px !important;
                     }
                     .ticket-divider {
-                        letter-spacing: -1.5px !important;
+                        letter-spacing: -1px !important;
                     }
                 }
             `}} />
